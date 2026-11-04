@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Explica+ — demonstração do template Quadro</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#123524">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Explica+">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F2F7F3; --surface:#FFFFFF; --ink:#123524; --muted:#557263; --acc:#2E8B57; --acc-ink:#FFFFFF; --soft:#DCEBE1;
+  --line:rgba(18,53,36,.14); --warn:#9A5A1E; --warn-bg:#FBE8D2; --bar:#123524; --bar-ink:#E8F3EC;
+  color-scheme:light; box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1A14; --surface:#16241C; --ink:#E4F1E8; --muted:#9BB8A7; --acc:#5CC48A; --acc-ink:#0B2416; --soft:#1F3328;
+    --line:rgba(228,241,232,.14); --warn:#F2B880; --warn-bg:#3A2A17; --bar:#081109; --bar-ink:#CFE5D7; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1A14; --surface:#16241C; --ink:#E4F1E8; --muted:#9BB8A7; --acc:#5CC48A; --acc-ink:#0B2416; --soft:#1F3328;
+  --line:rgba(228,241,232,.14); --warn:#F2B880; --warn-bg:#3A2A17; --bar:#081109; --bar-ink:#CFE5D7; color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 120px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Schibsted Grotesk",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:1.0625rem;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:20;background:var(--bar)}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--acc);outline-offset:3px;border-radius:4px}
+.wrap{max-width:1100px;margin:0 auto;padding:0 clamp(1rem,4vw,2.2rem)}
+
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:10}
+@media (max-width:640px){.top{position:static}.demobar p{flex-basis:100%}}
+.demobar{background:var(--bar);color:var(--bar-ink);font-size:.92rem}
+.demobar .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1rem;min-height:48px;padding-top:.35rem;padding-bottom:.35rem}
+.demobar p{margin:0;flex:1 1 260px}
+.demobar button{font:inherit;font-weight:600;border:1px solid rgba(255,255,255,.35);background:transparent;color:inherit;border-radius:999px;padding:.3rem .9rem;cursor:pointer;min-height:34px}
+.demobar button[aria-pressed="true"]{background:var(--bar-ink);color:var(--bar)}
+header.site{background:var(--bg);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:1rem;min-height:62px}
+.logo{white-space:nowrap;font-weight:900;font-size:1.3rem;letter-spacing:-.02em;text-decoration:none}
+.logo span{color:var(--acc)}
+.navr{display:flex;align-items:center;gap:1.2rem}
+.navr a.plain{text-decoration:none;color:var(--muted);font-weight:500}
+@media (max-width:560px){.navr a.plain{display:none}}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;min-height:44px;padding:0 1.15rem;border-radius:999px;font:inherit;font-weight:600;text-decoration:none;cursor:pointer;border:1.5px solid var(--ink);background:transparent;color:var(--ink)}
+.btn.solid{background:var(--acc);border-color:var(--acc);color:var(--acc-ink)}
+.btn.small{min-height:36px;padding:0 .9rem;font-size:.93rem}
+.btn.ghost{border-color:var(--line)}
+.btn:hover{filter:brightness(1.07)}
+.row{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+
+.hero{padding:clamp(2.5rem,7vw,4.5rem) 0 2rem;display:grid;grid-template-columns:1.2fr 1fr;gap:2.5rem;align-items:center}
+.hero h1{font-size:clamp(2.3rem,6vw,4.4rem);line-height:.98;letter-spacing:-.04em;margin:0 0 1rem;font-weight:900}
+.hero p{color:var(--muted);max-width:44ch;margin:0 0 1.4rem;font-size:1.12rem}
+.board{background:var(--ink);color:var(--bg);border-radius:22px;padding:1.6rem;min-height:250px;position:relative;overflow:hidden}
+.board h2{margin:0 0 1rem;font-size:1.1rem;opacity:.8;font-weight:600}
+.board .eq{font-size:clamp(1.5rem,3vw,2.2rem);font-weight:800;letter-spacing:-.02em;line-height:1.35}
+.board .eq em{font-style:normal;color:var(--acc)}
+@media (max-width:820px){.hero{grid-template-columns:1fr}}
+
+section.blk{padding:clamp(2.5rem,6vw,4rem) 0;border-top:1px solid var(--line)}
+h2.t{font-size:clamp(1.7rem,3.6vw,2.5rem);letter-spacing:-.03em;line-height:1.05;margin:0 0 .5rem;font-weight:800}
+p.sub{color:var(--muted);margin:0 0 1.8rem;max-width:56ch}
+.tbl{width:100%;border-collapse:collapse;background:var(--surface);border-radius:16px;overflow:hidden}
+.tbl th,.tbl td{text-align:left;padding:.85rem 1rem;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl th{font-size:.92rem;color:var(--muted);font-weight:600}
+.tbl tr:last-child td{border-bottom:0}
+.scroll{overflow-x:auto;border-radius:16px;border:1px solid var(--line)}
+.pill{display:inline-block;font-size:.86rem;font-weight:600;padding:.15rem .65rem;border-radius:999px;background:var(--soft);color:var(--ink)}
+.pill.warn{background:var(--warn-bg);color:var(--warn)}
+.pill.ok{background:var(--acc);color:var(--acc-ink)}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1.6rem;list-style:none;margin:0;padding:0;counter-reset:s}
+.steps li{counter-increment:s;padding-top:1rem;border-top:3px solid var(--acc)}
+.steps li::before{content:counter(s);font-weight:900;font-size:2rem;line-height:1;display:block;margin-bottom:.4rem}
+.steps h3{margin:0 0 .25rem;font-size:1.1rem}
+.steps p{margin:0;color:var(--muted)}
+@media (max-width:720px){.steps{grid-template-columns:1fr}}
+
+.area{padding:clamp(1.8rem,5vw,3rem) 0 4rem}
+.area h1{font-size:clamp(1.9rem,5vw,3rem);letter-spacing:-.04em;line-height:1;margin:0 0 .4rem;font-weight:900}
+.area > .wrap > p.sub{margin-bottom:1.6rem}
+.grid2{display:grid;grid-template-columns:1.1fr 1fr;gap:1.4rem;align-items:start}
+@media (max-width:860px){.grid2{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:1.3rem 1.4rem}
+.card h2{margin:0 0 .8rem;font-size:1.2rem}
+.card + .card{margin-top:1.2rem}
+.next{background:var(--acc);color:var(--acc-ink);border:0}
+.next .when{font-size:clamp(1.6rem,4vw,2.3rem);font-weight:900;letter-spacing:-.03em;line-height:1.1;margin:.2rem 0 .3rem}
+.next p{margin:0 0 1rem;opacity:.9}
+.next .btn{border-color:var(--acc-ink);color:var(--acc-ink)}
+.next .btn.solid{background:var(--acc-ink);color:var(--acc)}
+.salas{display:grid;gap:.8rem;list-style:none;margin:0;padding:0}
+.sala{display:flex;flex-wrap:wrap;gap:.6rem 1rem;align-items:center;justify-content:space-between;padding:1rem 1.1rem;border:1px solid var(--line);border-radius:14px;background:var(--bg)}
+.sala h3{margin:0;font-size:1.05rem}
+.sala p{margin:.1rem 0 0;color:var(--muted);font-size:.95rem}
+.list{list-style:none;margin:0;padding:0}
+.list li{display:flex;flex-wrap:wrap;gap:.4rem 1rem;align-items:center;justify-content:space-between;padding:.7rem 0;border-bottom:1px solid var(--line)}
+.list li:last-child{border-bottom:0}
+.list .meta{color:var(--muted);font-size:.93rem}
+.empty{color:var(--muted);margin:0}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.4rem}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:1rem 1.2rem}
+.stat b{display:block;font-size:2rem;font-weight:900;letter-spacing:-.03em;line-height:1.1}
+.stat span{color:var(--muted)}
+@media (max-width:560px){.stats{grid-template-columns:1fr}}
+.back{display:inline-block;margin-bottom:1rem;color:var(--muted);text-decoration:none;font-weight:500}
+.back:hover{color:var(--ink)}
+
+.f{display:grid;gap:.3rem;margin:0 0 1rem;min-width:0}
+.f > span{font-weight:600}
+.f small{color:var(--muted)}
+input,select,textarea{font:inherit;width:100%;padding:.65rem .8rem;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink)}
+textarea{min-height:90px;resize:vertical}
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:0 1rem}
+.fgrid .full{grid-column:1/-1}
+@media (max-width:640px){.fgrid{grid-template-columns:1fr}}
+.inline{display:flex;gap:.6rem;flex-wrap:wrap}
+.inline input{flex:1 1 180px;width:auto}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;margin-bottom:1.2rem;background:var(--surface)}
+.seg button{font:inherit;font-weight:600;border:0;background:transparent;color:var(--muted);padding:.45rem 1.05rem;border-radius:999px;cursor:pointer;min-height:38px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.narrow{max-width:560px}
+.err{color:#C0392B;min-height:1.4em;margin:.2rem 0 .8rem}
+.chk{display:flex;gap:.55rem;align-items:center;font-weight:600;margin:.6rem 0 .5rem;cursor:pointer}
+.meta{color:var(--muted);font-size:.93rem}
+.msgbox{max-height:340px;overflow-y:auto;border:1px solid var(--line);border-radius:14px;padding:.8rem;background:var(--bg);margin-bottom:.8rem}
+.msgs{list-style:none;margin:0;padding:0;display:grid;gap:.6rem}
+.msg{max-width:85%;background:var(--surface);border:1px solid var(--line);border-radius:14px 14px 14px 4px;padding:.55rem .8rem}
+.msg.mine{justify-self:end;background:var(--soft);border-radius:14px 14px 4px 14px}
+.msg .who{font-weight:700;font-size:.88rem}
+.msg .who span{font-weight:400;color:var(--muted)}
+.msg p{margin:.15rem 0 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.msg .gone{font-style:italic;color:var(--muted)}
+.chatform{display:flex;gap:.6rem;align-items:flex-end}
+.chatform textarea{min-height:46px;flex:1}
+.linkbtn{font:inherit;font-size:.85rem;background:none;border:0;padding:0;color:var(--muted);text-decoration:underline;cursor:pointer;margin-top:.2rem}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.chatnote{margin-bottom:.8rem;font-size:.93rem}
+.chk input{width:auto;accent-color:var(--acc);margin:0}
+.paylist{list-style:none;margin:0 0 .8rem;padding:0}
+.paylist li{padding:.6rem 0;border-bottom:1px solid var(--line)}
+.paylist li:last-child{border-bottom:0}
+.paylist b{display:block}
+.paylist span{color:var(--muted);font-variant-numeric:tabular-nums}
+
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1.2rem);transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:.85rem 1.2rem;border-radius:14px;max-width:min(92vw,520px);box-shadow:0 12px 30px rgba(0,0,0,.25);z-index:30;font-size:.97rem}
+.toast[hidden]{display:none}
+dialog#installDlg{border:0;border-radius:20px;padding:1.5rem 1.6rem;max-width:min(92vw,440px);background:var(--surface);color:var(--ink);box-shadow:0 20px 50px rgba(0,0,0,.3)}
+dialog#installDlg::backdrop{background:rgba(10,20,14,.55)}
+dialog#installDlg h2{margin:0 0 .8rem;font-size:1.35rem}
+dialog#installDlg ol{margin:0 0 1rem;padding-left:1.2rem}
+dialog#installDlg li{margin:.35rem 0}
+@media (max-width:560px){.plainbtn{display:none}}
+footer{border-top:1px solid var(--line);padding:1.6rem 0;color:var(--muted);font-size:.93rem}
+.aviso{background:var(--acc);color:var(--acc-ink);padding:.7rem 0;font-weight:600}
+.pvbar{background:var(--ink);color:var(--bg);padding:.75rem 0}
+.pvbar .pvback{border-color:currentColor;color:inherit}
+.savebar{position:sticky;bottom:0;z-index:5;background:var(--surface);border-top:1px solid var(--line);margin-top:1.5rem;padding:.7rem 0 calc(.7rem + env(safe-area-inset-bottom,0px))}
+.savebar .btn[disabled]{opacity:.5;cursor:default}
+.sw{width:14px;height:14px;border-radius:50%;display:inline-block;flex:none}
+.contacts{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem}
+.contacts li{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:1rem 1.2rem}
+.contacts b{display:block;font-size:.9rem;color:var(--muted);font-weight:600}
+.contacts a,.contacts span{font-weight:700;font-size:1.05rem;text-decoration:none;overflow-wrap:anywhere}
+.ladr{margin:.5rem 0 0;padding-left:1.1rem;color:var(--muted)}
+.pacote{display:grid;grid-template-columns:1fr 1fr auto;gap:0 .8rem;align-items:end}
+.pacote .btn{margin-bottom:1rem}
+dialog#dataDlg{border:0;border-radius:20px;padding:1.4rem 1.5rem;width:min(92vw,560px);background:var(--surface);color:var(--ink);box-shadow:0 20px 50px rgba(0,0,0,.3)}
+dialog#dataDlg::backdrop{background:rgba(0,0,0,.5)}
+dialog#dataDlg h2{margin:0 0 .6rem}
+.navr a.plain{text-decoration:none;color:var(--muted);font-weight:500}
+.opts{display:flex;flex-wrap:wrap;gap:.5rem}
+.opt{display:inline-flex;align-items:center;gap:.45rem;border:1px solid var(--line);border-radius:999px;padding:.4rem .9rem;cursor:pointer;min-height:40px;background:var(--surface)}
+.opt:has(input:checked){border-color:var(--acc);color:var(--acc);font-weight:600}
+.opt input{width:auto;margin:0;accent-color:var(--acc)}
+.lh{display:flex;flex-wrap:wrap;gap:.4rem 1rem;align-items:baseline;justify-content:space-between;width:100%}
+.lock{font-size:.93rem;color:var(--muted)}
+details summary{cursor:pointer;font-weight:600;color:var(--acc)}
+fieldset.f{border:0;padding:0}
+fieldset.f legend{font-weight:600;padding:0;margin-bottom:.3rem}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="demobar">
+    <div class="wrap">
+      <p>Estás a ver uma demonstração do template Quadro. Experimenta como:</p>
+      <button type="button" data-as="aluno">Aluno</button>
+      <button type="button" data-as="explicador">Explicador</button>
+      <button type="button" data-as="encarregado">Encarregado</button>
+      <button type="button" data-as="visitante">Visitante</button>
+      <button type="button" id="resetDemo">Recomeçar</button>
+    </div>
+  </div>
+  <header class="site">
+    <div class="wrap bar">
+      <a class="logo" href="#inicio">Explica<span>+</span></a>
+      <div class="navr" id="nav"></div>
+    </div>
+  </header>
+</div>
+
+<main id="view"></main>
+
+<footer><div class="wrap">Explica+, Rua das Flores. Dados fictícios, para demonstração.</div></footer>
+<div class="toast" id="toast" role="status" hidden></div>
+<dialog id="installDlg" aria-labelledby="idt"></dialog>
+
+<script>
+/* ---------- dados de demonstração ---------- */
+const KEY="quadro-demo-v4";
+const DIAS=["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
+function seed(){
+  return {
+    session:"u-ines",
+    users:{
+      "u-rita":{uid:"u-rita",nome:"Rita Fonseca",email:"rita@explicamais.pt",role:"explicador"},
+      "u-paula":{uid:"u-paula",nome:"Paula Martins",email:"paula@exemplo.pt",role:"encarregado",filhos:["u-ines"]},
+      "u-ines":{uid:"u-ines",nome:"Inês Martins",email:"ines@exemplo.pt",role:"aluno",ano:"11.º ano",encarregado:"Paula Martins",encarregadoUid:"u-paula"},
+      "u-tiago":{uid:"u-tiago",nome:"Tiago Sousa",email:"tiago@exemplo.pt",role:"aluno",ano:"11.º ano",encarregado:"Rui Sousa"},
+      "u-maria":{uid:"u-maria",nome:"Maria Lopes",email:"maria@exemplo.pt",role:"aluno",ano:"9.º ano",encarregado:"Ana Lopes"},
+      "u-duarte":{uid:"u-duarte",nome:"Duarte Pinto",email:"duarte@exemplo.pt",role:"aluno",ano:"9.º ano",encarregado:"Carla Pinto"}
+    },
+    salas:[
+      {id:"s1",nome:"Matemática A, 11.º ano",dia:4,hora:"18:00",duracao:60,formato:"Online",plataforma:"Zoom",link:"https://zoom.us/j/0000000000",codigo:"MAT11",capacidade:6,
+        alunos:["u-ines","u-tiago"],pedidos:[],
+        materiais:[{id:"m1",titulo:"Ficha 4: funções exponenciais",url:"https://example.com/ficha4.pdf"},{id:"m2",titulo:"Exame nacional 2025, 1.ª fase",url:"https://example.com/exame2025.pdf"}],
+        avisos:[{id:"a1",texto:"Na próxima aula corrigimos a ficha 4. Tragam as dúvidas anotadas.",data:Date.now()-86400000}]},
+      {id:"s2",nome:"Físico-Química, 9.º ano",dia:2,hora:"17:00",duracao:60,formato:"Presencial",morada:"Rua das Flores, 45, 1.º andar",plataforma:"Teams",link:"",codigo:"FQ9",capacidade:5,
+        alunos:["u-maria"],pedidos:["u-duarte","u-ines"],
+        materiais:[{id:"m3",titulo:"Resumo: reações químicas",url:"https://example.com/reacoes.pdf"}],avisos:[]},
+      {id:"s3",nome:"Matemática, 7.º ano em grupo",dia:6,hora:"10:00",duracao:90,formato:"Presencial e online",morada:"Rua das Flores, 45, 1.º andar",plataforma:"Zoom",link:"https://zoom.us/j/1111111111",codigo:"MAT7",capacidade:8,modos:{},
+        alunos:[],pedidos:[],materiais:[],avisos:[]}
+    ],
+    chats:{
+      "sala:s1":{modo:"aberto",msgs:[
+        {id:"c1",uid:"u-rita",texto:"Boa tarde! Tragam a ficha 4 resolvida para quinta.",data:Date.now()-2*86400000},
+        {id:"c2",uid:"u-tiago",texto:"Professora, o exercício 3 é para fazer todo?",data:Date.now()-2*86400000+1800000},
+        {id:"c3",uid:"u-rita",texto:"Sim, Tiago, as três alíneas.",data:Date.now()-2*86400000+3600000}]},
+      "priv:u-ines":{modo:"aberto",msgs:[
+        {id:"c4",uid:"u-rita",texto:"Olá Inês e Paula. A Inês tem evoluído muito nas exponenciais.",data:Date.now()-86400000},
+        {id:"c5",uid:"u-paula",texto:"Obrigada, Rita! Ela tem teste na quinta-feira.",data:Date.now()-86400000+5400000}]}
+    }
+  };
+}
+let db;
+try{ db=JSON.parse(localStorage.getItem(KEY))||seed(); }catch(e){ db=seed(); }
+const save=()=>{ try{ localStorage.setItem(KEY,JSON.stringify(db)); }catch(e){} };
+const me=()=>db.users[db.session]||null;
+const sala=id=>db.salas.find(s=>s.id===id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+const $=id=>document.getElementById(id);
+
+function nextAt(s){
+  const [h,m]=s.hora.split(":").map(Number), now=new Date(), d=new Date(now);
+  d.setHours(h,m,0,0);
+  let add=(s.dia-now.getDay()+7)%7;
+  if(add===0 && now>new Date(d.getTime()+s.duracao*60000)) add=7;
+  d.setDate(d.getDate()+add); return d;
+}
+function whenText(d){
+  const now=new Date(), diff=Math.round((new Date(d).setHours(0,0,0,0)-new Date(now).setHours(0,0,0,0))/86400000);
+  const hh=d.toLocaleTimeString("pt-PT",{hour:"2-digit",minute:"2-digit"});
+  if(diff===0) return `Hoje, ${hh}`; if(diff===1) return `Amanhã, ${hh}`;
+  return `${DIAS[d.getDay()]}, ${d.getDate()} de ${d.toLocaleDateString("pt-PT",{month:"long"})}, ${hh}`;
+}
+const horario=s=>`${DIAS[s.dia]}, ${s.hora} (${s.duracao} min)`;
+/* presencial, online ou misto: nas turmas mistas cada aluno escolhe */
+const temPres=s=>s.formato!=="Online";
+const modoDe=(s,u)=>s.formato==="Presencial e online"?((s.modos||{})[u]||"online"):(s.formato==="Presencial"?"presencial":"online");
+const ondeTxt=(s,u)=>modoDe(s,u)==="presencial"?`presencialmente, em ${s.morada||"local a confirmar"}`:`online, no ${s.plataforma}`;
+function mapa(s){ toast(`Aqui abria o mapa com a morada: ${s.morada||"a confirmar"}.`); }
+
+let toastT;
+function toast(msg){ const t=$("toast"); t.textContent=msg; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,4500); }
+
+/* Entrar na aula: na versão real abre o link; aqui mostra o que aconteceria. */
+function joinClass(s){
+  toast(`Aqui abria a aula no ${s.plataforma}. Só os alunos aceites nesta sala veem este botão.`);
+}
+
+/* ---------- instalar como app (PWA) ---------- */
+let installEvt=null;
+const standalone=()=>matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+window.addEventListener("beforeinstallprompt",e=>{ e.preventDefault(); installEvt=e; });
+window.addEventListener("appinstalled",()=>{ installEvt=null; toast("App instalada. Já a encontras no ecrã do telemóvel."); render(); });
+async function install(){
+  if(installEvt){ installEvt.prompt(); await installEvt.userChoice; installEvt=null; return; }
+  const ua=navigator.userAgent, ios=/iphone|ipad|ipod/i.test(ua)||(/Macintosh/.test(ua)&&"ontouchend" in document), d=$("installDlg");
+  d.innerHTML=`<h2 id="idt">Instalar a app</h2>
+    ${ios?`<ol><li>Abre este site no Safari.</li><li>Toca no botão Partilhar, o quadrado com a seta para cima.</li><li>Escolhe Adicionar ao ecrã principal.</li></ol>`
+      :`<ol><li>Abre o menu do browser, nos três pontos do canto.</li><li>Escolhe Instalar app ou Adicionar ao ecrã principal.</li></ol>`}
+    <p class="empty" style="margin-bottom:1rem">No site publicado, em Android e no computador, este botão instala a app diretamente. Nesta demonstração mostramos os passos.</p>
+    <form method="dialog"><button class="btn solid">Percebi</button></form>`;
+  d.showModal();
+}
+function bindInstall(){ document.querySelectorAll("[data-install]").forEach(b=>b.onclick=install); }
+if("serviceWorker" in navigator && window.isSecureContext){ navigator.serviceWorker.register("sw.js").catch(()=>{}); }
+
+/* ---------- navegação ---------- */
+function go(h){ if(location.hash==="#"+h) render(); else location.hash=h; }
+window.addEventListener("hashchange",render);
+document.querySelectorAll("[data-as]").forEach(b=>b.addEventListener("click",()=>{
+  const as=b.dataset.as; db.session=as==="aluno"?"u-ines":as==="explicador"?"u-rita":as==="encarregado"?"u-paula":null; save();
+  go(as==="visitante"?"inicio":"area");
+}));
+$("resetDemo").addEventListener("click",()=>{ db=seed(); save(); toast("Os dados da demonstração voltaram ao início."); go("area"); });
+
+function renderNav(){
+  const u=me();
+  $("nav").innerHTML=`<a class="plain" href="#inicio">Início</a><a class="plain" href="#horario">Horário</a>${standalone()?"":`<button class="btn small ghost plainbtn" type="button" data-install>Instalar app</button>`}`+
+    (u?`${u.role==="explicador"?`<a class="plain" href="#definicoes">Definições</a>`:""}<a class="btn small" href="#area">${u.role==="explicador"?"Painel":"A minha área"}</a><button class="btn small ghost" type="button" id="logout">Sair</button>`
+      :`<a class="btn small solid" href="#entrar">Entrar</a>`);
+  $("logout")?.addEventListener("click",()=>{ db.session=null; save(); go("inicio"); });
+  const as=!u?"visitante":u.uid==="u-ines"?"aluno":u.uid==="u-rita"?"explicador":u.uid==="u-paula"?"encarregado":"";
+  document.querySelectorAll("[data-as]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.as===as?"true":"false"));
+}
+
+function render(){
+  const h=(location.hash||"#inicio").slice(1), u=me(), v=$("view");
+  if(previewOn&&h!=="inicio") previewOn=false;
+  applyTheme(); renderNav();
+  if(h==="horario"||h==="inicio"||!h){ v.innerHTML=pageInicio(); bindInicio(); if(h==="horario") document.getElementById("horario")?.scrollIntoView(); }
+  else if(h==="entrar"){ v.innerHTML=pageEntrar(); bindEntrar(); }
+  else if(!u){ go("entrar"); return; }
+  else if(h==="definicoes"){ if(u.role!==OWNER){ go("area"); return; } v.innerHTML=pageDef(); bindDef(); }
+  else if(h==="area"){ if(u.role==="explicador"){ v.innerHTML=pageProf(); bindProf(); } else if(u.role==="encarregado"){ v.innerHTML=pageEnc(); bindEnc(); } else { v.innerHTML=pageAluno(); bindAluno(); } }
+  else if(h.startsWith("conversa-")){ const a=db.users[h.slice(9)]; if(!canPriv(u,a)){ go("area"); return; } v.innerHTML=pageConversa(a); }
+  else if(h.startsWith("sala-")){ const s=sala(h.slice(5)); if(!s){ go("area"); return; }
+    if(u.role==="explicador"){ v.innerHTML=pageSalaProf(s); bindSalaProf(s); }
+    else if(s.alunos.includes(u.uid)){ v.innerHTML=pageSalaAluno(s); bindSalaAluno(s); }
+    else { go("area"); return; } }
+  else { go("inicio"); return; }
+  if(previewOn) previewBar(v);
+  bindInstall(); bindChat();
+  if(keepY!==null){ window.scrollTo(0,keepY); keepY=null; } else window.scrollTo(0,0);
+}
+
+/* ---------- site público ---------- */
+function pageInicio(){
+  const rows=db.salas.map(s=>{const vagas=s.capacidade-s.alunos.length;return `<tr><td><b>${esc(s.nome)}</b></td><td>${horario(s)}</td><td>${esc(s.formato)}${temPres(s)&&s.morada?`<br><span class="meta">${esc(s.morada)}</span>`:""}</td>
+    <td>${vagas>0?`<span class="pill">${vagas} ${vagas===1?"vaga":"vagas"}</span>`:`<span class="pill warn">Completa</span>`}</td></tr>`;}).join("");
+  const S=site(), P=S.precos;
+  return `${avisoHTML()}<div class="wrap">
+    <section class="hero">
+      <div><h1>${esc(site().titulo)}</h1>
+        <p>${esc(site().descricao)}</p>
+        <div class="row"><a class="btn solid" href="#entrar">Criar conta de aluno</a><a class="btn" href="#horario">Ver horário</a>${standalone()?"":`<button class="btn ghost" type="button" data-install>Instalar a app</button>`}</div></div>
+      <div class="board" aria-hidden="true"><h2>Quinta-feira, Matemática A</h2>
+        <div class="eq">f(x) = 2<sup>x</sup><br>lim<sub>x→+∞</sub> f(x) = <em>+∞</em><br>f′(x) = 2<sup>x</sup> ln 2</div></div>
+    </section>
+  </div>
+  <section class="blk" id="horario"><div class="wrap">
+    <h2 class="t">Horário e vagas</h2><p class="sub">Escolhe a turma e pede o código ao explicador para entrares na sala.</p>
+    <div class="scroll"><table class="tbl"><thead><tr><th>Turma</th><th>Quando</th><th>Formato</th><th>Vagas</th></tr></thead><tbody>${rows}</tbody></table></div>
+  </div></section>
+  <section class="blk"><div class="wrap">
+    <h2 class="t">Como funciona para os alunos</h2><p class="sub">Tudo o que precisas para as aulas, num só sítio.</p>
+    <ol class="steps">
+      <li><h3>Crias a tua conta</h3><p>Com o teu ano de escolaridade e o nome do encarregado de educação.</p></li>
+      <li><h3>Entras na sala da turma</h3><p>Com o código que o explicador te dá. Ele confirma a tua entrada.</p></li>
+      <li><h3>Vais à aula como preferires</h3><p>Presencialmente, no nosso espaço, ou online, com um clique no Zoom ou no Teams. Nas turmas mistas escolhes tu.</p></li>
+    </ol>
+  </div></section>
+  <section class="blk" id="precos"><div class="wrap grid2"><div><h2 class="t">Sobre nós</h2><p class="sub" style="white-space:pre-line">${esc(S.sobre)}</p>
+      <p style="margin:0 0 .4rem"><b>Disciplinas:</b> ${esc(S.disciplinas)}</p><p style="margin:0"><b>Níveis:</b> ${esc(S.niveis.join(", "))}</p></div>
+    <div class="card"><h2>Preços</h2><ul class="list"><li><span>Aula avulsa</span><b>${eur(P.avulsa)}</b></li>
+      ${P.pacotes.filter(k=>k.aulas>0).map(k=>`<li><span>Pacote de ${k.aulas} aulas <span class="meta">(${eur(k.preco/k.aulas)} por aula)</span></span><b>${eur(k.preco)}</b></li>`).join("")}</ul>
+      ${S.faltas?`<p class="empty" style="margin-top:.6rem">${esc(S.faltas)}</p>`:""}</div></div></section>
+  ${contactosHTML()}`;
+}
+function bindInicio(){}
+
+/* ---------- entrar / criar conta ---------- */
+let modo="criar";
+function pageEntrar(){
+  const c=modo==="criar";
+  return `<div class="wrap area"><div class="narrow">
+    <h1>${c?"Criar conta de aluno":"Entrar"}</h1>
+    <p class="sub">Nesta demonstração a palavra-passe não é verificada. Para entrar numa conta que já criaste, basta o email.</p>
+    <div class="seg" role="group" aria-label="Conta"><button type="button" data-m="criar" aria-pressed="${c}">Criar conta</button><button type="button" data-m="entrar" aria-pressed="${!c}">Entrar</button></div>
+    <form id="fa" novalidate>
+      ${c?`<label class="f"><span>Nome do aluno</span><input name="nome" autocomplete="name" required></label>
+      <label class="f"><span>Ano de escolaridade</span><select name="ano" required><option value="">Escolhe</option>${["5.º","6.º","7.º","8.º","9.º","10.º","11.º","12.º"].map(a=>`<option>${a} ano</option>`).join("")}<option>Ensino superior ou adulto</option></select></label>
+      <label class="f"><span>Encarregado de educação</span><input name="encarregado" autocomplete="off"><small>Na versão real, o encarregado recebe um convite por email e entra nas conversas privadas com o explicador.</small></label>`:""}
+      <label class="f"><span>Email</span><input type="email" name="email" autocomplete="email" required></label>
+      <label class="f"><span>Palavra-passe</span><input type="password" name="pw" autocomplete="${c?"new-password":"current-password"}"></label>
+      <p class="err" id="ea" role="alert"></p>
+      <button class="btn solid" type="submit">${c?"Criar conta":"Entrar"}</button>
+    </form></div></div>`;
+}
+function bindEntrar(){
+  document.querySelectorAll("[data-m]").forEach(b=>b.addEventListener("click",()=>{modo=b.dataset.m;render();}));
+  $("fa").addEventListener("submit",e=>{
+    e.preventDefault(); const d=Object.fromEntries(new FormData(e.target)), err=$("ea"); const email=(d.email||"").trim().toLowerCase();
+    if(!email.includes("@")){ err.textContent="Escreve um email válido."; return; }
+    const ex=Object.values(db.users).find(u=>u.email===email);
+    if(modo==="criar"){
+      if(!d.nome?.trim()){ err.textContent="Escreve o nome do aluno."; return; }
+      if(!d.ano){ err.textContent="Escolhe o ano de escolaridade."; return; }
+      if(ex){ err.textContent="Já existe uma conta com este email. Entra com ela."; return; }
+      const id=uid("u-"); db.users[id]={uid:id,nome:d.nome.trim(),email,role:"aluno",ano:d.ano,encarregado:(d.encarregado||"").trim()}; db.session=id;
+    } else { if(!ex){ err.textContent="Não há nenhuma conta com este email."; return; } db.session=ex.uid; }
+    save(); go("area");
+  });
+}
+
+/* ---------- área do aluno ---------- */
+function pageAluno(){
+  const u=me(), minhas=db.salas.filter(s=>s.alunos.includes(u.uid)), pend=db.salas.filter(s=>s.pedidos.includes(u.uid));
+  const prox=minhas.map(s=>({s,d:nextAt(s)})).sort((a,b)=>a.d-b.d)[0];
+  return `<div class="wrap area">
+    <h1>Olá, ${esc(u.nome.split(" ")[0])}</h1><p class="sub">${esc(u.ano||"")}${u.encarregado?`. Encarregado de educação: ${esc(u.encarregado)}`:""}</p>
+    <div class="grid2"><div>
+      ${prox?`<div class="card next"><span>Próxima aula</span><div class="when">${whenText(prox.d)}</div><p>${esc(prox.s.nome)}, ${esc(ondeTxt(prox.s,u.uid))}</p>
+        <div class="row">${modoDe(prox.s,u.uid)==="online"?`<button class="btn solid" type="button" data-join="${prox.s.id}">Entrar na aula</button>`:`<button class="btn solid" type="button" data-map="${prox.s.id}">Ver no mapa</button>`}<a class="btn" href="#sala-${prox.s.id}">Abrir a sala</a></div></div>`
+        :`<div class="card"><h2>Ainda não estás em nenhuma sala</h2><p class="empty">Pede o código da turma ao explicador e escreve-o aqui ao lado.</p></div>`}
+      <div class="card"><h2>As minhas salas</h2>
+        ${minhas.length?`<ul class="salas">${minhas.map(s=>`<li class="sala"><div><h3>${esc(s.nome)}</h3><p>${horario(s)}, ${esc(ondeTxt(s,u.uid))}</p></div>
+          <a class="btn small" href="#sala-${s.id}">Abrir sala</a></li>`).join("")}</ul>`:`<p class="empty">Quando o explicador aceitar o teu pedido, a sala aparece aqui.</p>`}
+      </div>${privCard(u,"Falar com o explicador")}</div>
+    <div>
+      <div class="card"><h2>Entrar numa sala</h2>
+        <form id="fj" class="inline" novalidate><input name="codigo" placeholder="Código da turma" aria-label="Código da turma" autocomplete="off"><button class="btn solid" type="submit">Pedir entrada</button></form>
+        <p class="err" id="ej" role="alert"></p>
+        <p class="empty" style="font-size:.93rem">Na demonstração podes usar MAT7, a turma de sábado.</p></div>
+      <div class="card"><h2>À espera de confirmação</h2>
+        ${pend.length?`<ul class="list">${pend.map(s=>`<li><span>${esc(s.nome)}</span><span class="pill warn">Pendente</span></li>`).join("")}</ul>`:`<p class="empty">Não tens pedidos pendentes.</p>`}</div>
+      ${comoPagar()}
+      ${standalone()?"":`<div class="card"><h2>Leva as aulas no telemóvel</h2><p class="empty" style="margin-bottom:.9rem">Instala a app e entras na aula com um toque, sem andares à procura do link.</p><button class="btn small solid" type="button" data-install>Instalar a app</button></div>`}
+    </div></div></div>`;
+}
+function bindAluno(){
+  document.querySelectorAll("[data-join]").forEach(b=>b.addEventListener("click",()=>joinClass(sala(b.dataset.join))));
+  document.querySelectorAll("[data-map]").forEach(b=>b.addEventListener("click",()=>mapa(sala(b.dataset.map))));
+  $("payOnline")?.addEventListener("click",()=>toast("Aqui abria o link de pagamento escolhido pelo explicador. Na demonstração não há pagamentos reais."));
+  $("fj").addEventListener("submit",e=>{
+    e.preventDefault(); const c=(new FormData(e.target).get("codigo")||"").trim().toUpperCase(), err=$("ej"), u=me();
+    const s=db.salas.find(x=>x.codigo.toUpperCase()===c);
+    if(!s){ err.textContent="Não há nenhuma sala com este código. Confirma com o explicador."; return; }
+    if(s.alunos.includes(u.uid)){ err.textContent="Já estás nesta sala."; return; }
+    if(s.pedidos.includes(u.uid)){ err.textContent="Já pediste para entrar nesta sala. Falta o explicador confirmar."; return; }
+    s.pedidos.push(u.uid); save(); render(); toast(`Pedido enviado para ${s.nome}. Experimenta agora como Explicador para o aceitares.`);
+  });
+}
+function pageSalaAluno(s){
+  const d=nextAt(s);
+  return `<div class="wrap area"><a class="back" href="#area">Voltar à minha área</a>
+    <h1>${esc(s.nome)}</h1><p class="sub">${horario(s)}. ${esc(s.formato)}.</p>
+    <div class="grid2"><div>
+      <div class="card next"><span>Próxima aula</span><div class="when">${whenText(d)}</div><p>Vais ${esc(ondeTxt(s,me().uid))}.</p>
+        <div class="row">${modoDe(s,me().uid)==="online"?`<button class="btn solid" type="button" id="join">Entrar na aula no ${esc(s.plataforma)}</button>`:`<button class="btn solid" type="button" id="map">Ver no mapa</button>`}</div></div>
+      ${s.formato==="Presencial e online"?`<div class="card"><h2>Como vais às aulas?</h2><p class="empty" style="margin-bottom:.8rem">Esta turma é mista. Podes mudar sempre que quiseres.</p>
+        <div class="seg" role="group" aria-label="Como vais às aulas"><button type="button" data-modo="presencial" aria-pressed="${modoDe(s,me().uid)==="presencial"}">Presencial</button><button type="button" data-modo="online" aria-pressed="${modoDe(s,me().uid)==="online"}">Online</button></div></div>`:""}
+      <div class="card"><h2>Avisos</h2>${s.avisos.length?`<ul class="list">${[...s.avisos].reverse().map(a=>`<li><span>${esc(a.texto)}</span><span class="meta">${new Date(a.data).toLocaleDateString("pt-PT")}</span></li>`).join("")}</ul>`:`<p class="empty">Ainda não há avisos.</p>`}</div>
+    </div><div>
+      <div class="card"><h2>Fichas e materiais</h2>${s.materiais.length?`<ul class="list">${s.materiais.map(m=>`<li><span>${esc(m.titulo)}</span><button class="btn small ghost" type="button" data-mat="${m.id}">Abrir</button></li>`).join("")}</ul>`:`<p class="empty">O explicador ainda não partilhou materiais.</p>`}</div>
+      <div class="card"><h2>Colegas na sala</h2><p class="empty">${s.alunos.length} ${s.alunos.length===1?"aluno":"alunos"} nesta turma.</p></div>
+      ${turmaChat(s)}
+    </div></div></div>`;
+}
+function bindSalaAluno(s){
+  $("join")?.addEventListener("click",()=>joinClass(s));
+  $("map")?.addEventListener("click",()=>mapa(s));
+  document.querySelectorAll("[data-modo]").forEach(b=>b.addEventListener("click",()=>{ s.modos=s.modos||{}; s.modos[me().uid]=b.dataset.modo; save(); render();
+    toast(b.dataset.modo==="presencial"?"Ficaste marcado como presencial. O explicador já sabe.":"Ficaste marcado como online. O botão da aula aparece aqui."); }));
+  document.querySelectorAll("[data-mat]").forEach(b=>b.addEventListener("click",()=>toast("Aqui abria o ficheiro partilhado pelo explicador.")));
+}
+
+/* ---------- conversas ----------
+   Turma: só o explicador e os alunos aceites. O explicador modera: remove mensagens
+   (fica registado que foram removidas) e escolhe quem escreve.
+   Privada: explicador, aluno e encarregado de educação, os três na mesma conversa.
+   Nunca há conversas a sós entre o explicador e um aluno menor, nem entre alunos.
+   Alunos adultos falam a dois com o explicador. Ninguém apaga mensagens privadas. */
+let keepY=null;
+const ROLE={explicador:"explicador",aluno:"aluno",encarregado:"encarregado de educação"};
+const chat=k=>{ db.chats=db.chats||{}; return db.chats[k]||(db.chats[k]={modo:"aberto",msgs:[]}); };
+const adulto=a=>a.ano==="Ensino superior ou adulto";
+const privOK=a=>!!a&&a.role==="aluno"&&(adulto(a)||!!a.encarregadoUid);
+const explicadorU=()=>Object.values(db.users).find(u=>u.role==="explicador");
+const canPriv=(u,a)=>privOK(a)&&(u.role==="explicador"||u.uid===a.uid||u.uid===a.encarregadoUid);
+const participantes=a=>[explicadorU(),a,a.encarregadoUid?db.users[a.encarregadoUid]:null].filter(Boolean);
+const primeiro=n=>esc(String(n||"").split(" ")[0]);
+function msgsHTML(c,canMod){
+  const u=me(); if(!c.msgs.length) return `<p class="empty">Ainda não há mensagens.</p>`;
+  return `<ul class="msgs">${c.msgs.map(m=>{const a=db.users[m.uid]||{nome:"Utilizador",role:""}, mine=m.uid===u.uid;
+    return `<li class="msg${mine?" mine":""}"><div class="who">${esc(mine?"Tu":a.nome)} <span>${ROLE[a.role]||""}, ${new Date(m.data).toLocaleString("pt-PT",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</span></div>
+      ${m.removida?`<p class="gone">Mensagem removida pelo explicador.</p>`:`<p>${esc(m.texto)}</p>`}
+      ${canMod&&!m.removida?`<button class="linkbtn" type="button" data-rmmsg="${m.id}">Remover</button>`:""}</li>`;}).join("")}</ul>`;
+}
+function chatCard(key,title,{canWrite,canMod,note,closedMsg,extra}){
+  const c=chat(key);
+  return `<div class="card"><h2>${title}</h2>${note?`<p class="empty chatnote">${note}</p>`:""}${extra||""}
+    <div class="msgbox">${msgsHTML(c,canMod)}</div>
+    ${canWrite?`<form class="chatform" data-chat="${key}" novalidate><label class="sr" for="m-${key}">Mensagem</label><textarea id="m-${key}" name="t" rows="2" maxlength="1000" placeholder="Escreve uma mensagem"></textarea><button class="btn small solid" type="submit">Enviar</button></form>`
+      :`<p class="empty">${closedMsg||"Não podes escrever nesta conversa."}</p>`}</div>`;
+}
+function turmaChat(s){
+  const u=me(), c=chat("sala:"+s.id), prof=u.role==="explicador";
+  const canWrite=prof?c.modo!=="fechado":(s.alunos.includes(u.uid)&&c.modo==="aberto");
+  const extra=prof?`<label class="f" style="margin-bottom:.8rem"><span>Quem pode escrever</span><select id="chatModo" data-key="sala:${s.id}">${[["aberto","Eu e os alunos"],["so-explicador","Só eu"],["fechado","Ninguém, conversa fechada"]].map(([k,l])=>`<option value="${k}"${c.modo===k?" selected":""}>${l}</option>`).join("")}</select></label>`:"";
+  return chatCard("sala:"+s.id,"Conversa da turma",{canWrite,canMod:prof,extra,
+    note:prof?"Só tu e os alunos aceites nesta sala têm acesso. Podes remover mensagens.":"Com o explicador e os colegas da turma. O explicador vê tudo e pode remover mensagens.",
+    closedMsg:c.modo==="so-explicador"?"Neste momento só o explicador escreve aqui.":"O explicador fechou esta conversa."});
+}
+function privCard(a,title){
+  const u=me();
+  if(!privOK(a)) return `<div class="card"><h2>${title}</h2><p class="empty">A conversa privada fica disponível quando o encarregado de educação criar conta, porque ele faz parte da conversa.</p></div>`;
+  const c=chat("priv:"+a.uid), l=c.msgs[c.msgs.length-1];
+  const quem=adulto(a)?"Só tu e o explicador.":u.role==="aluno"?"O teu encarregado de educação também vê e participa.":`Tu, ${primeiro(a.nome)} e o explicador, na mesma conversa.`;
+  return `<div class="card"><h2>${title}</h2><p class="empty chatnote">${quem}</p>
+    ${l?`<p style="margin:0 0 .8rem"><b>${esc(db.users[l.uid]?.nome)}:</b> ${esc(l.texto.slice(0,90))}</p>`:""}
+    <a class="btn small solid" href="#conversa-${a.uid}">Abrir conversa</a></div>`;
+}
+function privListProf(){
+  const alunos=[...new Set(db.salas.flatMap(s=>s.alunos))].map(x=>db.users[x]).filter(Boolean);
+  return `<div class="card"><h2>Conversas privadas</h2><p class="empty chatnote">Com cada aluno e o encarregado de educação, na mesma conversa.</p>
+    ${alunos.length?`<ul class="list">${alunos.map(a=>{const n=chat("priv:"+a.uid).msgs.length;return `<li><span><b>${esc(a.nome)}</b><br><span class="meta">${privOK(a)?`${n} ${n===1?"mensagem":"mensagens"}${a.encarregadoUid?`, com ${esc(db.users[a.encarregadoUid]?.nome)}`:""}`:"Disponível quando o encarregado criar conta"}</span></span>
+      ${privOK(a)?`<a class="btn small" href="#conversa-${a.uid}">Abrir</a>`:""}</li>`;}).join("")}</ul>`:`<p class="empty">Ainda não tens alunos.</p>`}</div>`;
+}
+function pageConversa(a){
+  const u=me(), ps=participantes(a);
+  return `<div class="wrap area"><a class="back" href="#area">Voltar</a>
+    <h1>${u.uid===a.uid?"Conversa com o explicador":`Conversa sobre ${primeiro(a.nome)}`}</h1>
+    <p class="sub">Participantes: ${ps.map(p=>`${esc(p.nome)} (${ROLE[p.role]})`).join(", ")}. Todos veem todas as mensagens, e ninguém as pode apagar.</p>
+    <div style="max-width:760px">${chatCard("priv:"+a.uid,"Mensagens",{canWrite:true,canMod:false})}</div></div>`;
+}
+function bindChat(){
+  document.querySelectorAll(".msgbox").forEach(b=>b.scrollTop=b.scrollHeight);
+  document.querySelectorAll(".chatform").forEach(f=>{ const ta=f.querySelector("textarea");
+    ta.addEventListener("keydown",e=>{ if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); f.requestSubmit(); } });
+    f.addEventListener("submit",e=>{ e.preventDefault(); const t=ta.value.trim(); if(!t) return;
+      chat(f.dataset.chat).msgs.push({id:uid("c"),uid:me().uid,texto:t.slice(0,1000),data:Date.now()}); save(); keepY=scrollY; render();
+      document.querySelector(`[data-chat="${f.dataset.chat}"] textarea`)?.focus(); }); });
+  document.querySelectorAll("[data-rmmsg]").forEach(b=>b.addEventListener("click",()=>{
+    for(const c of Object.values(db.chats||{})){ const m=c.msgs.find(x=>x.id===b.dataset.rmmsg); if(m){ m.removida=true; save(); keepY=scrollY; render(); toast("Mensagem removida. Fica registado que foi removida."); return; } } }));
+  $("chatModo")?.addEventListener("change",e=>{ chat(e.target.dataset.key).modo=e.target.value; save(); keepY=scrollY; render(); toast("Regras da conversa atualizadas."); });
+}
+/* ---------- área do encarregado de educação ---------- */
+function pageEnc(){
+  const u=me(), filhos=(u.filhos||[]).map(x=>db.users[x]).filter(Boolean);
+  return `<div class="wrap area"><h1>Olá, ${primeiro(u.nome)}</h1><p class="sub">Encarregado de educação. Acompanhas as aulas e falas com o explicador.</p>
+    ${filhos.map(a=>{ const salas=db.salas.filter(s=>s.alunos.includes(a.uid)), prox=salas.map(s=>({s,d:nextAt(s)})).sort((x,y)=>x.d-y.d)[0];
+      return `<div class="grid2"><div>
+        ${prox?`<div class="card next"><span>Próxima aula de ${primeiro(a.nome)}</span><div class="when">${whenText(prox.d)}</div><p>${esc(prox.s.nome)}, ${esc(ondeTxt(prox.s,a.uid))}</p></div>`:""}
+        <div class="card"><h2>Salas de ${primeiro(a.nome)}</h2>${salas.length?`<ul class="list">${salas.map(s=>`<li><span><b>${esc(s.nome)}</b><br><span class="meta">${horario(s)}</span></span></li>`).join("")}</ul>`:`<p class="empty">Ainda não está em nenhuma sala.</p>`}
+          <p class="empty" style="margin-top:.6rem;font-size:.93rem">A conversa da turma é entre o explicador e os alunos, e é moderada pelo explicador.</p></div>
+      </div><div>${privCard(a,"Conversa com o explicador")}${comoPagar()}</div></div>`;}).join("")}</div>`;
+}
+function bindEnc(){ $("payOnline")?.addEventListener("click",()=>toast("Aqui abria o link de pagamento escolhido pelo explicador.")); }
+
+/* ---------- painel do explicador ---------- */
+function pageProf(){
+  const totalAlunos=new Set(db.salas.flatMap(s=>s.alunos)).size, pend=db.salas.flatMap(s=>s.pedidos.map(p=>({s,u:db.users[p]}))).filter(x=>x.u);
+  return `<div class="wrap area">
+    <h1>Painel</h1><div class="row" style="justify-content:space-between;margin-bottom:1.2rem"><p class="sub" style="margin:0">Olá, ${esc(me().nome)}. Aqui geres as salas, os alunos e os links das aulas.</p><a class="btn small" href="#definicoes">Definições do site</a></div>
+    <div class="stats"><div class="stat"><b>${db.salas.length}</b><span>salas</span></div><div class="stat"><b>${totalAlunos}</b><span>alunos</span></div><div class="stat"><b>${pend.length}</b><span>pedidos para aceitar</span></div></div>
+    <div class="grid2"><div>
+      <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:.8rem"><h2 style="margin:0">Salas</h2><button class="btn small solid" type="button" id="nova">Nova sala</button></div>
+        <ul class="salas">${db.salas.map(s=>`<li class="sala"><div><h3>${esc(s.nome)}</h3><p>${horario(s)}. ${esc(s.formato)}. Código ${esc(s.codigo)}. ${s.alunos.length} de ${s.capacidade} alunos${s.pedidos.length?`, ${s.pedidos.length} à espera`:""}</p></div>
+          <a class="btn small" href="#sala-${s.id}">Gerir</a></li>`).join("")}</ul></div>
+      ${privListProf()}
+    </div><div>
+      <div class="card"><h2>Pedidos para entrar</h2>
+        ${pend.length?`<ul class="list">${pend.map(x=>`<li><span><b>${esc(x.u.nome)}</b><br><span class="meta">${esc(x.u.ano||"")}, quer entrar em ${esc(x.s.nome)}</span></span>
+          <span class="row"><button class="btn small solid" type="button" data-ok="${x.s.id}|${x.u.uid}">Aceitar</button><button class="btn small ghost" type="button" data-no="${x.s.id}|${x.u.uid}">Recusar</button></span></li>`).join("")}</ul>`:`<p class="empty">Não há pedidos pendentes.</p>`}</div>
+      ${payCard()}
+    </div></div></div>`;
+}
+/* ---------- pagamentos: o explicador escolhe os métodos ---------- */
+function payDefaults(){ return {mbway:true,mbwayNum:"912 345 678",transf:true,iban:"PT50 0000 0000 0000 0000 0000 0",dinheiro:true,online:false,onlineLink:"",nota:"As aulas pagam-se até ao dia 8 de cada mês."}; }
+const pay=()=>db.pagamentos||(db.pagamentos=payDefaults());
+function payCard(){
+  const p=pay(), ck=(n,l)=>`<label class="chk"><input type="checkbox" name="${n}"${p[n]?" checked":""}>${l}</label>`;
+  return `<div class="card"><h2>Pagamentos</h2><p class="empty" style="margin-bottom:.4rem">Escolhe como os alunos te pagam. Só aparecem os métodos que ligares, e nenhum é obrigatório.</p>
+    <form id="fp" novalidate>
+      ${ck("mbway","MB Way")}<label class="f"><span class="empty">Número</span><input name="mbwayNum" inputmode="tel" value="${esc(p.mbwayNum)}"></label>
+      ${ck("transf","Transferência bancária")}<label class="f"><span class="empty">IBAN</span><input name="iban" value="${esc(p.iban)}"></label>
+      ${ck("dinheiro","Em dinheiro, na aula")}
+      ${ck("online","Pagamento online")}<label class="f"><span class="empty">Link de pagamento</span><input type="url" name="onlineLink" placeholder="Link do Stripe, SumUp, PayPal ou outro" value="${esc(p.onlineLink)}"></label>
+      <label class="f"><span>Nota para os alunos</span><input name="nota" value="${esc(p.nota)}"></label>
+      <p class="err" id="ep" role="alert"></p>
+      <button class="btn small solid" type="submit">Guardar pagamentos</button></form></div>`;
+}
+function bindPay(){
+  $("fp").addEventListener("submit",e=>{
+    e.preventDefault(); const fd=new FormData(e.target), err=$("ep"), on=n=>fd.get(n)==="on", v=n=>(fd.get(n)||"").toString().trim();
+    if(on("mbway")&&!v("mbwayNum")){ err.textContent="Escreve o número do MB Way, ou desliga esta opção."; return; }
+    if(on("transf")&&!v("iban")){ err.textContent="Escreve o IBAN, ou desliga a transferência."; return; }
+    if(on("online")&&!/^https:\/\//.test(v("onlineLink"))){ err.textContent="O link de pagamento tem de começar por https://"; return; }
+    db.pagamentos={mbway:on("mbway"),mbwayNum:v("mbwayNum"),transf:on("transf"),iban:v("iban"),dinheiro:on("dinheiro"),online:on("online"),onlineLink:v("onlineLink"),nota:v("nota")};
+    save(); render(); toast("Pagamentos guardados. Os alunos já veem estes métodos na área deles.");
+  });
+}
+function comoPagar(){
+  const p=pay(), items=[];
+  if(p.mbway) items.push(`<li><b>MB Way</b><span>${esc(p.mbwayNum)}</span></li>`);
+  if(p.transf) items.push(`<li><b>Transferência bancária</b><span>${esc(p.iban)}</span></li>`);
+  if(p.dinheiro) items.push(`<li><b>Em dinheiro</b><span>Na aula, diretamente ao explicador</span></li>`);
+  if(p.online) items.push(`<li><b>Pagamento online</b><button class="btn small solid" type="button" id="payOnline" style="margin-top:.4rem">Pagar online</button></li>`);
+  return `<div class="card"><h2>Como pagar</h2>${items.length?`<ul class="paylist">${items.join("")}</ul>`:`<p class="empty">Combina o pagamento diretamente com o explicador.</p>`}${p.nota?`<p class="empty">${esc(p.nota)}</p>`:""}</div>`;
+}
+function decide(val,ok){
+  const [sid,u]=val.split("|"), s=sala(sid); s.pedidos=s.pedidos.filter(x=>x!==u);
+  if(ok){ if(s.alunos.length>=s.capacidade){ toast("A sala está completa. Aumenta a capacidade para aceitares mais alunos."); s.pedidos.push(u); return; } s.alunos.push(u); }
+  save(); render(); toast(ok?`${db.users[u].nome} já tem acesso à sala e ao link da aula.`:"Pedido recusado.");
+}
+function bindProf(){
+  document.querySelectorAll("[data-ok]").forEach(b=>b.addEventListener("click",()=>decide(b.dataset.ok,true)));
+  document.querySelectorAll("[data-no]").forEach(b=>b.addEventListener("click",()=>decide(b.dataset.no,false)));
+  bindPay();
+  $("nova").addEventListener("click",()=>{
+    const s={id:uid("s"),nome:"Nova sala",dia:1,hora:"18:00",duracao:60,formato:"Online",plataforma:"Zoom",link:"",codigo:"SALA"+Math.floor(Math.random()*90+10),capacidade:6,alunos:[],pedidos:[],materiais:[],avisos:[]};
+    db.salas.push(s); save(); go("sala-"+s.id); toast("Sala criada. Dá-lhe um nome, o horário e o link da aula.");
+  });
+}
+function pageSalaProf(s){
+  const sel=(n,opts,v)=>`<select name="${n}">${opts.map(([k,l])=>`<option value="${k}"${String(v)===String(k)?" selected":""}>${l}</option>`).join("")}</select>`;
+  const alunos=s.alunos.map(x=>db.users[x]).filter(Boolean), pend=s.pedidos.map(x=>db.users[x]).filter(Boolean);
+  return `<div class="wrap area"><a class="back" href="#area">Voltar ao painel</a>
+    <h1>${esc(s.nome)}</h1><p class="sub">Os alunos entram com o código <b>${esc(s.codigo)}</b>. Só os que aceitares veem o link da aula.</p>
+    <div class="card"><h2>Dados da sala</h2>
+      <form id="fs" class="fgrid" novalidate>
+        <label class="f full"><span>Nome da turma</span><input name="nome" value="${esc(s.nome)}" required></label>
+        <label class="f"><span>Dia</span>${sel("dia",DIAS.map((d,i)=>[i,d]),s.dia)}</label>
+        <label class="f"><span>Hora</span><input type="time" name="hora" value="${esc(s.hora)}"></label>
+        <label class="f"><span>Duração (min)</span><input type="number" name="duracao" min="15" step="15" value="${s.duracao}"></label>
+        <label class="f"><span>Formato</span>${sel("formato",[["Online","Online"],["Presencial","Presencial"],["Presencial e online","Presencial e online"]],s.formato)}</label>
+        <label class="f"><span>Plataforma</span>${sel("plataforma",[["Zoom","Zoom"],["Teams","Teams"],["Google Meet","Google Meet"]],s.plataforma)}</label>
+        <label class="f"><span>Capacidade</span><input type="number" name="capacidade" min="1" value="${s.capacidade}"></label>
+        <label class="f full"><span>Morada das aulas presenciais</span><input name="morada" placeholder="Rua, número, andar, localidade" value="${esc(s.morada||"")}"><small>Só aparece aos alunos quando a turma tem aulas presenciais.</small></label>
+        <label class="f full"><span>Link da aula</span><input type="url" name="link" placeholder="https://zoom.us/j/..." value="${esc(s.link)}"><small>Para as aulas online. Cola aqui o link da reunião do Zoom, do Teams ou do Meet.</small></label>
+        <label class="f"><span>Código de entrada</span><input name="codigo" value="${esc(s.codigo)}"></label>
+        <p class="err full" id="es" role="alert"></p>
+        <div class="row full"><button class="btn solid" type="submit">Guardar alterações</button><button class="btn ghost" type="button" id="del">Apagar sala</button></div>
+      </form></div>
+    <div class="grid2" style="margin-top:1.2rem"><div>
+      <div class="card"><h2>Alunos (${alunos.length} de ${s.capacidade})</h2>
+        ${s.formato==="Presencial e online"&&alunos.length?`<p class="empty" style="margin-bottom:.6rem">${alunos.filter(u=>modoDe(s,u.uid)==="presencial").length} presencialmente, ${alunos.filter(u=>modoDe(s,u.uid)==="online").length} online</p>`:""}
+        ${alunos.length?`<ul class="list">${alunos.map(u=>`<li><span><b>${esc(u.nome)}</b><br><span class="meta">${esc(u.ano||"")}${u.encarregado?`, encarregado: ${esc(u.encarregado)}`:""}${s.formato==="Presencial e online"?`, vem ${modoDe(s,u.uid)==="presencial"?"presencialmente":"online"}`:""}</span></span><button class="btn small ghost" type="button" data-rm="${u.uid}">Remover</button></li>`).join("")}</ul>`:`<p class="empty">Ainda não há alunos. Partilha o código ${esc(s.codigo)}.</p>`}</div>
+      <div class="card"><h2>À espera de confirmação</h2>
+        ${pend.length?`<ul class="list">${pend.map(u=>`<li><span>${esc(u.nome)}, ${esc(u.ano||"")}</span><span class="row"><button class="btn small solid" type="button" data-ok="${s.id}|${u.uid}">Aceitar</button><button class="btn small ghost" type="button" data-no="${s.id}|${u.uid}">Recusar</button></span></li>`).join("")}</ul>`:`<p class="empty">Não há pedidos.</p>`}</div>
+    </div><div>
+      <div class="card"><h2>Fichas e materiais</h2>
+        ${s.materiais.length?`<ul class="list">${s.materiais.map(m=>`<li><span>${esc(m.titulo)}</span><button class="btn small ghost" type="button" data-mrm="${m.id}">Retirar</button></li>`).join("")}</ul>`:`<p class="empty">Ainda não partilhaste materiais.</p>`}
+        <form id="fm" novalidate style="margin-top:1rem"><label class="f"><span>Título</span><input name="titulo" placeholder="Ficha 5: derivadas"></label>
+          <label class="f"><span>Link do ficheiro</span><input type="url" name="url" placeholder="https://drive.google.com/..."></label>
+          <button class="btn small solid" type="submit">Partilhar com a turma</button></form></div>
+      <div class="card"><h2>Avisos</h2>
+        ${s.avisos.length?`<ul class="list">${[...s.avisos].reverse().map(a=>`<li><span>${esc(a.texto)}</span><span class="meta">${new Date(a.data).toLocaleDateString("pt-PT")}</span></li>`).join("")}</ul>`:`<p class="empty">Ainda não publicaste avisos.</p>`}
+        <form id="fv" novalidate style="margin-top:1rem"><label class="f"><span>Novo aviso</span><textarea name="texto" placeholder="Por exemplo: esta semana a aula passa para as 18h30."></textarea></label>
+          <button class="btn small solid" type="submit">Publicar aviso</button></form></div>
+      ${turmaChat(s)}
+    </div></div></div>`;
+}
+function bindSalaProf(s){
+  $("fs").addEventListener("submit",e=>{
+    e.preventDefault(); const d=Object.fromEntries(new FormData(e.target)), err=$("es");
+    if(!d.nome.trim()){ err.textContent="A sala precisa de um nome."; return; }
+    if(d.formato!=="Presencial"&&!d.link.trim()){ err.textContent="Para aulas online, cola o link da reunião."; return; }
+    if(d.formato!=="Online"&&!d.morada.trim()){ err.textContent="Para aulas presenciais, escreve a morada."; return; }
+    if(d.link && !/^https:\/\//.test(d.link.trim())){ err.textContent="O link da aula tem de começar por https://"; return; }
+    const cod=d.codigo.trim().toUpperCase();
+    if(!cod){ err.textContent="Escolhe um código de entrada."; return; }
+    if(db.salas.some(x=>x.id!==s.id&&x.codigo.toUpperCase()===cod)){ err.textContent="Outra sala já usa este código."; return; }
+    Object.assign(s,{nome:d.nome.trim(),dia:+d.dia,hora:d.hora||"18:00",duracao:Math.max(15,+d.duracao||60),formato:d.formato,plataforma:d.plataforma,capacidade:Math.max(1,+d.capacidade||1),link:d.link.trim(),morada:d.morada.trim(),codigo:cod});
+    save(); render(); toast("Alterações guardadas.");
+  });
+  $("del").addEventListener("click",()=>{ if(!confirm(`Apagar a sala ${s.nome}? Os alunos perdem o acesso aos materiais.`)) return; db.salas=db.salas.filter(x=>x!==s); save(); go("area"); toast("Sala apagada."); });
+  document.querySelectorAll("[data-ok]").forEach(b=>b.addEventListener("click",()=>decide(b.dataset.ok,true)));
+  document.querySelectorAll("[data-no]").forEach(b=>b.addEventListener("click",()=>decide(b.dataset.no,false)));
+  document.querySelectorAll("[data-rm]").forEach(b=>b.addEventListener("click",()=>{ s.alunos=s.alunos.filter(x=>x!==b.dataset.rm); save(); render(); toast("Aluno removido. Deixou de ver o link da aula."); }));
+  document.querySelectorAll("[data-mrm]").forEach(b=>b.addEventListener("click",()=>{ s.materiais=s.materiais.filter(m=>m.id!==b.dataset.mrm); save(); render(); }));
+  $("fm").addEventListener("submit",e=>{ e.preventDefault(); const d=Object.fromEntries(new FormData(e.target));
+    if(!d.titulo.trim()){ toast("Dá um título ao material."); return; }
+    s.materiais.push({id:uid("m"),titulo:d.titulo.trim(),url:d.url.trim()}); save(); render(); toast("Material partilhado com a turma."); });
+  $("fv").addEventListener("submit",e=>{ e.preventDefault(); const t=(new FormData(e.target).get("texto")||"").trim();
+    if(!t){ toast("Escreve o aviso antes de publicar."); return; }
+    s.avisos.push({id:uid("a"),texto:t,data:Date.now()}); save(); render(); toast("Aviso publicado. Os alunos veem-no na sala."); });
+}
+
+/* ---------- definições específicas do Quadro ---------- */
+const OWNER="explicador", LOCAL_LABEL="Morada";
+const eur=n=>new Intl.NumberFormat("pt-PT",{style:"currency",currency:"EUR"}).format(n);
+const CORES=[{id:"verde",nome:"Verde",light:"#2E8B57",dark:"#5CC48A"},{id:"azul",nome:"Azul",light:"#2456A6",dark:"#8BAEF0"},{id:"roxo",nome:"Roxo",light:"#6B46A8",dark:"#B79BEA"},{id:"tijolo",nome:"Tijolo",light:"#A4511A",dark:"#F0A066"},{id:"grafite",nome:"Grafite",light:"#3F4752",dark:"#AEB6C2"}];
+const NIVEIS=["5.º ano","6.º ano","7.º ano","8.º ano","9.º ano","10.º ano","11.º ano","12.º ano","Ensino superior"];
+function siteDefaults(){ return {
+  nome:"Explica+", titulo:"Explicações de Matemática e Físico-Química",
+  descricao:"Do 7.º ao 12.º ano, no nosso espaço ou online. Cada turma tem a sua sala, com a aula, as fichas e os avisos no mesmo sítio.",
+  sobre:"Somos dois professores com mais de dez anos de experiência no secundário. Preparamos para testes e exames nacionais, em turmas pequenas.",
+  disciplinas:"Matemática, Matemática A, Físico-Química", niveis:["7.º ano","8.º ano","9.º ano","10.º ano","11.º ano","12.º ano"],
+  contactos:{telefone:"253 000 000",whatsapp:"912 000 999",email:"ola@explicamais.pt",local:"Rua das Flores, 45, 1.º andar",instagram:"@explicamaisbraga"},
+  precos:{avulsa:15,pacotes:[{aulas:4,preco:55},{aulas:8,preco:100}]},
+  faltas:"Faltas avisadas com 24 horas de antecedência podem ser repostas noutra turma.",
+  cor:"verde", aviso:{ativo:true,texto:"Inscrições abertas para a preparação de exames nacionais."},
+  seo:{titulo:"Explica+, explicações de Matemática e FQ",descricao:"Explicações de Matemática e Físico-Química do 7.º ao 12.º ano, presenciais e online. Turmas pequenas e preparação para exames."} }; }
+const LABELS={nome:"nome",titulo:"título",descricao:"apresentação",sobre:"sobre nós",disciplinas:"disciplinas",niveis:"níveis",contactos:"contactos",precos:"preços",faltas:"faltas",cor:"cor",aviso:"aviso",seo:"Google"};
+const EX_AVISO="Por exemplo: inscrições abertas para o 2.º período.";
+const EX_ALT="Por exemplo: quero uma página com os resultados dos alunos nos exames.";
+function DEF_SECTIONS(){ const P=draft.precos; return `
+  <div class="card"><h2>O teu site</h2>${fText("nome","Nome")}${fText("titulo","Título principal",{max:60})}${fText("descricao","Frase de apresentação",{area:true,max:200})}${fText("sobre","Sobre nós",{area:true,max:600})}</div>
+  <div class="card"><h2>Contactos</h2>${fText("contactos.telefone","Telefone",{type:"tel"})}${fText("contactos.whatsapp","WhatsApp",{type:"tel"})}${fText("contactos.email","Email",{type:"email"})}${fText("contactos.local","Morada")}${fText("contactos.instagram","Instagram",{ph:"@utilizador"})}</div>
+  <div class="card"><h2>Disciplinas e níveis</h2>${fText("disciplinas","Disciplinas",{hint:"Separadas por vírgulas."})}${fChecks("niveis","Níveis",NIVEIS)}</div>
+  <div class="card"><h2>Preços</h2>${fNum("precos.avulsa","Aula avulsa (€)",{step:0.5})}
+    <h3 style="font-size:1rem;margin:.4rem 0 .6rem">Pacotes de aulas</h3>
+    ${P.pacotes.map((k,i)=>`<div class="pacote">${fNum(`precos.pacotes.${i}.aulas`,"Aulas")}${fNum(`precos.pacotes.${i}.preco`,"Preço (€)",{step:0.5})}<button class="btn small ghost" type="button" data-rmpac="${i}" aria-label="Retirar o pacote ${i+1}">Retirar</button></div><p class="meta" data-ppa="${i}" style="margin:-.6rem 0 1rem"></p>`).join("")}
+    <button class="btn small" type="button" id="addPac">Acrescentar pacote</button>
+    <div style="margin-top:1.2rem">${fText("faltas","Política de faltas",{area:true,max:300})}</div></div>`; }
+function validarExtra(d){ if(d.precos.pacotes.some(k=>!(k.aulas>0))) return "Cada pacote precisa de ter pelo menos uma aula."; return ""; }
+function afterInput(){ if(!draft) return; draft.precos.pacotes.forEach((k,i)=>{ const e=document.querySelector(`[data-ppa="${i}"]`); if(e) e.textContent=k.aulas>0?`Fica a ${eur(k.preco/k.aulas)} por aula${draft.precos.avulsa>0&&k.preco/k.aulas<draft.precos.avulsa?`, menos ${Math.round((1-k.preco/k.aulas/draft.precos.avulsa)*100)}% do que a aula avulsa`:""}.`:""; }); }
+function bindDefExtra(){
+  $("addPac").onclick=()=>{ draft.precos.pacotes.push({aulas:10,preco:120}); keepY=scrollY; render(); };
+  document.querySelectorAll("[data-rmpac]").forEach(b=>b.onclick=()=>{ draft.precos.pacotes.splice(+b.dataset.rmpac,1); keepY=scrollY; render(); });
+}
+const EXPORTS=[
+  {nome:"Alunos",cols:["Nome","Ano","Email","Encarregado de educação","Salas"],rows:()=>Object.values(db.users).filter(u=>u.role==="aluno").map(u=>[u.nome,u.ano,u.email,u.encarregado,db.salas.filter(s=>s.alunos.includes(u.uid)).map(s=>s.nome).join(", ")])},
+  {nome:"Salas",cols:["Sala","Dia","Hora","Formato","Alunos","Código"],rows:()=>db.salas.map(s=>[s.nome,DIAS[s.dia],s.hora,s.formato,s.alunos.length,s.codigo])}];
+
+/* =========================================================
+   DEFINIÇÕES DO SITE
+   O dono muda sozinho o dia a dia do negócio: textos, contactos, preços, cor, aviso e Google.
+   Nada fica visível sem Publicar, e cada publicação fica no histórico para poder ser reposta.
+   Domínio, alojamento, segurança, design e funções novas ficam com a antuneswho.
+   ========================================================= */
+const clone=o=>JSON.parse(JSON.stringify(o));
+let draft=null, previewOn=false;
+const baseSite=()=>db.site||(db.site=siteDefaults());
+const site=()=>(previewOn&&draft)?draft:baseSite();
+const getPath=(o,p)=>p.split(".").reduce((a,k)=>a==null?a:a[k],o);
+function setPath(o,p,v){ const ks=p.split("."); let a=o; ks.slice(0,-1).forEach(k=>{ if(a[k]==null) a[k]={}; a=a[k]; }); a[ks[ks.length-1]]=v; }
+function applyTheme(){
+  const S=site(), c=CORES.find(x=>x.id===S.cor)||CORES[0];
+  let st=document.getElementById("themeVars");
+  if(!st){ st=document.createElement("style"); st.id="themeVars"; document.head.appendChild(st); }
+  st.textContent=`:root{--acc:${c.light}}@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--acc:${c.dark}}}:root[data-theme="dark"]{--acc:${c.dark}}`;
+  document.title=S.seo.titulo||S.nome;
+  const lg=document.querySelector(".logo"); if(lg) lg.textContent=S.nome;
+}
+function avisoHTML(){ const a=site().aviso; return a.ativo&&a.texto.trim()?`<div class="aviso" role="note"><div class="wrap">${esc(a.texto)}</div></div>`:""; }
+function contactosHTML(){
+  const c=site().contactos, d=s=>String(s||"").replace(/\D/g,""), it=[];
+  if(c.telefone) it.push(`<li><b>Telefone</b><a href="tel:+351${d(c.telefone)}">${esc(c.telefone)}</a></li>`);
+  if(c.whatsapp) it.push(`<li><b>WhatsApp</b><a href="https://wa.me/351${d(c.whatsapp)}" target="_blank" rel="noopener">${esc(c.whatsapp)}</a></li>`);
+  if(c.email) it.push(`<li><b>Email</b><a href="mailto:${esc(c.email)}">${esc(c.email)}</a></li>`);
+  if(c.local) it.push(`<li><b>${LOCAL_LABEL}</b><span>${esc(c.local)}</span></li>`);
+  if(c.instagram) it.push(`<li><b>Instagram</b><span>${esc(c.instagram)}</span></li>`);
+  return it.length?`<section class="blk" id="contactos"><div class="wrap"><h2 class="t">Contactos</h2><ul class="contacts">${it.join("")}</ul></div></section>`:"";
+}
+const fv=p=>esc(getPath(draft,p)??"");
+const fText=(p,l,o={})=>`<label class="f"><span>${l}</span>${o.area?`<textarea data-k="${p}"${o.max?` maxlength="${o.max}"`:""}${o.ph?` placeholder="${o.ph}"`:""}>${fv(p)}</textarea>`:`<input data-k="${p}"${o.type?` type="${o.type}"`:""}${o.max?` maxlength="${o.max}"`:""}${o.ph?` placeholder="${o.ph}"`:""} value="${fv(p)}">`}${o.max?`<small><span data-count="${p}">${String(getPath(draft,p)||"").length}</span> de ${o.max} caracteres</small>`:""}${o.hint?`<small>${o.hint}</small>`:""}</label>`;
+const fNum=(p,l,o={})=>`<label class="f"><span>${l}</span><input type="number" inputmode="decimal" data-k="${p}" data-num min="0" step="${o.step||1}" value="${fv(p)}">${o.hint?`<small>${o.hint}</small>`:""}</label>`;
+const fChecks=(p,l,opts)=>`<fieldset class="f"><legend>${l}</legend><div class="opts">${opts.map(o=>`<label class="opt"><input type="checkbox" data-arr="${p}" value="${esc(o)}"${(getPath(draft,p)||[]).includes(o)?" checked":""}>${esc(o)}</label>`).join("")}</div></fieldset>`;
+const fToggle=(p,l)=>`<label class="chk"><input type="checkbox" data-bool="${p}"${getPath(draft,p)?" checked":""}>${l}</label>`;
+const coresHTML=()=>`<fieldset class="f"><legend>Cor principal</legend><div class="opts">${CORES.map(c=>`<label class="opt"><input type="radio" name="cor" data-radio="cor" value="${c.id}"${draft.cor===c.id?" checked":""}><i class="sw" style="background:${c.light}"></i>${c.nome}</label>`).join("")}</div><small>Todas estas cores mantêm o texto legível, no modo claro e no escuro.</small></fieldset>`;
+const mudancas=(a,b)=>Object.keys(LABELS).filter(k=>JSON.stringify(a[k])!==JSON.stringify(b[k])).map(k=>LABELS[k]);
+function validar(d){
+  if(!d.nome.trim()) return "O nome do site não pode ficar vazio.";
+  const c=d.contactos;
+  if(!c.telefone.trim()&&!c.email.trim()&&!c.whatsapp.trim()) return "Deixa pelo menos um contacto: telefone, WhatsApp ou email.";
+  if(c.email.trim()&&!/^\S+@\S+\.\S+$/.test(c.email.trim())) return "O email não parece válido.";
+  return validarExtra(d);
+}
+function publicar(){
+  const err=validar(draft); if(err){ toast(err); return false; }
+  const antes=clone(baseSite()), m=mudancas(antes,draft);
+  if(!m.length){ toast("Não há alterações para publicar."); return false; }
+  db.historico=[{id:uid("h"),data:Date.now(),quem:me().nome,resumo:m,antes},...(db.historico||[])].slice(0,20);
+  db.site=clone(draft); draft=null; previewOn=false; save(); applyTheme();
+  toast("Publicado. O site já mostra as alterações."); return true;
+}
+function repor(id){
+  const h=(db.historico||[]).find(x=>x.id===id); if(!h) return;
+  db.historico=[{id:uid("h"),data:Date.now(),quem:me().nome,resumo:["reposição de uma versão anterior"],antes:clone(baseSite())},...db.historico].slice(0,20);
+  db.site=clone(h.antes); draft=null; save(); applyTheme(); keepY=scrollY; render(); toast("Versão anterior reposta.");
+}
+function exportar(x){
+  const rows=x.rows(), csv=[x.cols,...rows].map(r=>r.map(v=>`"${String(v??"").replace(/"/g,'""')}"`).join(";")).join("\n");
+  let d=$("dataDlg"); if(!d){ d=document.createElement("dialog"); d.id="dataDlg"; document.body.appendChild(d); }
+  d.innerHTML=`<h2>${x.nome}</h2><p class="empty chatnote">${rows.length} ${rows.length===1?"linha":"linhas"}. Copia e cola no Excel ou no Google Sheets. No site publicado, este botão descarrega o ficheiro.</p>
+    <label class="sr" for="csvTa">Dados</label><textarea id="csvTa" readonly rows="8" style="font-size:.85rem">${esc(csv)}</textarea>
+    <div class="row" style="margin-top:.8rem"><button class="btn small solid" type="button" id="cpy">Copiar</button><form method="dialog"><button class="btn small">Fechar</button></form></div>`;
+  d.showModal();
+  $("cpy").onclick=async()=>{ try{ await navigator.clipboard.writeText(csv); }catch(e){ const ta=$("csvTa"); ta.select(); document.execCommand("copy"); } toast("Copiado."); };
+}
+function previewBar(v){
+  v.insertAdjacentHTML("afterbegin",`<div class="pvbar"><div class="wrap row"><b style="flex:1 1 240px">Pré-visualização. Os visitantes ainda veem a versão publicada.</b>
+    <button class="btn small solid" type="button" id="pvPub">Publicar</button><button class="btn small pvback" type="button" id="pvBack">Voltar a editar</button></div></div>`);
+  $("pvPub").onclick=()=>{ if(publicar()) render(); };
+  $("pvBack").onclick=()=>{ previewOn=false; applyTheme(); go("definicoes"); };
+}
+function pageDef(){
+  if(!draft) draft=clone(baseSite());
+  const dirty=JSON.stringify(draft)!==JSON.stringify(baseSite()), hist=db.historico||[], alts=db.alteracoes||[];
+  return `<div class="wrap area"><a class="back" href="#area">Voltar ao painel</a>
+    <h1>Definições do site</h1><p class="sub">Aqui mudas sozinho o que faz parte do dia a dia do teu negócio. Nada fica visível até carregares em Publicar, e podes sempre repor uma versão anterior.</p>
+    <div class="grid2"><div id="defForm">
+      ${DEF_SECTIONS()}
+      <div class="card"><h2>Aspeto</h2>${coresHTML()}</div>
+      <div class="card"><h2>Aviso no topo do site</h2>${fToggle("aviso.ativo","Mostrar o aviso")}${fText("aviso.texto","Texto do aviso",{max:140,ph:EX_AVISO})}</div>
+      <div class="card"><h2>No Google</h2><p class="empty chatnote">É o que aparece nos resultados de pesquisa.</p>${fText("seo.titulo","Título",{max:60})}${fText("seo.descricao","Descrição",{area:true,max:160})}</div>
+    </div><div>
+      <div class="card"><h2>Histórico de alterações</h2>${hist.length?`<ul class="list">${hist.map(h=>`<li><div class="lh"><b>${new Date(h.data).toLocaleString("pt-PT",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</b><button class="btn small ghost" type="button" data-repor="${h.id}">Repor como estava antes</button></div><span class="meta">${esc(h.quem)} mudou: ${esc(h.resumo.join(", "))}</span></li>`).join("")}</ul>`:`<p class="empty">Ainda não publicaste alterações.</p>`}</div>
+      <div class="card"><h2>Os teus dados</h2><p class="empty chatnote">Os dados são teus. Copia-os para o Excel sempre que quiseres.</p><div class="row">${EXPORTS.map((x,i)=>`<button class="btn small" type="button" data-export="${i}">${x.nome}</button>`).join("")}</div></div>
+      <div class="card"><h2>Pedir uma alteração à antuneswho</h2><p class="empty chatnote">Para o que não está aqui: mudar o design, criar uma página nova ou acrescentar uma função.</p>
+        <form id="falt" novalidate><label class="f"><span>O que precisas?</span><textarea name="texto" placeholder="${EX_ALT}"></textarea></label><button class="btn small solid" type="submit">Enviar pedido</button></form>
+        ${alts.length?`<ul class="list" style="margin-top:.8rem">${alts.map(a=>`<li><div class="lh"><span>${esc(a.texto)}</span><span class="pill">Enviado</span></div><span class="meta">${new Date(a.data).toLocaleDateString("pt-PT")}</span></li>`).join("")}</ul>`:""}
+        <details style="margin-top:.8rem"><summary>O que a antuneswho trata por ti</summary><ul class="ladr"><li>Domínio e alojamento</li><li>Segurança e atualizações</li><li>Cópias de segurança diárias</li><li>Design, páginas novas e funções novas</li></ul></details></div>
+    </div></div>
+    <div class="savebar"><div class="wrap row"><span id="dirty" class="meta" style="flex:1 1 200px">${dirty?"Tens alterações por publicar.":"Tudo publicado."}</span>
+      <button class="btn small" type="button" id="pvBtn">Pré-visualizar</button><button class="btn small ghost" type="button" id="discard"${dirty?"":" disabled"}>Descartar</button><button class="btn small solid" type="button" id="pubBtn">Publicar alterações</button></div></div></div>`;
+}
+function bindDef(){
+  const root=$("defForm");
+  const upd=()=>{ const dirty=JSON.stringify(draft)!==JSON.stringify(baseSite()); $("dirty").textContent=dirty?"Tens alterações por publicar.":"Tudo publicado."; $("discard").disabled=!dirty; afterInput(); };
+  root.querySelectorAll("[data-k]").forEach(el=>el.addEventListener("input",()=>{
+    setPath(draft,el.dataset.k,el.hasAttribute("data-num")?(el.value===""?0:Math.max(0,Number(el.value))):el.value);
+    const c=document.querySelector(`[data-count="${el.dataset.k}"]`); if(c) c.textContent=el.value.length; upd(); }));
+  root.querySelectorAll("[data-arr]").forEach(el=>el.addEventListener("change",()=>{ const p=el.dataset.arr; setPath(draft,p,[...root.querySelectorAll(`[data-arr="${p}"]:checked`)].map(x=>x.value)); upd(); }));
+  root.querySelectorAll("[data-bool]").forEach(el=>el.addEventListener("change",()=>{ setPath(draft,el.dataset.bool,el.checked); upd(); }));
+  root.querySelectorAll("[data-radio]").forEach(el=>el.addEventListener("change",()=>{ setPath(draft,el.dataset.radio,el.value); upd(); }));
+  bindDefExtra(root); afterInput();
+  $("pvBtn").onclick=()=>{ const e=validar(draft); if(e){ toast(e); return; } previewOn=true; applyTheme(); go("inicio"); };
+  $("pubBtn").onclick=()=>{ if(publicar()){ keepY=scrollY; render(); } };
+  $("discard").onclick=()=>{ draft=null; keepY=scrollY; render(); toast("Alterações descartadas."); };
+  document.querySelectorAll("[data-repor]").forEach(b=>b.onclick=()=>{ if(confirm("Repor o site como estava antes desta alteração?")) repor(b.dataset.repor); });
+  document.querySelectorAll("[data-export]").forEach(b=>b.onclick=()=>exportar(EXPORTS[+b.dataset.export]));
+  $("falt").addEventListener("submit",e=>{ e.preventDefault(); const t=(new FormData(e.target).get("texto")||"").trim();
+    if(!t){ toast("Escreve o que precisas."); return; }
+    db.alteracoes=[{texto:t,data:Date.now()},...(db.alteracoes||[])]; save(); keepY=scrollY; render(); toast("Pedido enviado à antuneswho. A resposta chega em 2 dias úteis."); });
+}
+
+render();
+</script>
+</body>
+</html>
