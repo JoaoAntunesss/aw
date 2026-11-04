@@ -1,0 +1,21 @@
+{
+  "name": "Explica+",
+  "short_name": "Explica+",
+  "description": "As tuas aulas, salas e fichas do Explica+.",
+  "lang": "pt-PT",
+  "start_url": "./#area",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F2F7F3",
+  "theme_color": "#123524",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "A minha área", "url": "./#area" },
+    { "name": "Horário", "url": "./#horario" }
+  ]
+}

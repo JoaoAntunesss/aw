@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Marta Silva, babysitter — demonstração do template Ninho</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FBF6F1; --surface:#FFFFFF; --ink:#2D2A3A; --muted:#6F6A7C; --acc:#4F7C76; --acc-ink:#FFFFFF; --warm:#F1B27A; --warm-ink:#5A3413;
+  --soft:#EFE4DA; --line:rgba(45,42,58,.14); --bar:#2D2A3A; --bar-ink:#F3EEF6; --red:#A8433A;
+  color-scheme:light; box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#17151D; --surface:#211E29; --ink:#EEEAF3; --muted:#ABA5B8; --acc:#7FB5AD; --acc-ink:#10221F; --warm:#E8A469; --warm-ink:#2A1606;
+    --soft:#2D2935; --line:rgba(238,234,243,.14); --bar:#0E0C12; --bar-ink:#E6E0EE; --red:#F08A80; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#17151D; --surface:#211E29; --ink:#EEEAF3; --muted:#ABA5B8; --acc:#7FB5AD; --acc-ink:#10221F; --warm:#E8A469; --warm-ink:#2A1606;
+  --soft:#2D2935; --line:rgba(238,234,243,.14); --bar:#0E0C12; --bar-ink:#E6E0EE; --red:#F08A80; color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Schibsted Grotesk",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:1.0625rem;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:20;background:var(--bar)}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--acc);outline-offset:3px;border-radius:4px}
+.wrap{max-width:1100px;margin:0 auto;padding:0 clamp(1rem,4vw,2.2rem)}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:10}
+@media (max-width:640px){.top{position:static}}
+.demobar{background:var(--bar);color:var(--bar-ink);font-size:.92rem}
+.demobar .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1rem;min-height:48px;padding-top:.35rem;padding-bottom:.35rem}
+.demobar p{margin:0;flex:1 1 260px}
+.demobar button{font:inherit;font-weight:600;border:1px solid rgba(255,255,255,.35);background:transparent;color:inherit;border-radius:999px;padding:.3rem .9rem;cursor:pointer;min-height:34px}
+.demobar button[aria-pressed="true"]{background:var(--bar-ink);color:var(--bar)}
+header.site{background:var(--bg);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:1rem;min-height:62px}
+.logo{white-space:nowrap;font-weight:900;font-size:1.3rem;letter-spacing:-.02em;text-decoration:none}
+.navr{display:flex;align-items:center;gap:1rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 1.15rem;border-radius:999px;font:inherit;font-weight:600;text-decoration:none;cursor:pointer;border:1.5px solid var(--ink);background:transparent;color:var(--ink)}
+.btn.solid{background:var(--acc);border-color:var(--acc);color:var(--acc-ink)}
+.btn.small{min-height:36px;padding:0 .9rem;font-size:.93rem}
+.btn.ghost{border-color:var(--line)}
+.btn.danger{border-color:var(--red);color:var(--red)}
+.btn:hover{filter:brightness(1.07)}
+.row{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+
+.hero{padding:clamp(2.5rem,7vw,4.5rem) 0 2.2rem;display:grid;grid-template-columns:1.15fr 1fr;gap:2.5rem;align-items:start}
+.hero h1{font-size:clamp(2.4rem,6vw,4.4rem);line-height:.98;letter-spacing:-.04em;margin:0 0 1rem;font-weight:900}
+.hero p.lead{color:var(--muted);max-width:44ch;margin:0 0 1.2rem;font-size:1.12rem}
+.badges{display:flex;flex-wrap:wrap;gap:.5rem;margin:0 0 1.4rem;padding:0;list-style:none}
+.badges li{background:var(--soft);border-radius:999px;padding:.35rem .9rem;font-weight:600;font-size:.95rem}
+@media (max-width:820px){.hero{grid-template-columns:1fr}}
+section.blk{padding:clamp(2.5rem,6vw,4rem) 0;border-top:1px solid var(--line)}
+h2.t{font-size:clamp(1.7rem,3.6vw,2.4rem);letter-spacing:-.03em;line-height:1.05;margin:0 0 .5rem;font-weight:800}
+p.sub{color:var(--muted);margin:0 0 1.6rem;max-width:58ch}
+.quotes{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem}
+.quotes blockquote{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:1.2rem 1.3rem}
+.quotes p{margin:0 0 .6rem}
+.quotes cite{font-style:normal;color:var(--muted);font-size:.95rem}
+@media (max-width:760px){.quotes{grid-template-columns:1fr}}
+
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cal .dow{font-size:.8rem;font-weight:700;color:var(--muted);text-align:center;padding-bottom:2px}
+.cal .d{aspect-ratio:1;border-radius:10px;display:grid;place-items:center;font-weight:600;font-size:.92rem;background:var(--soft);color:var(--muted);border:0;font-family:inherit}
+.cal .d.livre{background:var(--warm);color:var(--warm-ink)}
+.cal .d.marcado{background:var(--acc);color:var(--acc-ink)}
+.cal button.d{cursor:pointer}
+.cal .pad{visibility:hidden}
+.legend{display:flex;flex-wrap:wrap;gap:1rem;margin-top:.8rem;font-size:.9rem;color:var(--muted)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:.35rem;vertical-align:-1px}
+
+.area{padding:clamp(1.8rem,5vw,3rem) 0 4rem}
+.area h1{font-size:clamp(1.9rem,5vw,3rem);letter-spacing:-.04em;line-height:1;margin:0 0 .4rem;font-weight:900}
+.grid2{display:grid;grid-template-columns:1.1fr 1fr;gap:1.4rem;align-items:start}
+@media (max-width:860px){.grid2{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:1.3rem 1.4rem}
+.card h2{margin:0 0 .8rem;font-size:1.2rem}
+.card + .card{margin-top:1.2rem}
+.next{background:var(--acc);color:var(--acc-ink);border:0}
+.next .when{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:900;letter-spacing:-.03em;line-height:1.1;margin:.2rem 0 .3rem}
+.next p{margin:0;opacity:.92}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.4rem}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:1rem 1.2rem}
+.stat b{display:block;font-size:2rem;font-weight:900;letter-spacing:-.03em;line-height:1.1}
+.stat span{color:var(--muted)}
+@media (max-width:560px){.stats{grid-template-columns:1fr}}
+.list{list-style:none;margin:0;padding:0}
+.list > li{padding:.8rem 0;border-bottom:1px solid var(--line)}
+.list > li:last-child{border-bottom:0}
+.lh{display:flex;flex-wrap:wrap;gap:.4rem 1rem;align-items:baseline;justify-content:space-between}
+.meta{color:var(--muted);font-size:.93rem}
+.empty{color:var(--muted);margin:0}
+.pill{display:inline-block;font-size:.85rem;font-weight:700;padding:.15rem .65rem;border-radius:999px;background:var(--soft);color:var(--ink)}
+.pill.pendente{background:var(--warm);color:var(--warm-ink)}
+.pill.confirmado{background:var(--acc);color:var(--acc-ink)}
+.pill.recusado,.pill.cancelado{background:var(--soft);color:var(--muted)}
+.lock{font-size:.93rem;color:var(--muted);background:var(--bg);border:1px dashed var(--line);border-radius:12px;padding:.6rem .8rem;margin:.5rem 0}
+.ficha{background:var(--bg);border-radius:12px;padding:.7rem .9rem;margin:.5rem 0}
+.ficha dl{display:grid;grid-template-columns:auto 1fr;gap:.2rem 1rem;margin:0;font-size:.95rem}
+.ficha dt{color:var(--muted)}
+.ficha dd{margin:0}
+.back{display:inline-block;margin-bottom:1rem;color:var(--muted);text-decoration:none;font-weight:500}
+.f{display:grid;gap:.3rem;margin:0 0 1rem;min-width:0;border:0;padding:0}
+.f > span,.f > legend{font-weight:600;padding:0}
+.f small{color:var(--muted)}
+input,select,textarea{font:inherit;width:100%;padding:.65rem .8rem;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink)}
+textarea{min-height:80px;resize:vertical}
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:0 1rem}
+.fgrid .full{grid-column:1/-1}
+@media (max-width:640px){.fgrid{grid-template-columns:1fr}}
+.opts{display:flex;flex-wrap:wrap;gap:.5rem}
+.opt{display:inline-flex;align-items:center;gap:.45rem;border:1px solid var(--line);border-radius:999px;padding:.4rem .9rem;cursor:pointer;min-height:40px;background:var(--surface)}
+.opt:has(input:checked){border-color:var(--acc);color:var(--acc);font-weight:600}
+.opt input{width:auto;margin:0;accent-color:var(--acc)}
+.chk{display:flex;gap:.55rem;align-items:center;font-weight:600;margin:.6rem 0 .5rem;cursor:pointer}
+.chk input{width:auto;accent-color:var(--acc);margin:0}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;margin-bottom:1.2rem;background:var(--surface)}
+.seg button{font:inherit;font-weight:600;border:0;background:transparent;color:var(--muted);padding:.45rem 1.05rem;border-radius:999px;cursor:pointer;min-height:38px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.narrow{max-width:560px}
+.err{color:var(--red);min-height:1.4em;margin:.2rem 0 .8rem}
+details summary{cursor:pointer;font-weight:600;color:var(--acc);min-height:30px}
+
+.msgbox{max-height:360px;overflow-y:auto;border:1px solid var(--line);border-radius:14px;padding:.8rem;background:var(--bg);margin-bottom:.8rem}
+.msgs{list-style:none;margin:0;padding:0;display:grid;gap:.6rem}
+.msg{max-width:85%;background:var(--surface);border:1px solid var(--line);border-radius:14px 14px 14px 4px;padding:.55rem .8rem}
+.msg.mine{justify-self:end;background:var(--soft);border-radius:14px 14px 4px 14px}
+.msg .who{font-weight:700;font-size:.88rem}
+.msg .who span{font-weight:400;color:var(--muted)}
+.msg p{margin:.15rem 0 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.chatform{display:flex;gap:.6rem;align-items:flex-end}
+.chatform textarea{min-height:46px;flex:1}
+.chatnote{margin-bottom:.8rem;font-size:.93rem}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.paylist{list-style:none;margin:0 0 .8rem;padding:0}
+.paylist li{padding:.55rem 0;border-bottom:1px solid var(--line)}
+.paylist li:last-child{border-bottom:0}
+.paylist b{display:block}
+.paylist span{color:var(--muted);font-variant-numeric:tabular-nums}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1.2rem);transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:.85rem 1.2rem;border-radius:14px;max-width:min(92vw,520px);box-shadow:0 12px 30px rgba(0,0,0,.25);z-index:30;font-size:.97rem}
+.toast[hidden]{display:none}
+footer{border-top:1px solid var(--line);padding:1.6rem 0;color:var(--muted);font-size:.93rem}
+.aviso{background:var(--acc);color:var(--acc-ink);padding:.7rem 0;font-weight:600}
+.pvbar{background:var(--ink);color:var(--bg);padding:.75rem 0}
+.pvbar .pvback{border-color:currentColor;color:inherit}
+.savebar{position:sticky;bottom:0;z-index:5;background:var(--surface);border-top:1px solid var(--line);margin-top:1.5rem;padding:.7rem 0 calc(.7rem + env(safe-area-inset-bottom,0px))}
+.savebar .btn[disabled]{opacity:.5;cursor:default}
+.sw{width:14px;height:14px;border-radius:50%;display:inline-block;flex:none}
+.contacts{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem}
+.contacts li{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:1rem 1.2rem}
+.contacts b{display:block;font-size:.9rem;color:var(--muted);font-weight:600}
+.contacts a,.contacts span{font-weight:700;font-size:1.05rem;text-decoration:none;overflow-wrap:anywhere}
+.ladr{margin:.5rem 0 0;padding-left:1.1rem;color:var(--muted)}
+.pacote{display:grid;grid-template-columns:1fr 1fr auto;gap:0 .8rem;align-items:end}
+.pacote .btn{margin-bottom:1rem}
+dialog#dataDlg{border:0;border-radius:20px;padding:1.4rem 1.5rem;width:min(92vw,560px);background:var(--surface);color:var(--ink);box-shadow:0 20px 50px rgba(0,0,0,.3)}
+dialog#dataDlg::backdrop{background:rgba(0,0,0,.5)}
+dialog#dataDlg h2{margin:0 0 .6rem}
+.navr a.plain{text-decoration:none;color:var(--muted);font-weight:500}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="demobar"><div class="wrap">
+    <p>Estás a ver uma demonstração do template Ninho. Experimenta como:</p>
+    <button type="button" data-as="familia">Família</button>
+    <button type="button" data-as="babysitter">Babysitter</button>
+    <button type="button" data-as="visitante">Visitante</button>
+    <button type="button" id="resetDemo">Recomeçar</button>
+  </div></div>
+  <header class="site"><div class="wrap bar">
+    <a class="logo" href="#inicio">Marta Silva</a>
+    <div class="navr" id="nav"></div>
+  </div></header>
+</div>
+<main id="view"></main>
+<footer><div class="wrap">Marta Silva, babysitter. Dados fictícios, para demonstração.</div></footer>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+/* =========================================================
+   Regras da conversa e da privacidade neste template:
+   - A conversa é só entre cada família e a babysitter. As crianças não têm conta.
+   - Abre quando a família faz o primeiro pedido. Antes disso ninguém escreve.
+   - A morada e as fichas das crianças (alergias, rotinas, emergência) não andam no chat:
+     a babysitter só as vê para pedidos que confirmou.
+   - Ninguém apaga mensagens. A babysitter pode fechar a conversa e bloquear a família.
+   ========================================================= */
+const KEY="ninho-demo-v2";
+const DIAS=["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"], DIASL=["domingo","segunda","terça","quarta","quinta","sexta","sábado"];
+const iso=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+const addDays=(n)=>{const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()+n);return d;};
+const fromIso=s=>{const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d,12);};
+
+function seed(){
+  const livres=[]; for(let i=0;i<28;i++){ const d=addDays(i), w=d.getDay(); if(w===0||w===5||w===6||w===3) livres.push(iso(d)); }
+  const nextDow=w=>{for(let i=1;i<14;i++){const d=addDays(i);if(d.getDay()===w) return iso(d);}};
+  return {
+    session:"u-joana",
+    users:{
+      "u-marta":{uid:"u-marta",nome:"Marta Silva",email:"marta@exemplo.pt",role:"babysitter",precoHora:10},
+      "u-joana":{uid:"u-joana",nome:"Joana Costa",familia:"Família Costa",email:"joana@exemplo.pt",role:"familia",telefone:"912 000 111",morada:"Rua de Santa Margarida, 12, 3.º esq."},
+      "u-rui":{uid:"u-rui",nome:"Rui Rocha",familia:"Família Rocha",email:"rui@exemplo.pt",role:"familia",telefone:"913 000 222",morada:"Avenida da Liberdade, 300, 1.º"}
+    },
+    criancas:[
+      {id:"c1",familiaUid:"u-joana",nome:"Tomás",idade:"3 anos",alergias:"Frutos secos",rotina:"Jantar às 19h30, dorme às 20h30 com a luz de presença ligada.",emergencia:"Avó Rosa, 914 000 333"},
+      {id:"c2",familiaUid:"u-joana",nome:"Leonor",idade:"6 anos",alergias:"Nenhuma",rotina:"Pode ver um episódio antes de dormir. Deita-se às 21h.",emergencia:"Avó Rosa, 914 000 333"},
+      {id:"c3",familiaUid:"u-rui",nome:"Bia",idade:"8 meses",alergias:"Nenhuma",rotina:"Biberão às 20h, dorme às 20h30.",emergencia:"Tia Sara, 915 000 444"}
+    ],
+    pedidos:[
+      {id:"p1",familiaUid:"u-joana",data:nextDow(6),inicio:"19:00",fim:"23:00",criancas:["c1","c2"],notas:"Vamos a um jantar de anos.",estado:"confirmado",criadoEm:Date.now()-3*86400000},
+      {id:"p2",familiaUid:"u-rui",data:nextDow(5),inicio:"20:00",fim:"00:00",criancas:["c3"],notas:"Primeira vez que deixamos a Bia.",estado:"pendente",criadoEm:Date.now()-86400000}
+    ],
+    livres,
+    chats:{
+      "u-joana":{fechada:false,msgs:[
+        {id:"m1",uid:"u-joana",texto:"Olá Marta! Confirmas sábado às 19h?",data:Date.now()-2*86400000},
+        {id:"m2",uid:"u-marta",texto:"Olá Joana, confirmado. Já vi a ficha do Tomás e da Leonor.",data:Date.now()-2*86400000+3600000}]},
+      "u-rui":{fechada:false,msgs:[{id:"m3",uid:"u-rui",texto:"Boa tarde. A Bia ainda acorda uma vez à noite, está habituada a colo.",data:Date.now()-86400000}]}
+    },
+    bloqueadas:[],
+    pagamentos:{mbway:true,mbwayNum:"912 345 678",transf:false,iban:"",dinheiro:true,online:false,onlineLink:"",nota:"Pagamento no fim de cada babysitting."}
+  };
+}
+let db; try{ db=JSON.parse(localStorage.getItem(KEY))||seed(); }catch(e){ db=seed(); }
+const save=()=>{ try{ localStorage.setItem(KEY,JSON.stringify(db)); }catch(e){} };
+const me=()=>db.users[db.session]||null;
+const marta=()=>db.users["u-marta"];
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+const $=id=>document.getElementById(id);
+const eur=n=>new Intl.NumberFormat("pt-PT",{style:"currency",currency:"EUR"}).format(n);
+let toastT; function toast(m){ const t=$("toast"); t.textContent=m; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,4500); }
+
+function horas(p){ const [a,b]=[p.inicio,p.fim].map(x=>{const [h,m]=x.split(":").map(Number);return h*60+m;}); let d=b-a; if(d<=0) d+=1440; return d/60; }
+const dataTxt=s=>{const d=fromIso(s);return `${DIASL[d.getDay()]}, ${d.getDate()} de ${d.toLocaleDateString("pt-PT",{month:"long"})}`;};
+const estadoTxt={pendente:"Pendente",confirmado:"Confirmado",recusado:"Recusado",cancelado:"Cancelado"};
+const familia=u=>db.users[u]; const criancasDe=u=>db.criancas.filter(c=>c.familiaUid===u);
+const pedidosDe=u=>db.pedidos.filter(p=>p.familiaUid===u);
+const marcados=()=>new Set(db.pedidos.filter(p=>p.estado==="confirmado").map(p=>p.data));
+/* a babysitter só vê a ficha e a morada para pedidos que confirmou */
+const podeVerFicha=(famUid)=>db.pedidos.some(p=>p.familiaUid===famUid&&p.estado==="confirmado");
+/* a conversa existe a partir do primeiro pedido */
+const conversaAberta=famUid=>pedidosDe(famUid).length>0;
+const bloqueada=famUid=>db.bloqueadas.includes(famUid);
+const chatDe=famUid=>db.chats[famUid]||(db.chats[famUid]={fechada:false,msgs:[]});
+
+/* ---------- navegação ---------- */
+let keepY=null;
+function go(h){ if(location.hash==="#"+h) render(); else location.hash=h; }
+window.addEventListener("hashchange",render);
+document.querySelectorAll("[data-as]").forEach(b=>b.addEventListener("click",()=>{
+  const as=b.dataset.as; db.session=as==="familia"?"u-joana":as==="babysitter"?"u-marta":null; save(); go(as==="visitante"?"inicio":"area");
+}));
+$("resetDemo").addEventListener("click",()=>{ db=seed(); save(); toast("Os dados da demonstração voltaram ao início."); go("area"); });
+function renderNav(){
+  const u=me();
+  $("nav").innerHTML=(u?`${u.role==="babysitter"?`<a class="plain" href="#definicoes">Definições</a>`:""}<a class="btn small" href="#area">${u.role==="babysitter"?"Painel":"A minha área"}</a><button class="btn small ghost" type="button" id="logout">Sair</button>`:`<a class="btn small solid" href="#entrar">Entrar</a>`);
+  $("logout")?.addEventListener("click",()=>{ db.session=null; save(); go("inicio"); });
+  const as=!u?"visitante":u.uid==="u-joana"?"familia":u.uid==="u-marta"?"babysitter":"";
+  document.querySelectorAll("[data-as]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.as===as?"true":"false"));
+}
+function render(){
+  const h=(location.hash||"#inicio").slice(1), u=me(), v=$("view");
+  if(previewOn&&h!=="inicio") previewOn=false;
+  applyTheme(); renderNav();
+  if(h==="inicio"||!h){ v.innerHTML=pageInicio(); }
+  else if(h==="entrar"){ v.innerHTML=pageEntrar(); bindEntrar(); }
+  else if(!u){ go("entrar"); return; }
+  else if(h==="definicoes"){ if(u.role!==OWNER){ go("area"); return; } v.innerHTML=pageDef(); bindDef(); }
+  else if(h==="area"){ if(u.role==="babysitter"){ v.innerHTML=pageBaby(); bindBaby(); } else { v.innerHTML=pageFam(); bindFam(); } }
+  else if(h.startsWith("conversa-")&&u.role==="babysitter"){ const f=familia(h.slice(9)); if(!f||!conversaAberta(f.uid)){ go("area"); return; } v.innerHTML=pageConversa(f); bindConversa(f); }
+  else { go(u?"area":"inicio"); return; }
+  if(previewOn) previewBar(v);
+  bindChat();
+  if(keepY!==null){ window.scrollTo(0,keepY); keepY=null; } else window.scrollTo(0,0);
+}
+
+/* ---------- calendário ---------- */
+function calHTML(editable){
+  const m=marcados(), first=addDays(0), pad=(first.getDay()+6)%7;
+  let cells=["Seg","Ter","Qua","Qui","Sex","Sáb","Dom"].map(d=>`<div class="dow">${d}</div>`).join("")+Array(pad).fill('<div class="d pad"></div>').join("");
+  for(let i=0;i<28;i++){ const d=addDays(i), k=iso(d), st=m.has(k)?"marcado":db.livres.includes(k)?"livre":"";
+    const label=`${dataTxt(k)}: ${st==="marcado"?"marcado":st==="livre"?"livre":"ocupado"}`;
+    cells+=editable&&st!=="marcado"?`<button type="button" class="d ${st}" data-day="${k}" aria-label="${label}. Carrega para mudar.">${d.getDate()}</button>`:`<div class="d ${st}" aria-label="${label}">${d.getDate()}</div>`; }
+  return `<div class="cal">${cells}</div><div class="legend"><span><i style="background:var(--warm)"></i>Livre</span><span><i style="background:var(--soft)"></i>Ocupado</span><span><i style="background:var(--acc)"></i>Já marcado</span></div>`;
+}
+
+/* ---------- site público ---------- */
+function pageInicio(){
+  const S=site(), P=S.precos;
+  const sup=[P.criancaExtra>0?`mais ${eur(P.criancaExtra)} por hora por cada criança a mais`:"",P.noite>0?`mais ${eur(P.noite)} por hora depois da meia-noite`:"",P.minimoHoras>0?`mínimo de ${P.minimoHoras} horas`:""].filter(Boolean);
+  return `${avisoHTML()}<div class="wrap"><section class="hero"><div>
+    <h1>${esc(S.titulo)}</h1>
+    <p class="lead">${esc(S.descricao)}</p>
+    <ul class="badges">${S.badges.filter(x=>x&&x.trim()).map(x=>`<li>${esc(x)}</li>`).join("")}<li>${eur(P.hora)} por hora</li>${S.certificado?`<li>Certificado de registo criminal disponível a pedido</li>`:""}</ul>
+    <div class="row"><a class="btn solid" href="#entrar">Pedir babysitting</a></div></div>
+    <div class="card"><h2>Disponibilidade nas próximas 4 semanas</h2>${calHTML(false)}</div></section></div>
+  <section class="blk"><div class="wrap grid2"><div><h2 class="t">Sobre mim</h2><p class="sub" style="white-space:pre-line">${esc(S.sobre)}</p>
+      ${S.servicos.length?`<ul class="badges">${S.servicos.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}
+      ${S.idades.length?`<p class="empty">Idades: ${esc(S.idades.join(", "))}.</p>`:""}</div>
+    <div class="card"><h2>Preços</h2><p style="margin:0 0 .6rem"><b>${eur(P.hora)}</b> por hora${sup.length?`, ${sup.join(", ")}`:""}.</p>${S.cancelamento?`<p class="empty">${esc(S.cancelamento)}</p>`:""}</div></div></section>
+  <section class="blk"><div class="wrap"><h2 class="t">Como funciona</h2><p class="sub">Crias conta de família, escolhes um dia livre e fazes o pedido com as horas e as crianças. Depois de eu confirmar, falamos pela conversa da tua conta e eu vejo as fichas das crianças.</p></div></section>
+  <section class="blk"><div class="wrap"><h2 class="t">O que dizem as famílias</h2><div class="quotes">
+    <blockquote><p>Os miúdos já perguntam quando é que a Marta volta.</p><cite>Família Lima</cite></blockquote>
+    <blockquote><p>Muito cuidadosa com a alergia do mais novo. Ficámos tranquilos.</p><cite>Família Costa</cite></blockquote>
+    <blockquote><p>Pontual, calma e sempre a dar notícias durante a noite.</p><cite>Família Pires</cite></blockquote></div></div></section>
+  ${contactosHTML()}`;
+}
+
+/* ---------- conta ---------- */
+let modo="criar";
+function pageEntrar(){
+  const c=modo==="criar";
+  return `<div class="wrap area"><div class="narrow"><h1>${c?"Criar conta de família":"Entrar"}</h1>
+    <p class="sub">Nesta demonstração a palavra-passe não é verificada. Para entrar numa conta que já criaste, basta o email.</p>
+    <div class="seg" role="group" aria-label="Conta"><button type="button" data-m="criar" aria-pressed="${c}">Criar conta</button><button type="button" data-m="entrar" aria-pressed="${!c}">Entrar</button></div>
+    <form id="fa" novalidate>${c?`<label class="f"><span>O teu nome</span><input name="nome" autocomplete="name"></label>
+      <label class="f"><span>Nome da família</span><input name="familia" placeholder="Por exemplo: Família Costa"></label>
+      <label class="f"><span>Telemóvel</span><input name="telefone" type="tel" autocomplete="tel"></label>
+      <label class="f"><span>Morada</span><input name="morada" autocomplete="street-address"><small>Só a babysitter a vê, e só depois de confirmar um pedido teu.</small></label>`:""}
+      <label class="f"><span>Email</span><input type="email" name="email" autocomplete="email"></label>
+      <label class="f"><span>Palavra-passe</span><input type="password" name="pw" autocomplete="${c?"new-password":"current-password"}"></label>
+      <p class="err" id="ea" role="alert"></p><button class="btn solid" type="submit">${c?"Criar conta":"Entrar"}</button></form></div></div>`;
+}
+function bindEntrar(){
+  document.querySelectorAll("[data-m]").forEach(b=>b.addEventListener("click",()=>{modo=b.dataset.m;render();}));
+  $("fa").addEventListener("submit",e=>{ e.preventDefault(); const d=Object.fromEntries(new FormData(e.target)), err=$("ea"), email=(d.email||"").trim().toLowerCase();
+    if(!email.includes("@")){ err.textContent="Escreve um email válido."; return; }
+    const ex=Object.values(db.users).find(u=>u.email===email);
+    if(modo==="criar"){ if(!d.nome?.trim()){ err.textContent="Escreve o teu nome."; return; } if(ex){ err.textContent="Já existe uma conta com este email. Entra com ela."; return; }
+      const id=uid("u-"); db.users[id]={uid:id,nome:d.nome.trim(),familia:(d.familia||"").trim()||`Família de ${d.nome.trim()}`,email,role:"familia",telefone:(d.telefone||"").trim(),morada:(d.morada||"").trim()}; db.session=id;
+    } else { if(!ex){ err.textContent="Não há nenhuma conta com este email."; return; } db.session=ex.uid; }
+    save(); go("area"); });
+}
+
+/* ---------- conversa ---------- */
+function msgsHTML(c){
+  const u=me(); if(!c.msgs.length) return `<p class="empty">Ainda não há mensagens.</p>`;
+  return `<ul class="msgs">${c.msgs.map(m=>{const a=db.users[m.uid]||{nome:"Utilizador"}, mine=m.uid===u.uid;
+    return `<li class="msg${mine?" mine":""}"><div class="who">${esc(mine?"Tu":a.nome)} <span>${a.role==="babysitter"?"babysitter":esc(a.familia||"")}, ${new Date(m.data).toLocaleString("pt-PT",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</span></div><p>${esc(m.texto)}</p></li>`;}).join("")}</ul>`;
+}
+function chatCard(famUid,title,note){
+  const u=me(), c=chatDe(famUid), aberta=conversaAberta(famUid), blk=bloqueada(famUid)||c.fechada;
+  const canWrite=aberta&&!blk;
+  const why=!aberta?"A conversa abre quando fizeres o primeiro pedido.":u.role==="babysitter"?"Fechaste esta conversa.":"A Marta fechou esta conversa.";
+  return `<div class="card"><h2>${title}</h2><p class="empty chatnote">${note}</p>
+    <div class="msgbox">${msgsHTML(c)}</div>
+    ${canWrite?`<form class="chatform" data-chat="${famUid}" novalidate><label class="sr" for="m-${famUid}">Mensagem</label><textarea id="m-${famUid}" name="t" rows="2" maxlength="1000" placeholder="Escreve uma mensagem"></textarea><button class="btn small solid" type="submit">Enviar</button></form>`:`<p class="empty">${why}</p>`}</div>`;
+}
+function bindChat(){
+  document.querySelectorAll(".msgbox").forEach(b=>b.scrollTop=b.scrollHeight);
+  document.querySelectorAll(".chatform").forEach(f=>{ const ta=f.querySelector("textarea");
+    ta.addEventListener("keydown",e=>{ if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); f.requestSubmit(); } });
+    f.addEventListener("submit",e=>{ e.preventDefault(); const t=ta.value.trim(); if(!t) return;
+      chatDe(f.dataset.chat).msgs.push({id:uid("m"),uid:me().uid,texto:t.slice(0,1000),data:Date.now()}); save(); keepY=scrollY; render();
+      document.querySelector(`[data-chat="${f.dataset.chat}"] textarea`)?.focus(); }); });
+}
+
+/* ---------- pagamentos (a babysitter escolhe) ---------- */
+function comoPagar(valor){
+  const p=db.pagamentos, it=[];
+  if(p.mbway) it.push(`<li><b>MB Way</b><span>${esc(p.mbwayNum)}</span></li>`);
+  if(p.transf) it.push(`<li><b>Transferência bancária</b><span>${esc(p.iban)}</span></li>`);
+  if(p.dinheiro) it.push(`<li><b>Em dinheiro</b><span>No fim do babysitting</span></li>`);
+  if(p.online) it.push(`<li><b>Pagamento online</b><button class="btn small solid" type="button" id="payOnline" style="margin-top:.4rem">Pagar online</button></li>`);
+  return `<div class="card"><h2>Como pagar</h2>${valor?`<p style="margin:0 0 .6rem">Valor estimado dos pedidos confirmados: <b>${eur(valor)}</b></p>`:""}
+    ${it.length?`<ul class="paylist">${it.join("")}</ul>`:`<p class="empty">Combina o pagamento diretamente com a Marta.</p>`}${p.nota?`<p class="empty">${esc(p.nota)}</p>`:""}</div>`;
+}
+
+/* ---------- área da família ---------- */
+function pageFam(){
+  const u=me(), ps=pedidosDe(u.uid).sort((a,b)=>a.data.localeCompare(b.data)), kids=criancasDe(u.uid), hoje=iso(addDays(0));
+  const prox=ps.find(p=>p.estado==="confirmado"&&p.data>=hoje), valor=ps.filter(p=>p.estado==="confirmado"&&p.data>=hoje).reduce((s,p)=>s+valorPedido(p),0);
+  const nomes=ids=>ids.map(id=>db.criancas.find(c=>c.id===id)?.nome).filter(Boolean).join(" e ");
+  return `<div class="wrap area"><h1>Olá, ${esc(u.nome.split(" ")[0])}</h1><p class="sub">${esc(u.familia)}</p>
+  <div class="grid2"><div>
+    ${prox?`<div class="card next"><span>Próximo babysitting</span><div class="when">${dataTxt(prox.data)}</div><p>Das ${prox.inicio} às ${prox.fim}, com ${esc(nomes(prox.criancas))}</p></div>`:""}
+    <div class="card"><h2>Fazer um pedido</h2>
+      ${bloqueada(u.uid)?`<p class="empty">Neste momento não é possível fazer pedidos à Marta.</p>`:kids.length?`<form id="fp" class="fgrid" novalidate>
+        <label class="f"><span>Dia</span><input type="date" name="data" min="${hoje}" max="${iso(addDays(27))}"></label>
+        <label class="f"><span>Das</span><input type="time" name="inicio" value="19:00"></label>
+        <label class="f"><span>Às</span><input type="time" name="fim" value="23:00"></label>
+        <fieldset class="f full"><legend>Crianças</legend><div class="opts">${kids.map(k=>`<label class="opt"><input type="checkbox" name="c" value="${k.id}" checked>${esc(k.nome)}, ${esc(k.idade)}</label>`).join("")}</div></fieldset>
+        <label class="f full"><span>Notas para a Marta</span><textarea name="notas" placeholder="Por exemplo: vamos a um casamento, voltamos depois da meia-noite."></textarea></label>
+        <p class="err full" id="ep" role="alert"></p><div class="full"><button class="btn solid" type="submit">Enviar pedido</button></div></form>
+        <p class="empty" style="font-size:.93rem">Dias livres: os laranja no calendário da página inicial.</p>`:`<p class="empty">Primeiro acrescenta as tuas crianças, aqui ao lado.</p>`}</div>
+    <div class="card"><h2>Os meus pedidos</h2>${ps.length?`<ul class="list">${[...ps].reverse().map(p=>`<li><div class="lh"><b>${dataTxt(p.data)}, ${p.inicio} às ${p.fim}</b><span class="pill ${p.estado}">${estadoTxt[p.estado]}</span></div>
+      <span class="meta">${esc(nomes(p.criancas))}. ${horas(p)} h, cerca de ${eur(valorPedido(p))}.</span>
+      ${p.estado==="pendente"?`<div style="margin-top:.4rem"><button class="btn small ghost" type="button" data-cancel="${p.id}">Cancelar pedido</button></div>`:""}</li>`).join("")}</ul>`:`<p class="empty">Ainda não fizeste nenhum pedido.</p>`}</div>
+  </div><div>
+    ${chatCard(u.uid,"Conversa com a Marta","Só tu e a Marta veem esta conversa. Alergias, rotinas e contactos de emergência ficam nas fichas, não aqui.")}
+    <div class="card"><h2>As minhas crianças</h2><p class="empty chatnote">As fichas são privadas. A Marta só as vê depois de confirmar um pedido teu.</p>
+      ${kids.length?`<ul class="list">${kids.map(k=>`<li><div class="lh"><b>${esc(k.nome)}</b><span class="meta">${esc(k.idade)}</span></div>
+        <details><summary>Ver ficha</summary><div class="ficha"><dl><dt>Alergias</dt><dd>${esc(k.alergias||"Nenhuma")}</dd><dt>Rotina</dt><dd>${esc(k.rotina||"Não indicada")}</dd><dt>Emergência</dt><dd>${esc(k.emergencia||"Não indicado")}</dd></dl></div></details></li>`).join("")}</ul>`:""}
+      <details style="margin-top:.6rem"${kids.length?"":" open"}><summary>Acrescentar criança</summary><form id="fk" novalidate style="margin-top:.8rem">
+        <label class="f"><span>Nome</span><input name="nome"></label><label class="f"><span>Idade</span><input name="idade" placeholder="Por exemplo: 4 anos"></label>
+        <label class="f"><span>Alergias</span><input name="alergias"></label><label class="f"><span>Rotina</span><textarea name="rotina"></textarea></label>
+        <label class="f"><span>Contacto de emergência</span><input name="emergencia" placeholder="Nome e telemóvel"></label>
+        <p class="err" id="ek" role="alert"></p><button class="btn small solid" type="submit">Guardar ficha</button></form></details></div>
+    ${comoPagar(valor)}
+  </div></div></div>`;
+}
+function bindFam(){
+  const u=me();
+  $("fp")?.addEventListener("submit",e=>{ e.preventDefault(); const fd=new FormData(e.target), err=$("ep"), data=fd.get("data"), cs=fd.getAll("c");
+    if(!data){ err.textContent="Escolhe o dia."; return; }
+    if(!cs.length){ err.textContent="Escolhe pelo menos uma criança."; return; }
+    if(marcados().has(data)||!db.livres.includes(data)){ err.textContent="A Marta não está livre nesse dia. Escolhe um dos dias livres do calendário."; return; }
+    const p={id:uid("p"),familiaUid:u.uid,data,inicio:fd.get("inicio")||"19:00",fim:fd.get("fim")||"23:00",criancas:cs,notas:(fd.get("notas")||"").trim(),estado:"pendente",criadoEm:Date.now()};
+    if(horas(p)>12){ err.textContent="Um pedido pode ter no máximo 12 horas."; return; }
+    db.pedidos.push(p); save(); render(); toast("Pedido enviado. A conversa com a Marta já está aberta. Experimenta como Babysitter para o confirmares."); });
+  document.querySelectorAll("[data-cancel]").forEach(b=>b.addEventListener("click",()=>{ const p=db.pedidos.find(x=>x.id===b.dataset.cancel); p.estado="cancelado"; save(); keepY=scrollY; render(); toast("Pedido cancelado."); }));
+  $("fk")?.addEventListener("submit",e=>{ e.preventDefault(); const d=Object.fromEntries(new FormData(e.target));
+    if(!d.nome.trim()){ $("ek").textContent="Escreve o nome da criança."; return; }
+    db.criancas.push({id:uid("c"),familiaUid:u.uid,nome:d.nome.trim(),idade:d.idade.trim(),alergias:d.alergias.trim(),rotina:d.rotina.trim(),emergencia:d.emergencia.trim()}); save(); keepY=scrollY; render(); toast("Ficha guardada."); });
+  $("payOnline")?.addEventListener("click",()=>toast("Aqui abria o link de pagamento que a Marta escolheu. Na demonstração não há pagamentos reais."));
+}
+
+/* ---------- painel da babysitter ---------- */
+function pedidoHTML(p){
+  const f=familia(p.familiaUid), kids=p.criancas.map(id=>db.criancas.find(c=>c.id===id)).filter(Boolean), ok=p.estado==="confirmado";
+  return `<li><div class="lh"><b>${dataTxt(p.data)}, ${p.inicio} às ${p.fim}</b><span class="pill ${p.estado}">${estadoTxt[p.estado]}</span></div>
+    <span class="meta">${esc(f?.familia)}, ${kids.map(k=>`${esc(k.nome)} (${esc(k.idade)})`).join(" e ")}. ${horas(p)} h, ${eur(valorPedido(p))}.</span>
+    ${p.notas?`<p style="margin:.3rem 0">${esc(p.notas)}</p>`:""}
+    ${ok?`<details><summary>Morada e fichas das crianças</summary><div class="ficha"><dl><dt>Morada</dt><dd>${esc(f?.morada||"Não indicada")}</dd><dt>Telemóvel</dt><dd>${esc(f?.telefone||"")}</dd></dl></div>
+      ${kids.map(k=>`<div class="ficha"><b>${esc(k.nome)}</b><dl><dt>Alergias</dt><dd>${esc(k.alergias||"Nenhuma")}</dd><dt>Rotina</dt><dd>${esc(k.rotina||"Não indicada")}</dd><dt>Emergência</dt><dd>${esc(k.emergencia||"")}</dd></dl></div>`).join("")}</details>`
+      :p.estado==="pendente"?`<p class="lock">A morada e as fichas das crianças ficam visíveis quando confirmares.</p>`:""}
+    <div class="row" style="margin-top:.4rem">${p.estado==="pendente"?`<button class="btn small solid" type="button" data-ok="${p.id}">Confirmar</button><button class="btn small ghost" type="button" data-no="${p.id}">Recusar</button>`:""}
+      ${conversaAberta(p.familiaUid)?`<a class="btn small ghost" href="#conversa-${p.familiaUid}">Conversa</a>`:""}</div></li>`;
+}
+function pageBaby(){
+  const b=marta(), hoje=iso(addDays(0)), pend=db.pedidos.filter(p=>p.estado==="pendente"), conf=db.pedidos.filter(p=>p.estado==="confirmado").sort((a,c)=>a.data.localeCompare(c.data));
+  const mes=hoje.slice(0,7), mesConf=conf.filter(p=>p.data.startsWith(mes)), h=mesConf.reduce((s,p)=>s+horas(p),0);
+  const fams=Object.values(db.users).filter(u=>u.role==="familia"&&conversaAberta(u.uid));
+  const P=db.pagamentos, ck=(n,l)=>`<label class="chk"><input type="checkbox" name="${n}"${P[n]?" checked":""}>${l}</label>`;
+  return `<div class="wrap area"><h1>Painel</h1><div class="row" style="justify-content:space-between;margin-bottom:1.2rem"><p class="sub" style="margin:0">Olá, ${esc(b.nome.split(" ")[0])}. Pedidos, disponibilidade, conversas e pagamentos.</p><a class="btn small" href="#definicoes">Definições do site</a></div>
+  <div class="stats"><div class="stat"><b>${pend.length}</b><span>pedidos para responder</span></div><div class="stat"><b>${h} h</b><span>marcadas este mês</span></div><div class="stat"><b>${eur(mesConf.reduce((s,p)=>s+valorPedido(p),0))}</b><span>a receber este mês</span></div></div>
+  <div class="grid2"><div>
+    <div class="card"><h2>Pedidos para responder</h2>${pend.length?`<ul class="list">${pend.map(pedidoHTML).join("")}</ul>`:`<p class="empty">Não há pedidos pendentes.</p>`}</div>
+    <div class="card"><h2>Confirmados</h2>${conf.length?`<ul class="list">${conf.map(pedidoHTML).join("")}</ul>`:`<p class="empty">Ainda não tens babysittings confirmados.</p>`}</div>
+    <div class="card"><h2>Conversas</h2><p class="empty chatnote">Cada família só fala contigo, e só depois de te fazer um pedido.</p>
+      ${fams.length?`<ul class="list">${fams.map(f=>{const c=chatDe(f.uid),l=c.msgs[c.msgs.length-1];return `<li><div class="lh"><b>${esc(f.familia)}</b>${bloqueada(f.uid)?`<span class="pill">Bloqueada</span>`:c.fechada?`<span class="pill">Fechada</span>`:""}</div>
+        ${l?`<span class="meta">${esc(db.users[l.uid]?.nome)}: ${esc(l.texto.slice(0,80))}</span>`:""}<div style="margin-top:.4rem"><a class="btn small" href="#conversa-${f.uid}">Abrir conversa</a></div></li>`;}).join("")}</ul>`:`<p class="empty">Ainda não há conversas.</p>`}</div>
+  </div><div>
+    <div class="card"><h2>A minha disponibilidade</h2><p class="empty chatnote">Carrega num dia para o marcar como livre ou ocupado. As famílias só pedem dias livres.</p>${calHTML(true)}</div>
+    <div class="card"><h2>Pagamentos</h2><p class="empty chatnote">Escolhe como as famílias te pagam. Nenhum método é obrigatório. Os preços mudam-se nas <a href="#definicoes">Definições</a>.</p>
+      <form id="fpay" novalidate>
+        ${ck("mbway","MB Way")}<label class="f"><span class="meta">Número</span><input name="mbwayNum" value="${esc(P.mbwayNum)}" inputmode="tel"></label>
+        ${ck("transf","Transferência bancária")}<label class="f"><span class="meta">IBAN</span><input name="iban" value="${esc(P.iban)}"></label>
+        ${ck("dinheiro","Em dinheiro")}
+        ${ck("online","Pagamento online")}<label class="f"><span class="meta">Link de pagamento</span><input type="url" name="onlineLink" placeholder="Link do Stripe, SumUp, PayPal ou outro" value="${esc(P.onlineLink)}"></label>
+        <label class="f"><span>Nota para as famílias</span><input name="nota" value="${esc(P.nota)}"></label>
+        <p class="err" id="epay" role="alert"></p><button class="btn small solid" type="submit">Guardar</button></form></div>
+  </div></div></div>`;
+}
+function bindBaby(){
+  document.querySelectorAll("[data-ok],[data-no]").forEach(b=>b.addEventListener("click",()=>{
+    const p=db.pedidos.find(x=>x.id===(b.dataset.ok||b.dataset.no));
+    if(b.dataset.ok&&marcados().has(p.data)){ toast("Já tens outro babysitting confirmado nesse dia."); return; }
+    p.estado=b.dataset.ok?"confirmado":"recusado"; save(); keepY=scrollY; render();
+    toast(b.dataset.ok?"Confirmado. Já podes ver a morada e as fichas das crianças.":"Pedido recusado. A família vê isso na conta dela."); }));
+  document.querySelectorAll("[data-day]").forEach(b=>b.addEventListener("click",()=>{ const k=b.dataset.day, i=db.livres.indexOf(k);
+    if(i>=0) db.livres.splice(i,1); else db.livres.push(k); save(); keepY=scrollY; render(); }));
+  $("fpay").addEventListener("submit",e=>{ e.preventDefault(); const fd=new FormData(e.target), on=n=>fd.get(n)==="on", v=n=>(fd.get(n)||"").toString().trim(), err=$("epay");
+    if(on("mbway")&&!v("mbwayNum")){ err.textContent="Escreve o número do MB Way, ou desliga esta opção."; return; }
+    if(on("transf")&&!v("iban")){ err.textContent="Escreve o IBAN, ou desliga a transferência."; return; }
+    if(on("online")&&!/^https:\/\//.test(v("onlineLink"))){ err.textContent="O link de pagamento tem de começar por https://"; return; }
+    db.pagamentos={mbway:on("mbway"),mbwayNum:v("mbwayNum"),transf:on("transf"),iban:v("iban"),dinheiro:on("dinheiro"),online:on("online"),onlineLink:v("onlineLink"),nota:v("nota")};
+    save(); keepY=scrollY; render(); toast("Guardado. As famílias já veem os métodos de pagamento."); });
+}
+function pageConversa(f){
+  const c=chatDe(f.uid), blk=bloqueada(f.uid);
+  return `<div class="wrap area"><a class="back" href="#area">Voltar ao painel</a><h1>${esc(f.familia)}</h1>
+    <p class="sub">Conversa entre ti e ${esc(f.nome)}. Ninguém pode apagar mensagens, para as duas partes verem sempre o mesmo.</p>
+    <div class="grid2"><div>${chatCard(f.uid,"Mensagens","As fichas das crianças e a morada estão nos pedidos confirmados, não aqui.")}</div>
+    <div><div class="card"><h2>Gerir esta conversa</h2>
+      <p class="empty chatnote">${c.fechada?"A conversa está fechada. A família vê as mensagens antigas mas não pode escrever.":"Se precisares, fechas a conversa. Bloquear impede também novos pedidos desta família."}</p>
+      <div class="row"><button class="btn small" type="button" id="toggleChat">${c.fechada?"Reabrir conversa":"Fechar conversa"}</button>
+      <button class="btn small ${blk?"":"danger"}" type="button" id="toggleBlock">${blk?"Desbloquear família":"Bloquear família"}</button></div></div></div></div></div>`;
+}
+function bindConversa(f){
+  $("toggleChat").addEventListener("click",()=>{ const c=chatDe(f.uid); c.fechada=!c.fechada; save(); render(); toast(c.fechada?"Conversa fechada.":"Conversa reaberta."); });
+  $("toggleBlock").addEventListener("click",()=>{ const i=db.bloqueadas.indexOf(f.uid);
+    if(i>=0){ db.bloqueadas.splice(i,1); toast("Família desbloqueada."); }
+    else { if(!confirm(`Bloquear ${f.familia}? Deixa de poder escrever e de fazer pedidos.`)) return; db.bloqueadas.push(f.uid); toast("Família bloqueada."); }
+    save(); render(); });
+}
+/* ---------- definições específicas do Ninho ---------- */
+const OWNER="babysitter", LOCAL_LABEL="Zona onde trabalho";
+const CORES=[{id:"salvia",nome:"Sálvia",light:"#4F7C76",dark:"#7FB5AD"},{id:"azul",nome:"Azul",light:"#3A5BA0",dark:"#8FA8E0"},{id:"ameixa",nome:"Ameixa",light:"#7A4E7E",dark:"#C79BCB"},{id:"mel",nome:"Mel",light:"#8A5D0F",dark:"#E5B85C"},{id:"grafite",nome:"Grafite",light:"#3F4752",dark:"#AEB6C2"}];
+const IDADES=["Bebés até 1 ano","1 a 3 anos","4 a 6 anos","7 a 12 anos"];
+const SERVICOS=["Noites","Fins de semana","Levar e buscar à escola","Apoio nos trabalhos de casa","Férias e viagens","Crianças com necessidades especiais"];
+function siteDefaults(){ return {
+  nome:"Marta Silva", titulo:"Babysitter de confiança",
+  descricao:"Noites, fins de semana e saídas da escola. Cuido de crianças desde bebés até aos 12 anos, em tua casa.",
+  sobre:"Sou educadora de infância de formação e faço babysitting há cinco anos. Gosto de rotinas calmas, jogos ao ar livre e histórias antes de dormir.",
+  badges:["Primeiros socorros pediátricos","5 anos de experiência",""], certificado:false,
+  contactos:{telefone:"912 345 678",whatsapp:"912 345 678",email:"marta@exemplo.pt",local:"Centro da cidade e arredores, até 10 km",instagram:""},
+  precos:{hora:10,criancaExtra:2,noite:2,minimoHoras:2},
+  idades:[...IDADES], servicos:["Noites","Fins de semana","Levar e buscar à escola","Apoio nos trabalhos de casa"],
+  cancelamento:"Cancelamentos com menos de 24 horas de antecedência pagam metade do valor.",
+  cor:"salvia", aviso:{ativo:false,texto:""},
+  seo:{titulo:"Marta Silva, babysitter",descricao:"Babysitting: noites, fins de semana e saídas da escola. Vê os dias livres e faz o pedido online."} }; }
+const LABELS={nome:"nome",titulo:"título",descricao:"apresentação",sobre:"sobre mim",badges:"destaques",certificado:"certificado",contactos:"contactos",precos:"preços",idades:"idades",servicos:"serviços",cancelamento:"cancelamentos",cor:"cor",aviso:"aviso",seo:"Google"};
+const EX_AVISO="Por exemplo: de 1 a 15 de agosto estou de férias.";
+const EX_ALT="Por exemplo: quero uma página com fotografias das atividades.";
+function DEF_SECTIONS(){ return `
+  <div class="card"><h2>O teu site</h2>${fText("nome","Nome")}${fText("titulo","Título principal",{max:40})}${fText("descricao","Frase de apresentação",{area:true,max:200})}${fText("sobre","Sobre mim",{area:true,max:600})}
+    ${fText("badges.0","Destaque 1",{max:40})}${fText("badges.1","Destaque 2",{max:40})}${fText("badges.2","Destaque 3",{max:40,ph:"Por exemplo: falo inglês"})}
+    ${fToggle("certificado","Mostrar no site: certificado de registo criminal disponível a pedido")}</div>
+  <div class="card"><h2>Contactos</h2>${fText("contactos.telefone","Telefone",{type:"tel"})}${fText("contactos.whatsapp","WhatsApp",{type:"tel"})}${fText("contactos.email","Email",{type:"email"})}${fText("contactos.local","Zona onde trabalhas")}${fText("contactos.instagram","Instagram",{ph:"@utilizador"})}</div>
+  <div class="card"><h2>Preços</h2><div class="fgrid" style="grid-template-columns:1fr 1fr">${fNum("precos.hora","Por hora (€)",{step:0.5})}${fNum("precos.criancaExtra","Por criança a mais, por hora (€)",{step:0.5})}${fNum("precos.noite","Extra depois da meia-noite, por hora (€)",{step:0.5})}${fNum("precos.minimoHoras","Mínimo de horas")}</div>
+    <p class="lock" id="exemplo"></p>${fText("cancelamento","Política de cancelamento",{area:true,max:300})}</div>
+  <div class="card"><h2>Idades e serviços</h2>${fChecks("idades","Idades que aceitas",IDADES)}${fChecks("servicos","Serviços",SERVICOS)}</div>`; }
+function validarExtra(d){ return d.precos.hora>0?"":"Indica o preço por hora."; }
+function afterInput(){ const e=$("exemplo"); if(!e||!draft) return; const P=draft.precos, h=Math.max(4,P.minimoHoras||0);
+  e.textContent=`Exemplo: das 21h à 1h, com duas crianças, a família paga ${eur(h*P.hora+h*(P.criancaExtra||0)+(P.noite||0))}.`; }
+function bindDefExtra(){}
+const EXPORTS=[
+  {nome:"Pedidos",cols:["Data","Família","Início","Fim","Horas","Valor","Estado"],rows:()=>db.pedidos.map(p=>[p.data,familia(p.familiaUid)?.familia,p.inicio,p.fim,horas(p),valorPedido(p).toFixed(2).replace(".",","),estadoTxt[p.estado]])},
+  {nome:"Famílias",cols:["Família","Nome","Email","Telemóvel"],rows:()=>Object.values(db.users).filter(u=>u.role==="familia").map(u=>[u.familia,u.nome,u.email,u.telefone])}];
+/* valor de um pedido com os preços definidos pela babysitter */
+function horasNoite(p){ const m=x=>{const [a,b]=x.split(":").map(Number);return a*60+b;}; let s=m(p.inicio), e=m(p.fim); if(e<=s) e+=1440; let n=0; for(let t=s;t<e;t+=15){ if(t%1440<420) n+=15; } return n/60; }
+function valorPedido(p){ const P=site().precos, n=Math.max(1,p.criancas.length), h=Math.max(horas(p),P.minimoHoras||0); return h*P.hora+h*(n-1)*(P.criancaExtra||0)+horasNoite(p)*(P.noite||0); }
+
+/* =========================================================
+   DEFINIÇÕES DO SITE
+   O dono muda sozinho o dia a dia do negócio: textos, contactos, preços, cor, aviso e Google.
+   Nada fica visível sem Publicar, e cada publicação fica no histórico para poder ser reposta.
+   Domínio, alojamento, segurança, design e funções novas ficam com a antuneswho.
+   ========================================================= */
+const clone=o=>JSON.parse(JSON.stringify(o));
+let draft=null, previewOn=false;
+const baseSite=()=>db.site||(db.site=siteDefaults());
+const site=()=>(previewOn&&draft)?draft:baseSite();
+const getPath=(o,p)=>p.split(".").reduce((a,k)=>a==null?a:a[k],o);
+function setPath(o,p,v){ const ks=p.split("."); let a=o; ks.slice(0,-1).forEach(k=>{ if(a[k]==null) a[k]={}; a=a[k]; }); a[ks[ks.length-1]]=v; }
+function applyTheme(){
+  const S=site(), c=CORES.find(x=>x.id===S.cor)||CORES[0];
+  let st=document.getElementById("themeVars");
+  if(!st){ st=document.createElement("style"); st.id="themeVars"; document.head.appendChild(st); }
+  st.textContent=`:root{--acc:${c.light}}@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--acc:${c.dark}}}:root[data-theme="dark"]{--acc:${c.dark}}`;
+  document.title=S.seo.titulo||S.nome;
+  const lg=document.querySelector(".logo"); if(lg) lg.textContent=S.nome;
+}
+function avisoHTML(){ const a=site().aviso; return a.ativo&&a.texto.trim()?`<div class="aviso" role="note"><div class="wrap">${esc(a.texto)}</div></div>`:""; }
+function contactosHTML(){
+  const c=site().contactos, d=s=>String(s||"").replace(/\D/g,""), it=[];
+  if(c.telefone) it.push(`<li><b>Telefone</b><a href="tel:+351${d(c.telefone)}">${esc(c.telefone)}</a></li>`);
+  if(c.whatsapp) it.push(`<li><b>WhatsApp</b><a href="https://wa.me/351${d(c.whatsapp)}" target="_blank" rel="noopener">${esc(c.whatsapp)}</a></li>`);
+  if(c.email) it.push(`<li><b>Email</b><a href="mailto:${esc(c.email)}">${esc(c.email)}</a></li>`);
+  if(c.local) it.push(`<li><b>${LOCAL_LABEL}</b><span>${esc(c.local)}</span></li>`);
+  if(c.instagram) it.push(`<li><b>Instagram</b><span>${esc(c.instagram)}</span></li>`);
+  return it.length?`<section class="blk" id="contactos"><div class="wrap"><h2 class="t">Contactos</h2><ul class="contacts">${it.join("")}</ul></div></section>`:"";
+}
+const fv=p=>esc(getPath(draft,p)??"");
+const fText=(p,l,o={})=>`<label class="f"><span>${l}</span>${o.area?`<textarea data-k="${p}"${o.max?` maxlength="${o.max}"`:""}${o.ph?` placeholder="${o.ph}"`:""}>${fv(p)}</textarea>`:`<input data-k="${p}"${o.type?` type="${o.type}"`:""}${o.max?` maxlength="${o.max}"`:""}${o.ph?` placeholder="${o.ph}"`:""} value="${fv(p)}">`}${o.max?`<small><span data-count="${p}">${String(getPath(draft,p)||"").length}</span> de ${o.max} caracteres</small>`:""}${o.hint?`<small>${o.hint}</small>`:""}</label>`;
+const fNum=(p,l,o={})=>`<label class="f"><span>${l}</span><input type="number" inputmode="decimal" data-k="${p}" data-num min="0" step="${o.step||1}" value="${fv(p)}">${o.hint?`<small>${o.hint}</small>`:""}</label>`;
+const fChecks=(p,l,opts)=>`<fieldset class="f"><legend>${l}</legend><div class="opts">${opts.map(o=>`<label class="opt"><input type="checkbox" data-arr="${p}" value="${esc(o)}"${(getPath(draft,p)||[]).includes(o)?" checked":""}>${esc(o)}</label>`).join("")}</div></fieldset>`;
+const fToggle=(p,l)=>`<label class="chk"><input type="checkbox" data-bool="${p}"${getPath(draft,p)?" checked":""}>${l}</label>`;
+const coresHTML=()=>`<fieldset class="f"><legend>Cor principal</legend><div class="opts">${CORES.map(c=>`<label class="opt"><input type="radio" name="cor" data-radio="cor" value="${c.id}"${draft.cor===c.id?" checked":""}><i class="sw" style="background:${c.light}"></i>${c.nome}</label>`).join("")}</div><small>Todas estas cores mantêm o texto legível, no modo claro e no escuro.</small></fieldset>`;
+const mudancas=(a,b)=>Object.keys(LABELS).filter(k=>JSON.stringify(a[k])!==JSON.stringify(b[k])).map(k=>LABELS[k]);
+function validar(d){
+  if(!d.nome.trim()) return "O nome do site não pode ficar vazio.";
+  const c=d.contactos;
+  if(!c.telefone.trim()&&!c.email.trim()&&!c.whatsapp.trim()) return "Deixa pelo menos um contacto: telefone, WhatsApp ou email.";
+  if(c.email.trim()&&!/^\S+@\S+\.\S+$/.test(c.email.trim())) return "O email não parece válido.";
+  return validarExtra(d);
+}
+function publicar(){
+  const err=validar(draft); if(err){ toast(err); return false; }
+  const antes=clone(baseSite()), m=mudancas(antes,draft);
+  if(!m.length){ toast("Não há alterações para publicar."); return false; }
+  db.historico=[{id:uid("h"),data:Date.now(),quem:me().nome,resumo:m,antes},...(db.historico||[])].slice(0,20);
+  db.site=clone(draft); draft=null; previewOn=false; save(); applyTheme();
+  toast("Publicado. O site já mostra as alterações."); return true;
+}
+function repor(id){
+  const h=(db.historico||[]).find(x=>x.id===id); if(!h) return;
+  db.historico=[{id:uid("h"),data:Date.now(),quem:me().nome,resumo:["reposição de uma versão anterior"],antes:clone(baseSite())},...db.historico].slice(0,20);
+  db.site=clone(h.antes); draft=null; save(); applyTheme(); keepY=scrollY; render(); toast("Versão anterior reposta.");
+}
+function exportar(x){
+  const rows=x.rows(), csv=[x.cols,...rows].map(r=>r.map(v=>`"${String(v??"").replace(/"/g,'""')}"`).join(";")).join("\n");
+  let d=$("dataDlg"); if(!d){ d=document.createElement("dialog"); d.id="dataDlg"; document.body.appendChild(d); }
+  d.innerHTML=`<h2>${x.nome}</h2><p class="empty chatnote">${rows.length} ${rows.length===1?"linha":"linhas"}. Copia e cola no Excel ou no Google Sheets. No site publicado, este botão descarrega o ficheiro.</p>
+    <label class="sr" for="csvTa">Dados</label><textarea id="csvTa" readonly rows="8" style="font-size:.85rem">${esc(csv)}</textarea>
+    <div class="row" style="margin-top:.8rem"><button class="btn small solid" type="button" id="cpy">Copiar</button><form method="dialog"><button class="btn small">Fechar</button></form></div>`;
+  d.showModal();
+  $("cpy").onclick=async()=>{ try{ await navigator.clipboard.writeText(csv); }catch(e){ const ta=$("csvTa"); ta.select(); document.execCommand("copy"); } toast("Copiado."); };
+}
+function previewBar(v){
+  v.insertAdjacentHTML("afterbegin",`<div class="pvbar"><div class="wrap row"><b style="flex:1 1 240px">Pré-visualização. Os visitantes ainda veem a versão publicada.</b>
+    <button class="btn small solid" type="button" id="pvPub">Publicar</button><button class="btn small pvback" type="button" id="pvBack">Voltar a editar</button></div></div>`);
+  $("pvPub").onclick=()=>{ if(publicar()) render(); };
+  $("pvBack").onclick=()=>{ previewOn=false; applyTheme(); go("definicoes"); };
+}
+function pageDef(){
+  if(!draft) draft=clone(baseSite());
+  const dirty=JSON.stringify(draft)!==JSON.stringify(baseSite()), hist=db.historico||[], alts=db.alteracoes||[];
+  return `<div class="wrap area"><a class="back" href="#area">Voltar ao painel</a>
+    <h1>Definições do site</h1><p class="sub">Aqui mudas sozinho o que faz parte do dia a dia do teu negócio. Nada fica visível até carregares em Publicar, e podes sempre repor uma versão anterior.</p>
+    <div class="grid2"><div id="defForm">
+      ${DEF_SECTIONS()}
+      <div class="card"><h2>Aspeto</h2>${coresHTML()}</div>
+      <div class="card"><h2>Aviso no topo do site</h2>${fToggle("aviso.ativo","Mostrar o aviso")}${fText("aviso.texto","Texto do aviso",{max:140,ph:EX_AVISO})}</div>
+      <div class="card"><h2>No Google</h2><p class="empty chatnote">É o que aparece nos resultados de pesquisa.</p>${fText("seo.titulo","Título",{max:60})}${fText("seo.descricao","Descrição",{area:true,max:160})}</div>
+    </div><div>
+      <div class="card"><h2>Histórico de alterações</h2>${hist.length?`<ul class="list">${hist.map(h=>`<li><div class="lh"><b>${new Date(h.data).toLocaleString("pt-PT",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</b><button class="btn small ghost" type="button" data-repor="${h.id}">Repor como estava antes</button></div><span class="meta">${esc(h.quem)} mudou: ${esc(h.resumo.join(", "))}</span></li>`).join("")}</ul>`:`<p class="empty">Ainda não publicaste alterações.</p>`}</div>
+      <div class="card"><h2>Os teus dados</h2><p class="empty chatnote">Os dados são teus. Copia-os para o Excel sempre que quiseres.</p><div class="row">${EXPORTS.map((x,i)=>`<button class="btn small" type="button" data-export="${i}">${x.nome}</button>`).join("")}</div></div>
+      <div class="card"><h2>Pedir uma alteração à antuneswho</h2><p class="empty chatnote">Para o que não está aqui: mudar o design, criar uma página nova ou acrescentar uma função.</p>
+        <form id="falt" novalidate><label class="f"><span>O que precisas?</span><textarea name="texto" placeholder="${EX_ALT}"></textarea></label><button class="btn small solid" type="submit">Enviar pedido</button></form>
+        ${alts.length?`<ul class="list" style="margin-top:.8rem">${alts.map(a=>`<li><div class="lh"><span>${esc(a.texto)}</span><span class="pill">Enviado</span></div><span class="meta">${new Date(a.data).toLocaleDateString("pt-PT")}</span></li>`).join("")}</ul>`:""}
+        <details style="margin-top:.8rem"><summary>O que a antuneswho trata por ti</summary><ul class="ladr"><li>Domínio e alojamento</li><li>Segurança e atualizações</li><li>Cópias de segurança diárias</li><li>Design, páginas novas e funções novas</li></ul></details></div>
+    </div></div>
+    <div class="savebar"><div class="wrap row"><span id="dirty" class="meta" style="flex:1 1 200px">${dirty?"Tens alterações por publicar.":"Tudo publicado."}</span>
+      <button class="btn small" type="button" id="pvBtn">Pré-visualizar</button><button class="btn small ghost" type="button" id="discard"${dirty?"":" disabled"}>Descartar</button><button class="btn small solid" type="button" id="pubBtn">Publicar alterações</button></div></div></div>`;
+}
+function bindDef(){
+  const root=$("defForm");
+  const upd=()=>{ const dirty=JSON.stringify(draft)!==JSON.stringify(baseSite()); $("dirty").textContent=dirty?"Tens alterações por publicar.":"Tudo publicado."; $("discard").disabled=!dirty; afterInput(); };
+  root.querySelectorAll("[data-k]").forEach(el=>el.addEventListener("input",()=>{
+    setPath(draft,el.dataset.k,el.hasAttribute("data-num")?(el.value===""?0:Math.max(0,Number(el.value))):el.value);
+    const c=document.querySelector(`[data-count="${el.dataset.k}"]`); if(c) c.textContent=el.value.length; upd(); }));
+  root.querySelectorAll("[data-arr]").forEach(el=>el.addEventListener("change",()=>{ const p=el.dataset.arr; setPath(draft,p,[...root.querySelectorAll(`[data-arr="${p}"]:checked`)].map(x=>x.value)); upd(); }));
+  root.querySelectorAll("[data-bool]").forEach(el=>el.addEventListener("change",()=>{ setPath(draft,el.dataset.bool,el.checked); upd(); }));
+  root.querySelectorAll("[data-radio]").forEach(el=>el.addEventListener("change",()=>{ setPath(draft,el.dataset.radio,el.value); upd(); }));
+  bindDefExtra(root); afterInput();
+  $("pvBtn").onclick=()=>{ const e=validar(draft); if(e){ toast(e); return; } previewOn=true; applyTheme(); go("inicio"); };
+  $("pubBtn").onclick=()=>{ if(publicar()){ keepY=scrollY; render(); } };
+  $("discard").onclick=()=>{ draft=null; keepY=scrollY; render(); toast("Alterações descartadas."); };
+  document.querySelectorAll("[data-repor]").forEach(b=>b.onclick=()=>{ if(confirm("Repor o site como estava antes desta alteração?")) repor(b.dataset.repor); });
+  document.querySelectorAll("[data-export]").forEach(b=>b.onclick=()=>exportar(EXPORTS[+b.dataset.export]));
+  $("falt").addEventListener("submit",e=>{ e.preventDefault(); const t=(new FormData(e.target).get("texto")||"").trim();
+    if(!t){ toast("Escreve o que precisas."); return; }
+    db.alteracoes=[{texto:t,data:Date.now()},...(db.alteracoes||[])]; save(); keepY=scrollY; render(); toast("Pedido enviado à antuneswho. A resposta chega em 2 dias úteis."); });
+}
+
+render();
+</script>
+</body>
+</html>
