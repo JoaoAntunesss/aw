@@ -366,6 +366,14 @@ form h3:first-of-type{border-top:0;padding-top:0}
 .tabs{display:flex;gap:1.4rem;border-bottom:1px solid var(--line);margin-bottom:1.6rem}
 .tabs button{font:inherit;font-weight:600;background:none;border:0;border-bottom:2px solid transparent;padding:.6rem 0;color:var(--muted);cursor:pointer;margin-bottom:-1px}
 .tabs button[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--brand)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(9.5rem,1fr));gap:.8rem;margin:0 0 1.6rem}
+.kpi{border:1px solid var(--line);border-radius:14px;padding:.9rem 1rem;background:var(--surface)}
+.kpi b{display:block;font:700 1.7rem/1.1 var(--display);letter-spacing:-.02em}
+.kpi span{font-size:.82rem;color:var(--muted)}
+.kpi.hot{border-color:var(--brand)}.kpi.hot b{color:var(--brand)}
+.tabs .n{display:inline-block;min-width:1.35rem;margin-left:.4rem;padding:.05rem .4rem;border-radius:999px;background:var(--brand);color:var(--brand-ink);font-size:.74rem;text-align:center}
+.tools{display:flex;flex-wrap:wrap;gap:.8rem;align-items:end;margin-bottom:1rem}
+.who a.btn{margin-right:.5rem}
 .list-head{display:flex;flex-wrap:wrap;gap:1rem;align-items:center;justify-content:space-between;margin-bottom:.6rem}
 .list-head h2{margin:0;font-size:1.5rem;letter-spacing:-.02em}
 .pedido{border-top:1px solid var(--line);padding:1.4rem 0}
@@ -917,7 +925,9 @@ function demoStore(){
     async createSuporte(d){ mem.suporte=mem.suporte||[]; mem.suporte.push({...d,id:"s"+Date.now(),estado:"aberto",criadoEm:Date.now(),atualizadoEm:Date.now()}); save(); },
     async mySuporte(){ const u=cur(); return (mem.suporte||[]).filter(p=>p.uid===u?.uid).sort(byDate); },
     async allSuporte(){ return [...(mem.suporte||[])].sort(byDate); },
-    async updateSuporte(id,patch){ const p=(mem.suporte||[]).find(x=>x.id===id); if(p){Object.assign(p,patch,{atualizadoEm:Date.now()}); save();} }
+    async updateSuporte(id,patch){ const p=(mem.suporte||[]).find(x=>x.id===id); if(p){Object.assign(p,patch,{atualizadoEm:Date.now()}); save();} },
+    async allClientes(){ return [...(mem.clientes||[])].sort(byDate); },
+    async saveCliente(id,d){ mem.clientes=mem.clientes||[]; if(id){ const c=mem.clientes.find(x=>x.id===id); if(c) Object.assign(c,d,{atualizadoEm:Date.now()}); } else mem.clientes.push({...d,id:"c"+Date.now(),criadoEm:Date.now(),atualizadoEm:Date.now()}); save(); }
   };
 }
 
@@ -946,18 +956,23 @@ async function firebaseStore(cfg){
     async createSuporte(d){ await F.addDoc(F.collection(db,"suporte"),{...d,estado:"aberto",criadoEm:F.serverTimestamp(),atualizadoEm:F.serverTimestamp()}); },
     async mySuporte(){ const q=F.query(F.collection(db,"suporte"),F.where("uid","==",auth.currentUser.uid)); return (await F.getDocs(q)).docs.map(norm).sort(byDate); },
     async allSuporte(){ return (await F.getDocs(F.collection(db,"suporte"))).docs.map(norm).sort(byDate); },
-    async updateSuporte(id,patch){ await F.updateDoc(F.doc(db,"suporte",id),{...patch,atualizadoEm:F.serverTimestamp()}); }
+    async updateSuporte(id,patch){ await F.updateDoc(F.doc(db,"suporte",id),{...patch,atualizadoEm:F.serverTimestamp()}); },
+    async allClientes(){ return (await F.getDocs(F.collection(db,"clientes"))).docs.map(norm).sort(byDate); },
+    async saveCliente(id,d){ if(id) await F.updateDoc(F.doc(db,"clientes",id),{...d,atualizadoEm:F.serverTimestamp()}); else await F.addDoc(F.collection(db,"clientes"),{...d,criadoEm:F.serverTimestamp(),atualizadoEm:F.serverTimestamp()}); }
   };
 }
 
 /* =========================================================
    ÁREA DE CONTA
    ========================================================= */
+let gtab="pedidos", supSite="todos", cliQ="", cliDraft=null;
+const CLI_ESTADOS={"ativo":"Ativo","pausado":"Pausado","terminado":"Terminado"}, PLANOS=["Essencial","Cuidado","Completo","Sem manutenção"];
 const ESTADOS={"recebido":"Recebido","em-analise":"Em análise","orcamento-enviado":"Contraproposta","aceite":"Aceite","recusado":"Recusado"};
 let stab="meus", store=null, user=null, admin=false, pendingTpl=null, tab="meus", authMode="criar", adminFilter="todos";
 const eur=n=>(n===undefined||n===null||n==="")?"A definir":new Intl.NumberFormat("pt-PT",{style:"currency",currency:"EUR"}).format(n);
 const fmtDate=ms=>new Date(ms).toLocaleDateString("pt-PT",{day:"numeric",month:"long",year:"numeric"});
-const isApp=()=>/^#(conta|suporte)/.test(location.hash);
+const isApp=()=>/^#(conta|suporte|gestao)/.test(location.hash);
+const isGestao=()=>location.hash.startsWith("#gestao");
 const isSupport=()=>location.hash.startsWith("#suporte");
 const supportSite=()=>(new URLSearchParams(location.hash.split("?")[1]||"").get("site")||"").slice(0,80);
 
@@ -976,12 +991,12 @@ function renderBanner(){
   if(!store||store.mode!=="demo"){ b.innerHTML=""; return; }
   b.innerHTML=`<div class="banner"><p>Modo demonstração: as contas e os pedidos ficam só neste browser. Para usar a sério, liga a página ao teu projeto Firebase.</p>
     ${user?`<button class="btn small" type="button" id="toggleAdmin">${admin?"Ver como cliente":"Ver como administrador"}</button>`:""}</div>`;
-  $("toggleAdmin")?.addEventListener("click",()=>{ admin=!admin; store.setAdmin(admin); tab=admin?"gestao":"meus"; renderApp(); });
+  $("toggleAdmin")?.addEventListener("click",()=>{ admin=!admin; store.setAdmin(admin); tab=admin?"gestao":"meus"; if(admin&&isApp()&&!isSupport()){ location.hash="#gestao"; } else if(!admin&&isGestao()){ location.hash="#conta"; } else renderApp(); });
 }
 function renderWho(){
   const w=$("who");
   if(!user){ w.innerHTML=""; return; }
-  w.innerHTML=`<span>${esc(user.nome||user.email)}</span><button class="btn small" type="button" id="logout">Sair</button>`;
+  w.innerHTML=`<span>${esc(user.nome||user.email)}</span>${admin?`<a class="btn small solid" href="#gestao">Gestão</a>`:""}<button class="btn small" type="button" id="logout">Sair</button>`;
   $("logout").addEventListener("click",async()=>{ await store.signOut(); });
 }
 
@@ -991,6 +1006,7 @@ async function renderApp(){
   const root=$("appBody");
   if(!store){ root.innerHTML=`<p class="muted">A carregar…</p>`; return; }
   if(!user){ root.innerHTML=authHTML(); bindAuth(); return; }
+  if(isGestao()){ if(!admin){ root.innerHTML=`<p class="muted">Esta área é só para o administrador.</p>`; return; } return renderGestao(root); }
   if(isSupport()){
     root.innerHTML=`${admin?`<div class="tabs" role="group" aria-label="Vistas"><button type="button" data-stab="meus" aria-pressed="${stab==="meus"}">Os meus pedidos</button><button type="button" data-stab="gestao" aria-pressed="${stab==="gestao"}">Suporte recebido</button></div>`:""}<div id="listArea"><p class="muted">A carregar…</p></div>`;
     root.querySelectorAll("[data-stab]").forEach(b=>b.addEventListener("click",()=>{stab=b.dataset.stab;renderApp();}));
@@ -1155,9 +1171,12 @@ function renderAdmin(all){
         <label class="f full"><span>Prazo</span><input type="text" name="prazo" placeholder="Por exemplo: 2 semanas depois de recebermos os textos…" value="${esc(o.prazo??"")}"></label>
         <label class="f full"><span>Mensagem para o cliente</span><textarea name="mensagem">${esc(o.mensagem??"")}</textarea></label>
         <p class="err full" role="alert"></p>
-        <div class="ctas full"><button class="btn solid small" type="submit" value="aceitar">Aceitar proposta do cliente</button><button class="btn small" type="submit" value="enviar">Enviar contraproposta</button><button class="btn small" type="submit" value="guardar">Guardar estado</button></div>
+        <div class="ctas full"><button class="btn solid small" type="submit" value="aceitar">Aceitar proposta do cliente</button><button class="btn small" type="submit" value="enviar">Enviar contraproposta</button><button class="btn small" type="submit" value="guardar">Guardar estado</button>${p.estado==="aceite"?`<button class="btn small" type="button" data-cli="${p.id}">Criar ficha de cliente</button>`:""}</div>
       </form></article>`;}).join(""):`<p class="empty">Não há pedidos ${adminFilter==="todos"?"":"neste estado "}por agora.</p>`}`;
   $("filt").addEventListener("change",e=>{adminFilter=e.target.value;renderAdmin(all);});
+  a.querySelectorAll("[data-cli]").forEach(b=>b.addEventListener("click",()=>{ const p=all.find(x=>x.id===b.dataset.cli), o=p.orcamento||{}, r=p.respostas||{};
+    cliDraft={nome:r.negocio||"",contacto:p.nome||"",email:p.email||"",telefone:p.telefone||"",template:p.template,montagem:o.valor??r.budgetMontagem??"",mensal:o.mensal??r.budgetMensal??"",estado:"ativo",pedidoId:p.id};
+    gtab="clientes"; renderApp(); }));
   a.querySelectorAll(".orcForm").forEach(f=>f.addEventListener("submit",async e=>{
     e.preventDefault(); const er=f.querySelector(".err"); er.textContent="";
     const d=Object.fromEntries(new FormData(f)), num=v=>v===""?null:Number(v);
@@ -1172,6 +1191,80 @@ function renderAdmin(all){
   }));
 }
 
+
+/* ---- gestão: painel único (pedidos, suporte, clientes) ---- */
+async function renderGestao(root){
+  root.innerHTML=`<p class="muted">A carregar…</p>`;
+  let P,S,C;
+  try{ [P,S,C]=await Promise.all([store.allPedidos(),store.allSuporte(),store.allClientes().catch(()=>null)]); }
+  catch(e){ root.innerHTML=`<p class="err">${esc(errMsg(e))}</p>`; return; }
+  const novos=P.filter(p=>p.estado==="recebido").length, andamento=P.filter(p=>p.estado==="em-analise"||p.estado==="orcamento-enviado").length;
+  const sup=S.filter(p=>p.estado==="aberto").length, curso=S.filter(p=>p.estado==="em-curso").length;
+  const ativos=(C||[]).filter(c=>c.estado==="ativo"), mrr=ativos.reduce((t,c)=>t+(Number(c.mensal)||0),0);
+  const ren=ativos.filter(c=>c.renovacao&&new Date(c.renovacao)-Date.now()<30*864e5).length;
+  const kpi=(n,l,hot)=>`<div class="kpi${hot&&n>0?" hot":""}"><b>${n}</b><span>${l}</span></div>`;
+  const tb=(k,l,n)=>`<button type="button" data-g="${k}" aria-pressed="${gtab===k}">${l}${n?`<span class="n">${n}</span>`:""}</button>`;
+  root.innerHTML=`<div class="list-head"><h2>Gestão</h2></div>
+    <div class="kpis">${kpi(novos,"Orçamentos novos",1)}${kpi(andamento,"Orçamentos em curso")}${kpi(sup,"Suporte por abrir",1)}${kpi(curso,"Suporte em curso")}${kpi(ativos.length,"Clientes ativos")}${kpi(eur(mrr).replace(",00",""),"Receita mensal")}${ren?kpi(ren,"Renovações em 30 dias",1):""}</div>
+    <div class="tabs" role="group" aria-label="Vistas">${tb("pedidos","Orçamentos",novos)}${tb("suporte","Suporte",sup)}${tb("clientes","Clientes",0)}<button type="button" data-g="meus" aria-pressed="${gtab==="meus"}">Os meus pedidos</button></div>
+    <div id="listArea"></div>`;
+  root.querySelectorAll("[data-g]").forEach(b=>b.addEventListener("click",()=>{gtab=b.dataset.g;renderApp();}));
+  const area=$("listArea");
+  if(gtab==="pedidos") renderAdmin(P);
+  else if(gtab==="suporte"){
+    const sites=[...new Set(S.map(x=>x.site))].sort();
+    if(supSite!=="todos"&&!sites.includes(supSite)) supSite="todos";
+    renderSupportAdmin(supSite==="todos"?S:S.filter(x=>x.site===supSite));
+    const bar=document.createElement("div"); bar.className="tools";
+    bar.innerHTML=`<label class="f" style="margin:0"><span class="muted" style="font-weight:500">Site</span><select id="sfilt"><option value="todos">Todos (${S.length})</option>${sites.map(x=>`<option value="${esc(x)}"${supSite===x?" selected":""}>${esc(x)} (${S.filter(y=>y.site===x).length})</option>`).join("")}</select></label>`;
+    area.insertBefore(bar,area.children[1]||null);
+    $("sfilt").addEventListener("change",e=>{supSite=e.target.value;renderApp();});
+  }
+  else if(gtab==="clientes"){ if(C===null) area.innerHTML=`<p class="err">Não foi possível ler os clientes. Confirma que as regras do Firestore incluem a coleção "clientes" (ficheiro firestore.rules).</p>`; else renderClientes(C,S,P); }
+  else renderMine(await store.myPedidos());
+}
+function clienteForm(c,id){
+  const v=k=>esc(c?.[k]??"");
+  return `<form class="orcForm" data-cid="${id||""}">
+    <label class="f"><span>Negócio</span><input name="nome" required value="${v("nome")}"></label>
+    <label class="f"><span>Pessoa de contacto</span><input name="contacto" value="${v("contacto")}"></label>
+    <label class="f"><span>Email</span><input type="email" name="email" value="${v("email")}"></label>
+    <label class="f"><span>Telemóvel</span><input type="tel" name="telefone" value="${v("telefone")}"></label>
+    <label class="f"><span>Nome do site (como aparece no suporte)</span><input name="site" value="${v("site")}"></label>
+    <label class="f"><span>Endereço do site</span><input type="url" name="url" placeholder="https://" value="${v("url")}"></label>
+    <label class="f"><span>Template</span><select name="template">${TEMPLATES.map(t=>`<option value="${t.id}"${c?.template===t.id?" selected":""}>${esc(t.nome)}</option>`).join("")}</select></label>
+    <label class="f"><span>Plano</span><select name="plano">${PLANOS.map(x=>`<option${c?.plano===x?" selected":""}>${x}</option>`).join("")}</select></label>
+    <label class="f"><span>Montagem (€)</span><input type="number" name="montagem" min="0" step="1" value="${v("montagem")}"></label>
+    <label class="f"><span>Manutenção por mês (€)</span><input type="number" name="mensal" min="0" step="1" value="${v("mensal")}"></label>
+    <label class="f"><span>Início</span><input type="date" name="inicio" value="${v("inicio")}"></label>
+    <label class="f"><span>Próxima renovação</span><input type="date" name="renovacao" value="${v("renovacao")}"></label>
+    <label class="f"><span>Estado</span><select name="estado">${Object.entries(CLI_ESTADOS).map(([k,l])=>`<option value="${k}"${(c?.estado||"ativo")===k?" selected":""}>${l}</option>`).join("")}</select></label>
+    <label class="f full"><span>Notas (domínio, contas, o que falta, combinados)</span><textarea name="notas">${v("notas")}</textarea></label>
+    <p class="err full" role="alert"></p><div class="ctas full"><button class="btn solid small" type="submit">${id?"Guardar ficha":"Criar cliente"}</button></div></form>`;
+}
+function renderClientes(C,S,P){
+  const a=$("listArea"), q=cliQ.trim().toLowerCase();
+  const list=C.filter(c=>!q||[c.nome,c.contacto,c.email,c.site].join(" ").toLowerCase().includes(q));
+  a.innerHTML=`<div class="list-head"><h2>Clientes (${C.length})</h2><button class="btn solid small" type="button" id="novoCli">Novo cliente</button></div>
+    <div class="tools"><label class="f" style="margin:0"><span class="muted" style="font-weight:500">Procurar</span><input id="cq" type="search" value="${esc(cliQ)}" placeholder="Nome, email ou site"></label></div>
+    ${cliDraft?`<article class="pedido"><div class="ph"><h3>Novo cliente${cliDraft.pedidoId?" (a partir de um pedido aceite)":""}</h3></div>${clienteForm(cliDraft,"")}</article>`:""}
+    ${list.length?list.map(c=>{ const mine=S.filter(x=>(c.site&&x.site===c.site)||(c.email&&x.email===c.email)), abertos=mine.filter(x=>x.estado!=="resolvido").length, dias=c.renovacao?Math.ceil((new Date(c.renovacao)-Date.now())/864e5):null;
+      return `<article class="pedido"><div class="ph"><h3>${esc(c.nome)}</h3><span class="estado e-${c.estado==="ativo"?"aceite":c.estado==="pausado"?"em-analise":"recusado"}">${CLI_ESTADOS[c.estado]||esc(c.estado)}</span></div>
+      <p class="client">${esc(c.contacto||"")}${c.email?`, ${esc(c.email)}`:""}${c.telefone?`, ${esc(c.telefone)}`:""}</p>
+      <p>${esc(tplOf(c.template).nome)} · ${esc(c.plano||"")} · montagem ${eur(c.montagem===""?null:c.montagem)} · ${c.mensal?`${eur(c.mensal)} por mês`:"sem mensalidade"}${c.url?` · <a href="${esc(c.url)}" target="_blank" rel="noopener">${esc(c.url.replace(/^https?:\/\//,""))}</a>`:""}</p>
+      <p class="muted">${abertos?`${abertos} pedido(s) de suporte por resolver`:`Sem suporte por resolver`}${mine.length?` · ${mine.length} no total`:""}${dias!==null?` · renovação ${dias<0?`atrasada ${-dias} dias`:dias===0?"hoje":`em ${dias} dias`}`:""}</p>
+      <details><summary>Abrir ficha</summary>${clienteForm(c,c.id)}</details></article>`; }).join(""):`<p class="empty">${C.length?"Nenhum cliente encontrado.":"Ainda não tens clientes registados. Quando aceitares um orçamento, usa “Criar ficha de cliente”."}</p>`}`;
+  $("novoCli").addEventListener("click",()=>{cliDraft={estado:"ativo"};renderClientes(C,S,P);});
+  $("cq").addEventListener("input",e=>{cliQ=e.target.value;const p=e.target.selectionStart;renderClientes(C,S,P);const n=$("cq");n.focus();n.setSelectionRange(p,p);});
+  a.querySelectorAll("form[data-cid]").forEach(f=>f.addEventListener("submit",async e=>{
+    e.preventDefault(); const er=f.querySelector(".err"); er.textContent=""; const d=Object.fromEntries(new FormData(f)); const num=x=>x===""?"":Number(x);
+    if(!d.nome.trim()){ er.textContent="Indica o nome do negócio."; return; }
+    const data={nome:d.nome.trim(),contacto:d.contacto.trim(),email:d.email.trim(),telefone:d.telefone.trim(),site:d.site.trim(),url:d.url.trim(),template:d.template,plano:d.plano,montagem:num(d.montagem),mensal:num(d.mensal),inicio:d.inicio,renovacao:d.renovacao,estado:d.estado,notas:d.notas.trim()};
+    f.querySelector("button").disabled=true;
+    try{ await store.saveCliente(f.dataset.cid||null,data); if(!f.dataset.cid) cliDraft=null; renderApp(); }
+    catch(ex){ er.textContent=errMsg(ex); f.querySelector("button").disabled=false; }
+  }));
+}
 
 /* ---- suporte aos sites entregues ---- */
 const SUP_ESTADOS={"aberto":"Aberto","em-curso":"Em curso","resolvido":"Resolvido"};
@@ -1226,7 +1319,7 @@ function renderSupportAdmin(all){
 (async()=>{
   try{ store=FIREBASE_CONFIG?await firebaseStore(FIREBASE_CONFIG):demoStore(); }
   catch(e){ console.warn("Firebase indisponível, a usar modo demonstração.",e); store=demoStore(); }
-  store.onAuth(async u=>{ user=u; admin=u?await store.isAdmin():false; tab=admin?"gestao":"meus"; stab=admin?"gestao":"meus"; renderApp(); });
+  store.onAuth(async u=>{ user=u; admin=u?await store.isAdmin():false; tab=admin?"gestao":"meus"; stab=admin?"gestao":"meus"; if(admin&&location.hash==="#conta") location.hash="#gestao"; else renderApp(); });
 })();
 route();
 renderDetail(0); document.getElementById("count").textContent=`1 de ${PANELS.length}`;
