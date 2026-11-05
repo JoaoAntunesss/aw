@@ -336,7 +336,9 @@ form h3:first-of-type{border-top:0;padding-top:0}
 .estado{display:inline-block;font-size:.86rem;font-weight:600;padding:.2rem .7rem;border-radius:999px;background:var(--sunk);color:var(--muted)}
 .e-em-analise{background:var(--ochre-bg);color:var(--ochre)}
 .e-orcamento-enviado{background:var(--violet);color:#fff}
-.e-aceite{background:var(--green-bg);color:var(--green)}
+.e-aceite,.e-resolvido{background:var(--green-bg);color:var(--green)}
+.e-aberto{background:var(--ochre-bg);color:var(--ochre)}
+.e-em-curso{background:var(--violet);color:#fff}
 .e-recusado{background:var(--red-bg);color:var(--red)}
 .orc{background:var(--surface);border-radius:16px;padding:1.1rem 1.2rem;margin:.6rem 0 1rem;max-width:620px;box-shadow:var(--shadow)}
 .orc h4{margin:0 0 .6rem}
@@ -504,6 +506,7 @@ details summary{cursor:pointer;color:var(--brand);font-weight:600;min-height:32p
       <h2 class="title">Fala connosco</h2>
       <p class="intro" style="margin-bottom:1.8rem">Tens dúvidas antes de fazer uma proposta? Escreve-nos. Respondemos em menos de dois dias úteis.</p>
       <a class="mail" href="mailto:j.p.r.n.antunes@gmail.com">j.p.r.n.antunes@gmail.com</a>
+      <p class="intro" style="margin:1.8rem 0 0">Já tens um site nosso e precisas de ajuda? <a href="#suporte">Abre um pedido de suporte</a>. Respondemos em 1 dia útil.</p>
     </div>
   </section>
 </main>
@@ -831,7 +834,7 @@ const errMsg=e=>ERR[e?.code]||e?.message||"Algo correu mal. Tenta outra vez.";
 const byDate=(a,b)=>(b.criadoEm||0)-(a.criadoEm||0);
 
 function demoStore(){
-  const KEY="antuneswho-demo"; let mem={users:{},session:null,pedidos:[],admin:false}, cb=()=>{};
+  const KEY="antuneswho-demo"; let mem={users:{},session:null,pedidos:[],suporte:[],admin:false}, cb=()=>{};
   try{const r=localStorage.getItem(KEY); if(r) mem={...mem,...JSON.parse(r)};}catch(e){}
   const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(mem));}catch(e){}};
   const cur=()=>mem.session?mem.users[mem.session]||null:null;
@@ -847,7 +850,11 @@ function demoStore(){
     async createPedido(d){ mem.pedidos.push({...d,id:"p"+Date.now(),criadoEm:Date.now(),atualizadoEm:Date.now()}); save(); },
     async myPedidos(){ const u=cur(); return mem.pedidos.filter(p=>p.uid===u?.uid).sort(byDate); },
     async allPedidos(){ return [...mem.pedidos].sort(byDate); },
-    async updatePedido(id,patch){ const p=mem.pedidos.find(x=>x.id===id); if(p){Object.assign(p,patch,{atualizadoEm:Date.now()}); save();} }
+    async updatePedido(id,patch){ const p=mem.pedidos.find(x=>x.id===id); if(p){Object.assign(p,patch,{atualizadoEm:Date.now()}); save();} },
+    async createSuporte(d){ mem.suporte=mem.suporte||[]; mem.suporte.push({...d,id:"s"+Date.now(),estado:"aberto",criadoEm:Date.now(),atualizadoEm:Date.now()}); save(); },
+    async mySuporte(){ const u=cur(); return (mem.suporte||[]).filter(p=>p.uid===u?.uid).sort(byDate); },
+    async allSuporte(){ return [...(mem.suporte||[])].sort(byDate); },
+    async updateSuporte(id,patch){ const p=(mem.suporte||[]).find(x=>x.id===id); if(p){Object.assign(p,patch,{atualizadoEm:Date.now()}); save();} }
   };
 }
 
@@ -872,7 +879,11 @@ async function firebaseStore(cfg){
     async createPedido(d){ await F.addDoc(F.collection(db,"pedidos"),{...d,criadoEm:F.serverTimestamp(),atualizadoEm:F.serverTimestamp()}); },
     async myPedidos(){ const q=F.query(F.collection(db,"pedidos"),F.where("uid","==",auth.currentUser.uid)); return (await F.getDocs(q)).docs.map(norm).sort(byDate); },
     async allPedidos(){ return (await F.getDocs(F.collection(db,"pedidos"))).docs.map(norm).sort(byDate); },
-    async updatePedido(id,patch){ await F.updateDoc(F.doc(db,"pedidos",id),{...patch,atualizadoEm:F.serverTimestamp()}); }
+    async updatePedido(id,patch){ await F.updateDoc(F.doc(db,"pedidos",id),{...patch,atualizadoEm:F.serverTimestamp()}); },
+    async createSuporte(d){ await F.addDoc(F.collection(db,"suporte"),{...d,estado:"aberto",criadoEm:F.serverTimestamp(),atualizadoEm:F.serverTimestamp()}); },
+    async mySuporte(){ const q=F.query(F.collection(db,"suporte"),F.where("uid","==",auth.currentUser.uid)); return (await F.getDocs(q)).docs.map(norm).sort(byDate); },
+    async allSuporte(){ return (await F.getDocs(F.collection(db,"suporte"))).docs.map(norm).sort(byDate); },
+    async updateSuporte(id,patch){ await F.updateDoc(F.doc(db,"suporte",id),{...patch,atualizadoEm:F.serverTimestamp()}); }
   };
 }
 
@@ -880,13 +891,15 @@ async function firebaseStore(cfg){
    ÁREA DE CONTA
    ========================================================= */
 const ESTADOS={"recebido":"Recebido","em-analise":"Em análise","orcamento-enviado":"Contraproposta","aceite":"Aceite","recusado":"Recusado"};
-let store=null, user=null, admin=false, pendingTpl=null, tab="meus", authMode="criar", adminFilter="todos";
+let stab="meus", store=null, user=null, admin=false, pendingTpl=null, tab="meus", authMode="criar", adminFilter="todos";
 const eur=n=>(n===undefined||n===null||n==="")?"A definir":new Intl.NumberFormat("pt-PT",{style:"currency",currency:"EUR"}).format(n);
 const fmtDate=ms=>new Date(ms).toLocaleDateString("pt-PT",{day:"numeric",month:"long",year:"numeric"});
-const isApp=()=>location.hash==="#conta";
+const isApp=()=>/^#(conta|suporte)/.test(location.hash);
+const isSupport=()=>location.hash.startsWith("#suporte");
+const supportSite=()=>(new URLSearchParams(location.hash.split("?")[1]||"").get("site")||"").slice(0,80);
 
 function route(){
-  const h=location.hash, app=h==="#conta", work=h==="#trabalho";
+  const h=location.hash, app=isApp(), work=h==="#trabalho";
   $("topo").hidden=app||work; $("app").hidden=!app; $("portfolio").hidden=!work;
   document.querySelectorAll('nav a[href="#trabalho"]').forEach(a=>a.toggleAttribute("aria-current",work));
   if(app){ window.scrollTo(0,0); renderApp(); }
@@ -915,6 +928,13 @@ async function renderApp(){
   const root=$("appBody");
   if(!store){ root.innerHTML=`<p class="muted">A carregar…</p>`; return; }
   if(!user){ root.innerHTML=authHTML(); bindAuth(); return; }
+  if(isSupport()){
+    root.innerHTML=`${admin?`<div class="tabs" role="group" aria-label="Vistas"><button type="button" data-stab="meus" aria-pressed="${stab==="meus"}">Os meus pedidos</button><button type="button" data-stab="gestao" aria-pressed="${stab==="gestao"}">Suporte recebido</button></div>`:""}<div id="listArea"><p class="muted">A carregar…</p></div>`;
+    root.querySelectorAll("[data-stab]").forEach(b=>b.addEventListener("click",()=>{stab=b.dataset.stab;renderApp();}));
+    try{ if(admin&&stab==="gestao") renderSupportAdmin(await store.allSuporte()); else renderSupportMine(await store.mySuporte()); }
+    catch(e){ $("listArea").innerHTML=`<p class="err">${esc(errMsg(e))}</p>`; }
+    return;
+  }
   if(pendingTpl!==null){ root.innerHTML=briefHTML(pendingTpl); bindBrief(); return; }
   root.innerHTML=`${admin?`<div class="tabs" role="group" aria-label="Vistas"><button type="button" data-tab="gestao" aria-pressed="${tab==="gestao"}">Pedidos recebidos</button><button type="button" data-tab="meus" aria-pressed="${tab==="meus"}">Os meus pedidos</button></div>`:""}<div id="listArea"><p class="muted">A carregar pedidos…</p></div>`;
   root.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>{tab=b.dataset.tab;renderApp();}));
@@ -928,7 +948,7 @@ async function renderApp(){
 function authHTML(){
   const c=authMode==="criar", t=pendingTpl!==null?TEMPLATES[pendingTpl]:null;
   return `<div class="narrow">
-    ${t?`<p>Vais fazer uma proposta para o template <strong>${t.nome}</strong>. Primeiro, cria a tua conta ou entra.</p>`:`<p class="muted">Com a conta fazes propostas e recebes a nossa resposta.</p>`}
+    ${isSupport()?`<p>Para abrir um pedido de suporte, cria a tua conta ou entra. Respondemos em 1 dia útil.</p>`:t?`<p>Vais fazer uma proposta para o template <strong>${t.nome}</strong>. Primeiro, cria a tua conta ou entra.</p>`:`<p class="muted">Com a conta fazes propostas e recebes a nossa resposta.</p>`}
     <div class="seg" role="group" aria-label="Conta"><button type="button" data-m="criar" aria-pressed="${c}">Criar conta</button><button type="button" data-m="entrar" aria-pressed="${!c}">Entrar</button></div>
     <form id="authForm" novalidate>
       ${c?`<label class="f"><span>Nome</span><input type="text" name="nome" autocomplete="name" required></label>
@@ -1089,11 +1109,61 @@ function renderAdmin(all){
   }));
 }
 
+
+/* ---- suporte aos sites entregues ---- */
+const SUP_ESTADOS={"aberto":"Aberto","em-curso":"Em curso","resolvido":"Resolvido"};
+const SUP_TIPOS=["As marcações não funcionam","Preços ou serviços errados","Fotos ou imagens","Equipa ou horários","Avisos por WhatsApp ou email","Entrar no painel","O site não abre","Outro"];
+function renderSupportMine(list){
+  const a=$("listArea"), site=supportSite();
+  a.innerHTML=`<div class="list-head"><h2>Pedir suporte</h2></div>
+  <p class="muted">Respondemos em 1 dia útil. Diz-nos qual é o site, o que aconteceu e em que página.</p>
+  <form id="supForm" class="orcForm" novalidate>
+    <label class="f"><span>Site</span><input type="text" name="site" maxlength="80" required value="${esc(site)}" placeholder="Nome ou endereço do site"></label>
+    <label class="f full"><span>Tipo de problema</span><select name="tipo">${SUP_TIPOS.map(t=>`<option>${esc(t)}</option>`).join("")}</select></label>
+    <label class="f full"><span>O que aconteceu?</span><textarea name="descricao" maxlength="2000" required placeholder="Em que página estavas, o que fizeste e o que apareceu."></textarea></label>
+    <p class="err full" role="alert"></p>
+    <div class="ctas full"><button class="btn solid small" type="submit">Enviar pedido</button></div>
+  </form>
+  <div class="list-head" style="margin-top:2rem"><h2>Os meus pedidos de suporte</h2></div>
+  ${list.length?list.map(p=>`<article class="pedido">
+    <div class="ph"><h3>${esc(p.tipo)}: ${esc(p.site)}</h3><span class="estado e-${p.estado}">${SUP_ESTADOS[p.estado]||esc(p.estado)}</span></div>
+    <p class="muted">Aberto a ${fmtDate(p.criadoEm)}</p><p>${esc(p.descricao)}</p>
+    ${p.resposta?`<div class="orc"><h4>Resposta</h4><p>${esc(p.resposta)}</p></div>`:(p.estado==="resolvido"?"":`<p class="muted">Vamos responder aqui, em 1 dia útil.</p>`)}
+  </article>`).join(""):`<p class="empty">Ainda não abriste nenhum pedido de suporte.</p>`}`;
+  const f=$("supForm");
+  f.addEventListener("submit",async e=>{
+    e.preventDefault(); const er=f.querySelector(".err"); er.textContent="";
+    const d=Object.fromEntries(new FormData(f)); d.site=d.site.trim(); d.descricao=d.descricao.trim();
+    if(!d.site){ er.textContent="Indica o site."; return; }
+    if(d.descricao.length<10){ er.textContent="Descreve o problema com um pouco mais de detalhe."; return; }
+    f.querySelector("button").disabled=true;
+    try{ await store.createSuporte({uid:user.uid,nome:user.nome||"",email:user.email||"",telefone:user.telefone||"",site:d.site,tipo:d.tipo,descricao:d.descricao}); renderApp(); }
+    catch(ex){ er.textContent=errMsg(ex); f.querySelector("button").disabled=false; }
+  });
+}
+function renderSupportAdmin(all){
+  const a=$("listArea"), open=all.filter(p=>p.estado!=="resolvido").length;
+  a.innerHTML=`<div class="list-head"><h2>Suporte recebido (${open} por resolver)</h2></div>`+(all.length?all.map(p=>`<article class="pedido">
+    <div class="ph"><h3>${esc(p.tipo)}: ${esc(p.site)}</h3><span class="estado e-${p.estado}">${SUP_ESTADOS[p.estado]||esc(p.estado)}</span></div>
+    <p class="client">${esc(p.nome)}, ${esc(p.email)}${p.telefone?`, ${esc(p.telefone)}`:""}. Aberto a ${fmtDate(p.criadoEm)}.</p><p>${esc(p.descricao)}</p>
+    <form class="orcForm" data-id="${p.id}">
+      <label class="f"><span>Estado</span><select name="estado">${Object.entries(SUP_ESTADOS).map(([k,v])=>`<option value="${k}"${p.estado===k?" selected":""}>${v}</option>`).join("")}</select></label>
+      <label class="f full"><span>Resposta para o cliente</span><textarea name="resposta" maxlength="2000">${esc(p.resposta||"")}</textarea></label>
+      <p class="err full" role="alert"></p><div class="ctas full"><button class="btn solid small" type="submit">Guardar</button></div>
+    </form></article>`).join(""):`<p class="empty">Não há pedidos de suporte.</p>`);
+  a.querySelectorAll(".orcForm").forEach(f=>f.addEventListener("submit",async e=>{
+    e.preventDefault(); const er=f.querySelector(".err"); er.textContent=""; const d=Object.fromEntries(new FormData(f));
+    f.querySelector("button").disabled=true;
+    try{ await store.updateSuporte(f.dataset.id,{estado:d.estado,resposta:d.resposta.trim()}); renderApp(); }
+    catch(ex){ er.textContent=errMsg(ex); f.querySelector("button").disabled=false; }
+  }));
+}
+
 /* ---- arranque dos dados ---- */
 (async()=>{
   try{ store=FIREBASE_CONFIG?await firebaseStore(FIREBASE_CONFIG):demoStore(); }
   catch(e){ console.warn("Firebase indisponível, a usar modo demonstração.",e); store=demoStore(); }
-  store.onAuth(async u=>{ user=u; admin=u?await store.isAdmin():false; tab=admin?"gestao":"meus"; renderApp(); });
+  store.onAuth(async u=>{ user=u; admin=u?await store.isAdmin():false; tab=admin?"gestao":"meus"; stab=admin?"gestao":"meus"; renderApp(); });
 })();
 route();
 renderDetail(0); document.getElementById("count").textContent=`1 de ${PANELS.length}`;
