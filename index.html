@@ -148,35 +148,35 @@ p.intro{color:var(--muted);max-width:52ch;margin:0;font-size:1.1rem}
 .about .big span{display:block}
 .about p.lede{font-size:1.15rem;margin:.4rem 0 1.6rem;max-width:44ch}
 
-/* ===== Sobre mim: sistema em camadas (3D guiado pelo scroll) ===== */
-.eu{background:#100e0c;color:#EFE8DE;position:relative}
+/* ===== Sobre mim: sistema em camadas (3D guiado pelo scroll) · paleta home office ===== */
+.eu{background:radial-gradient(120% 90% at 70% 40%,#EFE6D6 0%,#E4D9C6 60%,#D9CCB5 100%);color:#2B241E;position:relative}
 .eu-track{height:520vh;position:relative}
 .eu-stick{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden}
 .eu-stick canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 .eu-ui{position:absolute;inset:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center;padding:calc(env(safe-area-inset-top,0px) + 5.5rem) clamp(1.2rem,5vw,4rem) 2.5rem;pointer-events:none}
 .eu-term{max-width:34rem;pointer-events:auto}
 .eu-id{display:flex;align-items:center;gap:.9rem;margin:0 0 2.4rem}
-.eu-id img{width:3.4rem;height:3.4rem;border-radius:50%;object-fit:cover;filter:grayscale(1) contrast(1.08)}
-.eu-id b{display:block;font:600 1rem/1.2 Geist,system-ui,sans-serif;color:#F5EFE6}
-.eu-id span{font:500 .78rem/1.3 ui-monospace,Menlo,Consolas,monospace;color:#9d9082;letter-spacing:.04em}
-.eu-idx{font:600 .78rem/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.16em;text-transform:uppercase;color:#D6B892;margin:0 0 1rem;display:flex;gap:.8rem;align-items:center}
-.eu-idx::after{content:"";height:1px;width:3rem;background:#D6B892;opacity:.6}
-.eu-big{font-family:var(--display);font-weight:600;font-size:clamp(2rem,4.6vw,3.9rem);line-height:1.02;letter-spacing:-.035em;margin:0 0 1.1rem;text-wrap:balance;color:#F5EFE6}
-.eu-txt{font:400 clamp(1rem,1.5vw,1.15rem)/1.6 Geist,system-ui,sans-serif;color:#B9AD9E;margin:0;max-width:36ch}
+.eu-id img{width:3.4rem;height:3.4rem;border-radius:50%;object-fit:cover;filter:grayscale(1) contrast(1.05) sepia(.25)}
+.eu-id b{display:block;font:600 1rem/1.2 Geist,system-ui,sans-serif;color:#2B241E}
+.eu-id span{font:500 .78rem/1.3 ui-monospace,Menlo,Consolas,monospace;color:#7A6A58;letter-spacing:.04em}
+.eu-idx{font:600 .78rem/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.16em;text-transform:uppercase;color:#8A5A36;margin:0 0 1rem;display:flex;gap:.8rem;align-items:center}
+.eu-idx::after{content:"";height:1px;width:3rem;background:#8A5A36;opacity:.6}
+.eu-big{font-family:var(--display);font-weight:600;font-size:clamp(2rem,4.6vw,3.9rem);line-height:1.02;letter-spacing:-.035em;margin:0 0 1.1rem;text-wrap:balance;color:#2B241E}
+.eu-txt{font:400 clamp(1rem,1.5vw,1.15rem)/1.6 Geist,system-ui,sans-serif;color:#5E5144;margin:0;max-width:36ch}
 .eu-step{opacity:0;transform:translateY(12px);transition:opacity .55s,transform .55s;position:absolute;left:0;right:0;pointer-events:none}
 .eu-step[data-on]{opacity:1;transform:none;pointer-events:auto}
 .eu-steps{position:relative;min-height:17rem}
 .eu-ctas{display:flex;flex-wrap:wrap;gap:.7rem;margin-top:1.5rem}
-.eu-ctas a{font:600 .95rem Geist,system-ui,sans-serif;text-decoration:none;padding:.7rem 1.25rem;border-radius:999px;border:1px solid #6b5640;color:#F5EFE6}
-.eu-ctas a.solid{background:#D6B892;color:#17130f;border-color:#D6B892}
-.eu-rail{position:absolute;right:clamp(1.2rem,4vw,3rem);top:50%;transform:translateY(-50%);display:grid;gap:1.1rem;font:600 .74rem/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.14em;text-transform:uppercase;color:#6b5f52;text-align:right}
-.eu-rail span[data-on]{color:#D6B892}
+.eu-ctas a{font:600 .95rem Geist,system-ui,sans-serif;text-decoration:none;padding:.7rem 1.25rem;border-radius:999px;border:1px solid #9a8567;color:#2B241E}
+.eu-ctas a.solid{background:#8A5A36;color:#FAF5EA;border-color:#8A5A36}
+.eu-rail{position:absolute;right:clamp(1.2rem,4vw,3rem);bottom:2.2rem;display:flex;gap:1.6rem;font:600 .74rem/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.14em;text-transform:uppercase;color:#9a8b78;text-align:right}
+.eu-rail span[data-on]{color:#8A5A36}
 .eu-rail span::after{content:"";display:inline-block;width:.45rem;height:.45rem;margin-left:.7rem;border-radius:50%;border:1px solid currentColor;vertical-align:.05rem}
-.eu-rail span[data-on]::after{background:#D6B892}
-.eu-lab{position:absolute;left:0;top:0;font:600 .7rem/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.14em;text-transform:uppercase;color:#cdb892;pointer-events:none;white-space:nowrap;opacity:0;transition:opacity .4s}
+.eu-rail span[data-on]::after{background:#8A5A36}
+.eu-lab{position:absolute;left:0;top:0;font:600 .7rem/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.14em;text-transform:uppercase;color:#6E5A3E;pointer-events:none;white-space:nowrap;opacity:0;transition:opacity .4s}
 @media (max-width:820px){
   .eu-ui{grid-template-columns:1fr;align-items:end;padding-bottom:2rem}
-  .eu-term{max-width:none;background:linear-gradient(transparent,rgba(16,14,12,.94) 28%);padding-top:2.4rem}
+  .eu-term{max-width:none;background:linear-gradient(transparent,rgba(228,217,198,.96) 28%);padding-top:2.4rem}
   .eu-id{margin-bottom:1.2rem}
   .eu-steps{min-height:15rem}
   .eu-rail{display:none}
@@ -1348,22 +1348,22 @@ else try{
   const canvas=document.getElementById("euScene"), small=matchMedia("(max-width:820px)").matches;
   const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true}); renderer.setPixelRatio(Math.min(devicePixelRatio,small?1.5:2));
   const scene=new THREE.Scene(), camera=new THREE.PerspectiveCamera(30,1,.1,60);
-  const BRASS=new THREE.Color(0xD6B892), DIM=new THREE.Color(0x4a3f33), N=4, S=4.2, NODES=15;
+  const BRASS=new THREE.Color(0xB5683F), DIM=new THREE.Color(0x8a7a62), N=4, S=4.2, NODES=15;
   let seed=7; const rnd=()=>{ seed=(seed*16807)%2147483647; return (seed-1)/2147483646; };
   const names=["Análise","Tecnologia","Processos","Pessoas"];
   const layers=[];
   for(let i=0;i<N;i++){
     const g=new THREE.Group(); scene.add(g);
-    const plate=new THREE.Mesh(new THREE.PlaneGeometry(S,S),new THREE.MeshBasicMaterial({color:0xD6B892,transparent:true,opacity:.04,side:THREE.DoubleSide,depthWrite:false})); plate.rotation.x=-Math.PI/2; g.add(plate);
-    const edge=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(S,S)),new THREE.LineBasicMaterial({color:0x4a3f33,transparent:true,opacity:.9})); edge.rotation.x=-Math.PI/2; g.add(edge);
+    const plate=new THREE.Mesh(new THREE.PlaneGeometry(S,S),new THREE.MeshBasicMaterial({color:0x7E8B6A,transparent:true,opacity:.10,side:THREE.DoubleSide,depthWrite:false})); plate.rotation.x=-Math.PI/2; g.add(plate);
+    const edge=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(S,S)),new THREE.LineBasicMaterial({color:0x8a7a62,transparent:true,opacity:.9})); edge.rotation.x=-Math.PI/2; g.add(edge);
     /* grelha de pontos fina */
     const pts=[]; for(let x=-S/2;x<=S/2+.01;x+=S/14) for(let z=-S/2;z<=S/2+.01;z+=S/14) pts.push(x,0,z);
     const dg=new THREE.BufferGeometry(); dg.setAttribute("position",new THREE.Float32BufferAttribute(pts,3));
-    const dots=new THREE.Points(dg,new THREE.PointsMaterial({color:0x6b5640,size:.018,transparent:true,opacity:.7,depthWrite:false})); g.add(dots);
+    const dots=new THREE.Points(dg,new THREE.PointsMaterial({color:0x8a7a62,size:.018,transparent:true,opacity:.7,depthWrite:false})); g.add(dots);
     /* nós */
     const np=[],nodes=[]; for(let k=0;k<NODES;k++){ const x=(rnd()-.5)*(S-.5), z=(rnd()-.5)*(S-.5); np.push(x,0,z); nodes.push(new THREE.Vector3(x,0,z)); }
     const ng=new THREE.BufferGeometry(); ng.setAttribute("position",new THREE.Float32BufferAttribute(np,3));
-    const nm=new THREE.PointsMaterial({color:0xD6B892,size:.09,transparent:true,opacity:.9,depthWrite:false,sizeAttenuation:true});
+    const nm=new THREE.PointsMaterial({color:0xB5683F,size:.09,transparent:true,opacity:.9,depthWrite:false,sizeAttenuation:true});
     const nodePts=new THREE.Points(ng,nm); g.add(nodePts);
     layers.push({g,plate,edge,dots,nodePts,nodes,glow:0});
   }
@@ -1372,9 +1372,9 @@ else try{
   for(let i=0;i<N-1;i++){ layers[i].nodes.forEach((a,ai)=>{ const near=layers[i+1].nodes.map((b,bi)=>({bi,d:(a.x-b.x)**2+(a.z-b.z)**2})).sort((p,q)=>p.d-q.d).slice(0,2);
     near.forEach(n=>{ links.push({i,a:ai,b:n.bi,t:rnd(),v:.18+rnd()*.25}); }); }); }
   const lineGeo=new THREE.BufferGeometry(); lineGeo.setAttribute("position",new THREE.BufferAttribute(new Float32Array(links.length*6),3));
-  const lineMat=new THREE.LineBasicMaterial({color:0x6b5640,transparent:true,opacity:.0}); scene.add(new THREE.LineSegments(lineGeo,lineMat));
+  const lineMat=new THREE.LineBasicMaterial({color:0x7E8B6A,transparent:true,opacity:.0}); scene.add(new THREE.LineSegments(lineGeo,lineMat));
   const pulseGeo=new THREE.BufferGeometry(); pulseGeo.setAttribute("position",new THREE.BufferAttribute(new Float32Array(links.length*3),3));
-  const pulses=new THREE.Points(pulseGeo,new THREE.PointsMaterial({color:0xFFE9C4,size:.07,transparent:true,opacity:0,depthWrite:false})); scene.add(pulses);
+  const pulses=new THREE.Points(pulseGeo,new THREE.PointsMaterial({color:0xC8923F,size:.07,transparent:true,opacity:0,depthWrite:false})); scene.add(pulses);
   /* etiquetas HTML ligadas às camadas */
   const labs=names.map(n=>{ const d=document.createElement("div"); d.className="eu-lab"; d.textContent=n; labsBox.appendChild(d); return d; });
   const camBase=new THREE.Vector3(5.6,4.6,6.4), look=new THREE.Vector3(0,0,0);
@@ -1396,7 +1396,7 @@ else try{
     const gap=.14+spread*1.05;
     layers.forEach((L,k)=>{ const y=(k-(N-1)/2)*gap; L.g.position.y+=(y-L.g.position.y)*(1-Math.exp(-dt*10));
       const on=active===k||(active<0), tgt=on?1:0; L.glow+=((active<0?.55:tgt)-L.glow)*(1-Math.exp(-dt*7));
-      L.edge.material.color.copy(DIM).lerp(BRASS,L.glow); L.plate.material.opacity=.03+.1*L.glow*spread;
+      L.edge.material.color.copy(DIM).lerp(BRASS,L.glow); L.plate.material.opacity=.07+.16*L.glow*spread;
       L.dots.material.opacity=.25+.55*L.glow; L.nodePts.material.size=.06+.07*L.glow; L.nodePts.material.opacity=.45+.55*L.glow;
       L.g.rotation.y=Math.sin(t0*.2+k)*.015; });
     /* ligações e pulsos */
