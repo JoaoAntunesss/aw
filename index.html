@@ -1136,13 +1136,18 @@ async function start3D(THREE){
         float fade=smoothstep(5.,.4,d); float front=smoothstep(uReveal,uReveal-.8,d); float edge=smoothstep(.35,0.,abs(d-uReveal))*step(uReveal,8.5);
         gl_FragColor=vec4(uColor,(g*.3*front+edge*g*.85)*fade); }`});
   const grid=new THREE.Mesh(new THREE.PlaneGeometry(14,14),gridMat); grid.rotation.x=-Math.PI/2; grid.position.y=-.64; scene.add(grid);
+  const fc=document.createElement("canvas"); fc.width=4; fc.height=128; const fx=fc.getContext("2d");
+  const fg=fx.createLinearGradient(0,0,0,128); fg.addColorStop(0,"#000"); fg.addColorStop(.55,"#222"); fg.addColorStop(1,"#fff"); fx.fillStyle=fg; fx.fillRect(0,0,4,128);
+  const fadeTex=new THREE.CanvasTexture(fc);
   const PW=1.6, PH=1.0, sideMat=new THREE.MeshStandardMaterial({color:0xc4cad2,roughness:.55,metalness:.15});
   const panels=texs.map(tex=>{
     tex.colorSpace=THREE.SRGBColorSpace; tex.anisotropy=renderer.capabilities.getMaxAnisotropy();
     const front=new THREE.MeshBasicMaterial({map:tex,toneMapped:false});
     const mesh=new THREE.Mesh(new THREE.BoxGeometry(PW,PH,.035),[sideMat,sideMat,sideMat,sideMat,front,sideMat]);
     const shadow=new THREE.Mesh(new THREE.PlaneGeometry(PW*1.3,.6),new THREE.MeshBasicMaterial({map:shadowTex,transparent:true,depthWrite:false,opacity:.5}));
-    shadow.rotation.x=-Math.PI/2; scene.add(mesh); scene.add(shadow); return {mesh,shadow,front,lift:0};
+    shadow.rotation.x=-Math.PI/2; scene.add(mesh); scene.add(shadow);
+    const refl=new THREE.Mesh(new THREE.PlaneGeometry(PW,PH),new THREE.MeshBasicMaterial({map:tex,alphaMap:fadeTex,transparent:true,opacity:.22,depthWrite:false,side:THREE.DoubleSide,toneMapped:false}));
+    scene.add(refl); return {mesh,shadow,front,refl,lift:0};
   });
   let offset=0, spread=(reduceMotion||window.__introSeen)?1:0, introT=0, dragging=false, hover=-1, running=false, visible=true, last=0;
   let introGo=false, camDist=4, par={x:0,y:0}, parT={x:0,y:0};
@@ -1159,6 +1164,8 @@ async function start3D(THREE){
     p.mesh.position.set(sg*(n1*1.3+rest*.55)*spread, .04*near+p.lift, -(n1*.95+rest*.3)*spread-(1-spread)*ad*.05);
     p.mesh.rotation.y=-sg*n1*.7*spread; const s=1+.08*near; p.mesh.scale.set(s,s,1);
     p.front.color.setScalar((1-Math.min(1,ad)*.32)*(.18+.82*Math.min(1,introK*1.4)));
+    p.refl.position.set(p.mesh.position.x,p.mesh.position.y-PH*s-.03,p.mesh.position.z); p.refl.rotation.y=p.mesh.rotation.y; p.refl.scale.set(s,-s,1);
+    p.refl.material.opacity=.24*spread*(.35+.65*near)*(.18+.82*Math.min(1,introK*1.4));
     p.shadow.position.set(p.mesh.position.x,-PH*.5*s-.06,p.mesh.position.z); p.shadow.material.opacity=.45*(.5+.5*near)*spread+.15; }); }
   function frame(now){ const dt=Math.min(.05,(now-(last||now))/1000); last=now; let moving=false;
     if(!dragging){ const n=offset+(current-offset)*(1-Math.exp(-dt*9)); if(Math.abs(current-n)>.0005){offset=n;moving=true;} else offset=current; } else moving=true;
