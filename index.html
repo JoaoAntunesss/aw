@@ -120,6 +120,7 @@ nav a{text-decoration:none;color:var(--muted);font-weight:500;font-size:.98rem}
 /* fio 3D que atravessa a página */
 #fio{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;display:none}
 .has-fio #fio{display:block}
+body:has(#app:not([hidden])) #fio{display:none!important}
 .paint{transition:color .6s cubic-bezier(.2,.7,.15,1)}
 .paint.lit{color:var(--brand)}
 
@@ -443,8 +444,8 @@ form h3:first-of-type{border-top:0;padding-top:0}
 .consent input{margin-top:.35rem;accent-color:var(--brand)}
 .err{color:var(--red);margin:.4rem 0 1rem;min-height:1.4em}
 .ok{color:var(--green)}
-.tabs{display:flex;gap:1.4rem;border-bottom:1px solid var(--line);margin-bottom:1.6rem}
-.tabs button{font:inherit;font-weight:600;background:none;border:0;border-bottom:2px solid transparent;padding:.6rem 0;color:var(--muted);cursor:pointer;margin-bottom:-1px}
+.tabs{display:flex;gap:1.4rem;border-bottom:1px solid var(--line);margin-bottom:1.6rem;overflow-x:auto;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
+.tabs button{white-space:nowrap;flex:none;font:inherit;font-weight:600;background:none;border:0;border-bottom:2px solid transparent;padding:.6rem 0;color:var(--muted);cursor:pointer;margin-bottom:-1px}
 .tabs button[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--brand)}
 .plan .who{margin:.2rem 0 .8rem;color:var(--muted);font-size:.95rem}
 .faq{display:grid;gap:.6rem;max-width:46rem}

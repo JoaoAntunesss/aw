@@ -214,7 +214,7 @@ fieldset.f legend{font-weight:600;padding:0;margin-bottom:.3rem}
 
 <main id="view"></main>
 
-<footer><div class="wrap">Explica+, Rua das Flores. Dados fictícios, para demonstração.</div></footer>
+<footer><div class="wrap">Explica+, Rua das Flores. Dados fictícios, para demonstração. <a href="https://joaoantunesss.github.io/aw/#suporte" target="_blank" rel="noopener">Pedir suporte</a></div></footer>
 <div class="toast" id="toast" role="status" hidden></div>
 <dialog id="installDlg" aria-labelledby="idt"></dialog>
 
@@ -567,7 +567,7 @@ function bindEnc(){ $("payOnline")?.addEventListener("click",()=>toast("Aqui abr
 function pageProf(){
   const totalAlunos=new Set(db.salas.flatMap(s=>s.alunos)).size, pend=db.salas.flatMap(s=>s.pedidos.map(p=>({s,u:db.users[p]}))).filter(x=>x.u);
   return `<div class="wrap area">
-    <h1>Painel</h1><div class="row" style="justify-content:space-between;margin-bottom:1.2rem"><p class="sub" style="margin:0">Olá, ${esc(me().nome)}. Aqui geres as salas, os alunos e os links das aulas.</p><a class="btn small" href="#definicoes">Definições do site</a></div>
+    <h1>Painel</h1><div class="row" style="justify-content:space-between;margin-bottom:1.2rem"><p class="sub" style="margin:0">Olá, ${esc(me().nome)}. Aqui geres as salas, os alunos e os links das aulas.</p><span class="row" style="gap:.5rem"><a class="btn small" href="#definicoes">Definições do site</a><a class="btn small" href="https://joaoantunesss.github.io/aw/#suporte" target="_blank" rel="noopener">Pedir suporte</a></span></div>
     <div class="stats"><div class="stat"><b>${db.salas.length}</b><span>salas</span></div><div class="stat"><b>${totalAlunos}</b><span>alunos</span></div><div class="stat"><b>${pend.length}</b><span>pedidos para aceitar</span></div></div>
     <div class="grid2"><div>
       <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:.8rem"><h2 style="margin:0">Salas</h2><button class="btn small solid" type="button" id="nova">Nova sala</button></div>
