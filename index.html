@@ -1715,7 +1715,7 @@ else try{
 </script>
 
 <script type="module">
-/* o fio: uma linha 3D desenha-se ao longo da página com o scroll e pinta os títulos por onde passa */
+/* o fio: um cabo de rede (Ethernet) desenha-se ao longo da página com o scroll, com a ficha RJ45 na ponta, e pinta os títulos por onde passa */
 (async()=>{
   if(matchMedia("(prefers-reduced-motion: reduce)").matches||matchMedia("(max-width:820px)").matches) return;
   let THREE; try{ THREE=await import("three"); }catch(e){ return; }
@@ -1724,15 +1724,27 @@ else try{
   document.documentElement.classList.add("has-fio");
   R.setPixelRatio(Math.min(devicePixelRatio,2)); R.setClearColor(0,0);
   const scene=new THREE.Scene(), cam=new THREE.PerspectiveCamera(35,1,.1,100); cam.position.z=10;
+  try{ const {RoomEnvironment}=await import("https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/environments/RoomEnvironment.js");
+    const pm=new THREE.PMREMGenerator(R); scene.environment=pm.fromScene(new RoomEnvironment(),.04).texture; }catch(e){}
+  scene.add(new THREE.AmbientLight(0xffffff,.55));
+  const sun=new THREE.DirectionalLight(0xffffff,1.6); sun.position.set(3,4,6); scene.add(sun);
   const FOV_H=2*10*Math.tan(THREE.MathUtils.degToRad(17.5));
-  let mesh=null, head=null, L=0, pxU=1, Hp=1, vh=1, total=1;
+  let mesh=null, plug=null, L=0, pxU=1, Hp=1, vh=1, total=1, cur=-1, raf=0;
   const titles=[...document.querySelectorAll("main h2.title")].filter(h=>!h.closest(".eu"));
   titles.forEach(h=>h.classList.add("paint"));
-  const mat=new THREE.ShaderMaterial({transparent:true,
-    uniforms:{uHead:{value:0},uBlue:{value:new THREE.Color(0x2547F5)},uOr:{value:new THREE.Color(0xFF6A3D)}},
-    vertexShader:"attribute float aT;varying float vT;varying vec3 vN;void main(){vT=aT;vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}",
-    fragmentShader:"uniform float uHead;uniform vec3 uBlue;uniform vec3 uOr;varying float vT;varying vec3 vN;void main(){if(vT>uHead)discard;float l=.5+.5*dot(normalize(vN),normalize(vec3(.4,.7,.6)));float h=smoothstep(uHead-.006,uHead-.002,vT);vec3 c=mix(uBlue*(.55+.6*l),uOr*(.8+.35*l),h);gl_FragColor=vec4(c,.62);}"
-  });
+  const jacket=new THREE.MeshStandardMaterial({color:0x2547F5,roughness:.38,metalness:.08,transparent:true,opacity:.9});
+  /* ficha RJ45: corpo transparente, 8 contactos dourados, patilha e capa de proteção */
+  function makePlug(){
+    const g=new THREE.Group(); g.scale.setScalar(1.9);
+    const clear=new THREE.MeshPhysicalMaterial({color:0xe9eef5,roughness:.12,metalness:0,transparent:true,opacity:.62,clearcoat:1,clearcoatRoughness:.1});
+    const body=new THREE.Mesh(new THREE.BoxGeometry(.17,.125,.30),clear); body.position.z=.06; g.add(body);
+    const gold=new THREE.MeshStandardMaterial({color:0xE1B54A,metalness:1,roughness:.22});
+    for(let i=0;i<8;i++){ const c=new THREE.Mesh(new THREE.BoxGeometry(.011,.006,.13),gold); c.position.set(-.0725+i*.0207,.066,.115); g.add(c); }
+    const latch=new THREE.Mesh(new THREE.BoxGeometry(.1,.012,.16),clear); latch.position.set(0,-.07,.02); latch.rotation.x=.18; g.add(latch);
+    const wires=new THREE.Mesh(new THREE.BoxGeometry(.15,.09,.12),new THREE.MeshStandardMaterial({color:0xFF6A3D,roughness:.5})); wires.position.z=-.02; g.add(wires);
+    const boot=new THREE.Mesh(new THREE.CylinderGeometry(.062,.098,.2,24),jacket.clone()); boot.material.opacity=1; boot.rotation.x=Math.PI/2; boot.position.z=-.2; g.add(boot);
+    return g;
+  }
   function build(){
     const w=innerWidth; vh=innerHeight; Hp=document.documentElement.scrollHeight;
     R.setSize(w,vh,false); cam.aspect=w/vh; cam.updateProjectionMatrix();
@@ -1742,23 +1754,21 @@ else try{
       pts.push(new THREE.Vector3(Math.sin(u*L*.62)*3.4*Math.min(1,cam.aspect/1.6), y, Math.cos(u*L*.9)*1.4)); }
     const curve=new THREE.CatmullRomCurve3(pts,false,"catmullrom",.5);
     total=Math.min(4000,Math.round(L*22));
-    const g=new THREE.TubeGeometry(curve,total,.06,10,false);
-    const cnt=g.attributes.position.count, aT=new Float32Array(cnt);
-    for(let i=0;i<cnt;i++) aT[i]=Math.floor(i/11)/total;
-    g.setAttribute("aT",new THREE.BufferAttribute(aT,1));
+    const g=new THREE.TubeGeometry(curve,total,.085,14,false);
     if(mesh){ scene.remove(mesh); mesh.geometry.dispose(); }
-    mesh=new THREE.Mesh(g,mat); mesh.userData.curve=curve; scene.add(mesh);
-    if(!head){ head=new THREE.Mesh(new THREE.SphereGeometry(.12,20,16),new THREE.MeshBasicMaterial({color:0xFF6A3D})); scene.add(head); }
+    mesh=new THREE.Mesh(g,jacket); mesh.userData.curve=curve; scene.add(mesh);
+    if(!plug){ plug=makePlug(); scene.add(plug); }
     cur=-1; frame();
   }
-  let cur=-1, raf=0;
+  const fwd=new THREE.Vector3(0,0,1);
   function frame(){
     raf=0;
     const sy=scrollY, headPage=sy+vh*.55, target=Math.min(1,Math.max(0,headPage/Hp));
     cur=cur<0?target:cur+(target-cur)*.14;
-    const c=mesh.userData.curve, pt=c.getPointAt(Math.min(.9999,Math.max(.0001,cur)));
-    mat.uniforms.uHead.value=cur; mesh.geometry.setDrawRange(0,Math.max(0,Math.floor(cur*total))*60+60);
-    head.position.copy(pt); head.visible=cur>.002&&cur<.998;
+    const c=mesh.userData.curve, u=Math.min(.9999,Math.max(.0001,cur));
+    const pt=c.getPointAt(u), tg=c.getTangentAt(u);
+    mesh.geometry.setDrawRange(0,Math.max(0,Math.floor(cur*total))*84);
+    plug.position.copy(pt).addScaledVector(tg,.3); plug.quaternion.setFromUnitVectors(fwd,tg); plug.visible=cur>.002&&cur<.998;
     cam.position.y=-(sy+vh/2)/pxU;
     R.render(scene,cam);
     const hp=cur*Hp;
