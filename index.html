@@ -373,6 +373,10 @@ form h3:first-of-type{border-top:0;padding-top:0}
 .faq summary::after{content:"+";font-weight:400;font-size:1.3rem;line-height:1}
 .faq details[open] summary::after{content:"–"}
 .faq details p{margin:0 0 1rem;color:var(--muted)}
+.consent{display:flex;gap:.6rem;align-items:flex-start;margin:.2rem 0 .8rem;font-size:.92rem;color:var(--muted);cursor:pointer}
+.consent input{margin-top:.28rem;width:auto;flex:none}
+.mydata{margin-top:2.4rem;padding-top:1.4rem;border-top:1px solid var(--line)}
+.mydata h3{margin:0 0 .3rem;font-size:1.1rem}.mydata p{margin:.2rem 0 .9rem;color:var(--muted);max-width:46rem}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(9.5rem,1fr));gap:.8rem;margin:0 0 1.6rem}
 .kpi{border:1px solid var(--line);border-radius:14px;padding:.9rem 1rem;background:var(--surface)}
 .kpi b{display:block;font:700 1.7rem/1.1 var(--display);letter-spacing:-.02em}
@@ -1069,7 +1073,7 @@ function authHTML(){
       <label class="f"><span>Email</span><input type="email" name="email" autocomplete="email" required></label>
       <label class="f"><span>Palavra-passe</span><input type="password" name="password" autocomplete="${c?"new-password":"current-password"}" minlength="6" required><small>${c?"Pelo menos 6 caracteres.":""}</small></label>
       <p class="err" id="authErr" role="alert"></p>
-      ${c?`<p class="muted" style="font-size:.9rem">Ao criar conta aceitas os <a href="termos.html" target="_blank" rel="noopener">termos</a> e a <a href="privacidade.html" target="_blank" rel="noopener">política de privacidade</a>.</p>`:""}
+      ${c?`<label class="consent"><input type="checkbox" name="rgpd"><span>Li e aceito os <a href="termos.html" target="_blank" rel="noopener">termos</a> e a <a href="privacidade.html" target="_blank" rel="noopener">política de privacidade</a>.</span></label>`:""}
       <div class="ctas"><button class="btn solid" type="submit">${c?"Criar conta":"Entrar"}</button>
       ${c?"":`<button class="linkbtn" type="button" id="forgot">Esqueci-me da palavra-passe</button>`}</div>
     </form></div>`;
@@ -1081,6 +1085,7 @@ function bindAuth(){
     e.preventDefault(); err.textContent=""; err.classList.remove("ok");
     const d=Object.fromEntries(new FormData(f)); d.email=(d.email||"").trim();
     if(authMode==="criar"&&!d.nome?.trim()){err.textContent="Escreve o teu nome.";return;}
+    if(authMode==="criar"&&!d.rgpd){err.textContent="Para criares conta, aceita os termos e a política de privacidade.";return;}
     if(!d.email.includes("@")){err.textContent="Escreve um email válido.";return;}
     if((d.password||"").length<6){err.textContent="A palavra-passe tem de ter pelo menos 6 caracteres.";return;}
     const btn=f.querySelector("[type=submit]"); btn.disabled=true;
@@ -1117,6 +1122,7 @@ function briefHTML(ti){
     <h3>Notas</h3>${NOTAS.map(field).join("")}
     <label class="consent"><input type="checkbox" name="consent" required><span>Aceito que estes dados sejam usados para analisar a minha proposta, conforme a <a href="#contacto">política de privacidade</a>.</span></label>
     <p class="err" id="briefErr" role="alert"></p>
+    <p class="muted" style="font-size:.9rem;margin:.4rem 0 1rem">Uso estes dados só para responder ao teu pedido. Vê a <a href="privacidade.html" target="_blank" rel="noopener">política de privacidade</a>.</p>
     <div class="ctas"><button class="btn solid" type="submit">Enviar proposta</button><button class="btn" type="button" id="cancelBrief">Cancelar</button></div>
   </form></div>`;
 }
@@ -1182,6 +1188,21 @@ function renderMine(list){
       <details><summary>Ver as minhas respostas</summary>${answersHTML(p)}</details>
     </article>`).join(""):`<p class="empty">Ainda não fizeste nenhum pedido. Escolhe um modelo e conta-me como é o teu negócio.</p>`);
   $("newReq").addEventListener("click",()=>{ pendingTpl=PANELS[current].t; renderApp(); });
+  const md=document.createElement("section"); md.className="mydata";
+  md.innerHTML=`<h3>Os teus dados</h3><p>Podes descarregar uma cópia de tudo o que tenho sobre ti, ou pedir que apague a tua conta e os teus dados. Consulta a <a href="privacidade.html" target="_blank" rel="noopener">política de privacidade</a>.</p><div class="ctas"><button class="btn small" type="button" id="dlData">Descarregar os meus dados</button><button class="btn small" type="button" id="delData">Pedir o apagamento dos meus dados</button></div><p class="ok" id="mydataMsg" role="status"></p>`;
+  a.appendChild(md);
+  $("dlData").addEventListener("click",async()=>{
+    const sup=await store.mySuporte().catch(()=>[]);
+    const dump={geradoEm:new Date().toISOString(),conta:{nome:user.nome||"",email:user.email||"",telefone:user.telefone||""},pedidos:list,suporte:sup};
+    const url=URL.createObjectURL(new Blob([JSON.stringify(dump,null,2)],{type:"application/json"}));
+    const l=document.createElement("a"); l.href=url; l.download="os-meus-dados-aw.json"; document.body.appendChild(l); l.click(); l.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+  });
+  $("delData").addEventListener("click",async()=>{
+    if(!confirm("Vou apagar a tua conta e os teus dados, incluindo pedidos e suporte. Queres mesmo pedir isto?")) return;
+    const b=$("delData"); b.disabled=true;
+    try{ await store.createSuporte({uid:user.uid,nome:user.nome||"",email:user.email||"",telefone:user.telefone||"",site:"AW (a minha conta)",tipo:"Apagar os meus dados (RGPD)",descricao:"Pedido de apagamento da conta e de todos os dados pessoais."}); $("mydataMsg").textContent="Pedido enviado. Respondo e confirmo o apagamento em poucos dias."; }
+    catch(ex){ $("mydataMsg").classList.remove("ok"); $("mydataMsg").textContent=errMsg(ex); b.disabled=false; }
+  });
   a.querySelectorAll("[data-acc],[data-rec]").forEach(b=>b.addEventListener("click",async()=>{
     const id=b.dataset.acc||b.dataset.rec; b.disabled=true;
     try{ await store.updatePedido(id,{estado:b.dataset.acc?"aceite":"recusado"}); renderApp(); }catch(ex){ alert(errMsg(ex)); b.disabled=false; }
@@ -1313,6 +1334,7 @@ function renderSupportMine(list){
     <label class="f full"><span>Tipo de problema</span><select name="tipo">${SUP_TIPOS.map(t=>`<option>${esc(t)}</option>`).join("")}</select></label>
     <label class="f full"><span>O que aconteceu?</span><textarea name="descricao" maxlength="2000" required placeholder="Em que página estavas, o que fizeste e o que apareceu."></textarea></label>
     <p class="err full" role="alert"></p>
+    <p class="muted" style="font-size:.9rem;margin:.4rem 0 1rem">Uso estes dados só para responder ao teu pedido. Vê a <a href="privacidade.html" target="_blank" rel="noopener">política de privacidade</a>.</p>
     <div class="ctas full"><button class="btn solid small" type="submit">Enviar pedido</button></div>
   </form>
   <div class="list-head" style="margin-top:2rem"><h2>Os meus pedidos de suporte</h2></div>
