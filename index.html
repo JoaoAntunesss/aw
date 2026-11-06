@@ -122,7 +122,6 @@ nav a{text-decoration:none;color:var(--muted);font-weight:500;font-size:.98rem}
 .has-fio #fio{display:block}
 .paint{transition:color .6s cubic-bezier(.2,.7,.15,1)}
 .paint.lit{color:var(--brand)}
-@media (max-width:820px){#fio{display:none!important}}
 
 
 /* caso real: a imagem expande até ocupar o ecrã */
@@ -170,7 +169,7 @@ nav a{text-decoration:none;color:var(--muted);font-weight:500;font-size:.98rem}
 .pc-flat figure{margin:2rem 0 0}.pc-flat img{width:100%;height:auto;border-radius:14px;display:block}
 .pc-flat figcaption{margin-top:.7rem;color:#B9C8F2}.pc-flat figcaption b{color:#EEF2F8;margin-right:.5rem}
 .percurso.flat .pc-track{display:none}.percurso.flat .pc-flat{display:block}
-@media (max-width:820px){.pc-track{display:none}.pc-flat{display:block}}
+@media (max-width:820px){.pc-cap b{font-size:1.9rem}.pc-cap span{font-size:.98rem;max-width:18rem}.pc-title{font-size:1.4rem;top:1.4rem}.pc-rail{display:none}}
 @media (prefers-reduced-motion:reduce){.pc-track{display:none}.pc-flat{display:block}}
 
 .stage-wrap{margin-top:clamp(2.4rem,5vw,4rem)}
@@ -1696,7 +1695,9 @@ else try{
   const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
   function draw(){
     let p=1;
-    if(!still()){ const r=track.getBoundingClientRect(), span=track.offsetHeight-innerHeight; p=span>0?clamp(-r.top/span,0,1):1; }
+    if(matchMedia("(prefers-reduced-motion: reduce)").matches) p=1;
+    else if(matchMedia("(max-width:820px)").matches){ const r=art.getBoundingClientRect(); p=clamp((innerHeight*.92-r.top)/(innerHeight*.55),0,1); }
+    else { const r=track.getBoundingClientRect(), span=track.offsetHeight-innerHeight; p=span>0?clamp(-r.top/span,0,1):1; }
     let act=0;
     planes.forEach((el,i)=>{
       const rv=i===0?1:clamp((p-(i-1)*.3)/.3,0,1);
@@ -1717,7 +1718,7 @@ else try{
 <script type="module">
 /* o fio: um cabo de rede (Ethernet) desenha-se ao longo da página com o scroll, com a ficha RJ45 na ponta, e pinta os títulos por onde passa */
 (async()=>{
-  if(matchMedia("(prefers-reduced-motion: reduce)").matches||matchMedia("(max-width:820px)").matches) return;
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   let THREE; try{ THREE=await import("three"); }catch(e){ return; }
   const cv=document.getElementById("fio"); let R;
   try{ R=new THREE.WebGLRenderer({canvas:cv,alpha:true,antialias:true}); }catch(e){ return; }
@@ -1732,7 +1733,7 @@ else try{
   let mesh=null, plug=null, L=0, pxU=1, Hp=1, vh=1, total=1, cur=-1, raf=0;
   const titles=[...document.querySelectorAll("main h2.title")].filter(h=>!h.closest(".eu"));
   titles.forEach(h=>h.classList.add("paint"));
-  const jacket=new THREE.MeshStandardMaterial({color:0x2547F5,roughness:.38,metalness:.08,transparent:true,opacity:.9});
+  const jacket=new THREE.MeshStandardMaterial({color:0x2547F5,roughness:.38,metalness:.08,transparent:true,opacity:innerWidth<820?.6:.9});
   /* ficha RJ45: corpo transparente, 8 contactos dourados, patilha e capa de proteção */
   function makePlug(){
     const g=new THREE.Group(); g.scale.setScalar(1.9);
@@ -1751,7 +1752,7 @@ else try{
     pxU=vh/FOV_H; L=Hp/pxU;
     const pts=[]; const N=Math.max(40,Math.round(L*1.6));
     for(let i=0;i<=N;i++){ const u=i/N, y=-u*L;
-      pts.push(new THREE.Vector3(Math.sin(u*L*.62)*3.4*Math.min(1,cam.aspect/1.6), y, Math.cos(u*L*.9)*1.4)); }
+      const ph=cam.aspect<1; pts.push(new THREE.Vector3(ph?(1.15+Math.sin(u*L*.62)*.45):Math.sin(u*L*.62)*3.4*Math.min(1,cam.aspect/1.6), y, Math.cos(u*L*.9)*1.4)); }
     const curve=new THREE.CatmullRomCurve3(pts,false,"catmullrom",.5);
     total=Math.min(4000,Math.round(L*22));
     const g=new THREE.TubeGeometry(curve,total,.085,14,false);
@@ -1809,7 +1810,7 @@ else try{
 (async()=>{
   const sec=document.getElementById("percurso"); if(!sec) return;
   const flat=()=>{ sec.classList.add("flat"); };
-  if(matchMedia("(prefers-reduced-motion: reduce)").matches||matchMedia("(max-width:820px)").matches){ flat(); return; }
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches){ flat(); return; }
   let THREE; try{ THREE=await import("three"); }catch(e){ flat(); return; }
   const cv=document.getElementById("pcCanvas"), track=sec.querySelector(".pc-track"); let R;
   try{ R=new THREE.WebGLRenderer({canvas:cv,antialias:true}); }catch(e){ flat(); return; }
@@ -1823,10 +1824,10 @@ else try{
     ["Quadro","O site do centro de explicações: turmas, vagas e preços.","img/frames/quadro.jpg"],
     ["AT Beauty Studio","O site real de uma cliente, com marcações online.","img/at-beauty-studio.jpg"]
   ];
-  const N=items.length, GAP=6.4, panels=[]; const loader=new THREE.TextureLoader();
+  const N=items.length, GAP=6.4, panels=[], PORT=innerWidth/innerHeight<1, DIST=PORT?4.6:5.8, SIDE=PORT?1.05:1.9, PS=PORT?.72:1; const loader=new THREE.TextureLoader();
   items.forEach((it,i)=>{
     const g=new THREE.Group(); const side=i%2?1:-1;
-    g.position.set(side*1.9,.15*Math.sin(i*1.7),-i*GAP); g.rotation.y=-side*.3;
+    g.position.set(side*SIDE,.15*Math.sin(i*1.7),-i*GAP); g.rotation.y=-side*.3;
     const mat=new THREE.MeshBasicMaterial({color:0x888888,fog:true});
     const mesh=new THREE.Mesh(new THREE.PlaneGeometry(4.4,2.2),mat); g.add(mesh);
     const plate=new THREE.Mesh(new THREE.PlaneGeometry(4.4,2.2),new THREE.MeshBasicMaterial({color:0x2547F5,transparent:true,opacity:.28,depthWrite:false})); plate.position.set(.22,-.22,-.05); g.add(plate);
@@ -1834,7 +1835,7 @@ else try{
     const edge=new THREE.LineSegments(new THREE.EdgesGeometry(mesh.geometry),new THREE.LineBasicMaterial({color:0x7C93FF})); g.add(edge);
     loader.load(it[2],tx=>{ tx.colorSpace=THREE.SRGBColorSpace; tx.anisotropy=4; mat.map=tx; mat.needsUpdate=true;
       const a=tx.image.width/tx.image.height; const w=2.2*a; [mesh,plate,plate2,edge].forEach(o=>o.scale.x=w/4.4); });
-    scene.add(g); panels.push({g,mat});
+    g.scale.setScalar(PS); scene.add(g); panels.push({g,mat});
   });
   const grid=new THREE.GridHelper(80,80,0x2547F5,0x2547F5); grid.material.transparent=true; grid.material.opacity=.16; grid.position.set(0,-2,-12); scene.add(grid);
   const pn=500, pp=new Float32Array(pn*3); for(let i=0;i<pn;i++){ pp[i*3]=(Math.random()-.5)*16; pp[i*3+1]=(Math.random()-.5)*7; pp[i*3+2]=-Math.random()*(N*GAP+8)+5; }
@@ -1842,7 +1843,7 @@ else try{
   scene.add(new THREE.Points(pg,new THREE.PointsMaterial({color:0xB9C8F2,size:.035,transparent:true,opacity:.7,sizeAttenuation:true})));
   const nameEl=document.getElementById("pcName"), txtEl=document.getElementById("pcTxt"), dots=[...document.querySelectorAll("#pcRail i")];
   let lastAct=-1, mx=0, my=0, vis=true, cur=0;
-  function size(){ const w=cv.clientWidth,h=cv.clientHeight; R.setSize(w,h,false); cam.aspect=w/h; cam.updateProjectionMatrix(); }
+  function size(){ const w=cv.clientWidth,h=cv.clientHeight; R.setSize(w,h,false); cam.aspect=w/h; cam.fov=w/h<1?Math.min(95,2*Math.atan(1.75/DIST/(w/h))*180/Math.PI):40; cam.updateProjectionMatrix(); }
   size(); addEventListener("resize",size);
   addEventListener("pointermove",e=>{ mx=e.clientX/innerWidth-.5; my=e.clientY/innerHeight-.5; },{passive:true});
   new IntersectionObserver(es=>{ vis=es[0].isIntersecting; if(vis) loop(); }).observe(sec);
@@ -1854,7 +1855,7 @@ else try{
     const p=span>0?clamp(-r.top/span,0,1):0; cur+=(p-cur)*.1;
     const f=cur*(N-1), i0=Math.min(N-2,Math.floor(f)), fr=sm(f-i0);
     const x0=panels[i0].g.position.x, x1=panels[i0+1].g.position.x, xt=x0+(x1-x0)*fr;
-    const camZ=5.8-cur*(N-1)*GAP;
+    const camZ=DIST-cur*(N-1)*GAP;
     cam.position.set(xt*.45+mx*.7, .55-my*.4, camZ);
     cam.lookAt(xt*.85, 0, camZ-5);
     panels.forEach((o,i)=>{ const a=1-Math.min(1,Math.abs(f-i)); o.mat.color.setScalar(.38+.62*sm(a)); });
