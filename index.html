@@ -220,6 +220,56 @@ body:has(#app:not([hidden])) #fio{display:none!important}
 @media (max-width:820px){.live-grid{grid-template-columns:1fr}.lv-stage{min-height:28rem}.live p{max-width:none}}
 @media (prefers-reduced-motion:reduce){.lv-phone{transition:none;transform:rotateY(-9deg);opacity:1}.lv-sec{opacity:1;transform:none;transition:none}.lv-replay{display:none}}
 
+/* demo: separadores e cenas */
+.lv-tabs{display:flex;gap:.45rem;flex-wrap:wrap;margin:0 0 1.4rem}
+.lv-tabs button{font:inherit;font-size:.95rem;color:#B9C8F2;background:none;border:1px solid rgba(238,242,248,.25);border-radius:999px;padding:.45rem 1rem;cursor:pointer;transition:all .25s}
+.lv-tabs button[aria-selected="true"]{background:#EEF2F8;color:#0B1220;border-color:#EEF2F8;font-weight:600}
+.lv-scr{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .45s}
+.lv-scr.act{opacity:1}
+.lv-note.sm{background:rgba(255,255,255,.97)}
+/* restaurante */
+.lv-scr.r{background:#1d1410;color:#f1e4cf}
+.r .lv-bar{color:#d9b36c}.r .lv-bar span{color:#f1e4cf99}
+.r-book{position:relative;margin:.5rem .9rem 0;height:11.2rem;perspective:900px}
+.r-page{position:absolute;inset:0;border-radius:.4rem .9rem .9rem .4rem;background:#f1e4cf;color:#2a1b12;padding:.8rem .85rem}
+.r-page small{color:#2a1b12aa;font-size:.58rem;letter-spacing:.02em}
+.r-page h4{margin:.15rem 0 .2rem;font-size:.95rem;font-family:Georgia,serif;position:relative;display:inline-block}
+.r-ul{position:absolute;left:0;right:0;bottom:-.12rem;height:.18rem;background:#b8862f;transform:scaleX(0);transform-origin:left;transition:transform .8s}
+.r-ul.on{transform:none}
+.r-price{float:right;font-weight:700;color:#8a5a14}
+.r-al{display:flex;gap:.3rem;margin-top:.7rem;opacity:0;transform:translateY(6px);transition:all .5s}.r-al.on{opacity:1;transform:none}
+.r-al i{font-style:normal;font-size:.56rem;border:1px solid #2a1b1244;border-radius:999px;padding:.15rem .45rem}
+.r-cover{position:absolute;inset:0;border-radius:.4rem .9rem .9rem .4rem;background:linear-gradient(135deg,#4b2a17,#2b170c);border:1.5px solid #b8862f;display:grid;place-items:center;text-align:center;transform-origin:left center;transition:transform 1.2s cubic-bezier(.6,.1,.2,1);backface-visibility:hidden;box-shadow:0 10px 24px rgba(0,0,0,.45)}
+.r-cover b{font:700 1.15rem Georgia,serif;color:#d9b36c;letter-spacing:.08em}.r-cover span{display:block;font-size:.58rem;color:#d9b36caa;margin-top:.3rem}
+.r-cover.open{transform:rotateY(-168deg)}
+.r .lv-cta{background:#b8862f;color:#1d1410}.r .lv-cta,.r .lv-cta span{color:#1d1410}.r .lv-cta.ok{background:#4f9a6b}.r .lv-cta.ok,.r .lv-cta.ok span{color:#fff}
+.r .lv-cta svg path{stroke:#fff}
+.r-s .lv-slot{background:#2b1d15;border-color:#4a3524;color:#f1e4cf}.r-s .lv-slot.sel{background:#b8862f;border-color:#b8862f;color:#1d1410}
+/* ninho */
+.lv-scr.n{background:#eef8f5;color:#12332d}
+.n .lv-bar{color:#1f8a7a}.n .lv-bar span{color:#12332d99}
+.n-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:.22rem;text-align:center;font-size:.6rem}
+.n-cal b{color:#12332d88;font-weight:500;font-size:.52rem}
+.n-d{background:#fff;border:1.5px solid #d6ebe5;border-radius:.5rem;padding:.38rem 0;transition:all .3s}
+.n-d.x{background:transparent;border-color:transparent;color:#12332d44;text-decoration:line-through}
+.n-d.f{animation:nfree 1.8s ease-in-out infinite}
+@keyframes nfree{0%,100%{box-shadow:0 0 0 0 rgba(31,138,122,.0)}50%{box-shadow:0 0 0 .22rem rgba(31,138,122,.25)}}
+.n-d.sel{background:#1f8a7a;border-color:#1f8a7a;color:#fff;animation:none;transform:scale(1.1)}
+.n .lv-slot.sel{background:#f08a63;border-color:#f08a63}
+.n .lv-cta{background:#1f8a7a}.n .lv-cta.ok{background:#3f8f64}
+/* quadro */
+.lv-scr.q{background:#f1f7f3;color:#0d2a20}
+.q .lv-bar{color:#1b5e45}.q .lv-bar span{color:#0d2a2099}
+.q-t{display:flex;justify-content:space-between;align-items:center;background:#fff;border:1.5px solid #d3e6db;border-radius:.8rem;padding:.55rem .65rem;margin-bottom:.4rem;transition:all .3s}
+.q-t small{display:block;color:#0d2a2099;font-size:.6rem}
+.q-v{font-size:.58rem;font-weight:700;border-radius:999px;padding:.18rem .5rem;background:#dff0e6;color:#1b5e45}
+.q-v.l{background:#fde7d2;color:#9a4d10}
+.q-t.sel{border-color:#1b5e45;background:#e4f3ea;transform:scale(1.02)}
+.q .lv-cta{background:#1b5e45}.q .lv-cta.ok{background:#3f8f64}
+.q-form{opacity:.25;transform:translateY(8px);transition:all .5s}.q-form.on{opacity:1;transform:none}
+.q-f{background:#fff;border:1.5px solid #d3e6db;border-radius:.7rem;padding:.5rem .65rem;margin-bottom:.35rem;font-size:.66rem}
+.q-f small{display:block;color:#0d2a2088;font-size:.54rem}
+
 /* percurso 3D pelos modelos */
 .percurso{background:#0B1220;color:#EEF2F8}
 .pc-track{height:480vh;position:relative}
@@ -674,16 +724,6 @@ details summary{cursor:pointer;color:var(--brand);font-weight:600;min-height:32p
     </div>
   </section>
 
-  <section class="caso" id="caso" aria-label="Um caso real">
-    <div class="caso-track"><div class="caso-stick">
-      <figure class="caso-fig" id="casoFig"><img src="img/at-beauty-studio.jpg" alt="Site do AT Beauty Studio" width="1267" height="676"><div class="caso-shade"></div></figure>
-      <div class="wrap caso-wrap">
-        <div class="caso-copy" id="casoCopy"><h2 class="caso-title">Um site que já trabalha para uma cliente.</h2><p>O AT Beauty Studio recebe marcações online e gere os clientes num painel, com um site feito por mim.</p></div>
-        <blockquote class="caso-quote" id="casoQuote">“Ajuda muito a gerir, tanto a nível financeiro como a agilizar as marcações. Foi um passo em frente para o negócio.”<cite>Xana, <span translate="no">AT Beauty Studio & Estética</span></cite><div class="ctas"><a class="btn solid" href="https://beautystudio.pt" target="_blank" rel="noopener">Ver o site do AT Beauty Studio</a><a class="btn" href="#trabalho">Ver todo o trabalho</a></div></blockquote>
-      </div>
-    </div></div>
-  </section>
-
   <section class="block" id="como">
     <div class="wrap">
       <div class="head-row">
@@ -697,6 +737,16 @@ details summary{cursor:pointer;color:var(--brand);font-weight:600;min-height:32p
         <li><h3>Monto e mantenho</h3><p>Adapto tudo, publico e trato das atualizações. O dia a dia mudas tu, no teu painel.</p></li>
       </ol>
     </div>
+  </section>
+
+  <section class="caso" id="caso" aria-label="Um caso real">
+    <div class="caso-track"><div class="caso-stick">
+      <figure class="caso-fig" id="casoFig"><img src="img/at-beauty-studio.jpg" alt="Site do AT Beauty Studio" width="1267" height="676"><div class="caso-shade"></div></figure>
+      <div class="wrap caso-wrap">
+        <div class="caso-copy" id="casoCopy"><h2 class="caso-title">Um site que já trabalha para uma cliente.</h2><p>O AT Beauty Studio recebe marcações online e gere os clientes num painel, com um site feito por mim.</p></div>
+        <blockquote class="caso-quote" id="casoQuote">“Ajuda muito a gerir, tanto a nível financeiro como a agilizar as marcações. Foi um passo em frente para o negócio.”<cite>Xana, <span translate="no">AT Beauty Studio & Estética</span></cite><div class="ctas"><a class="btn solid" href="https://beautystudio.pt" target="_blank" rel="noopener">Ver o site do AT Beauty Studio</a><a class="btn" href="#trabalho">Ver todo o trabalho</a></div></blockquote>
+      </div>
+    </div></div>
   </section>
 
   <section class="block" id="templates">
@@ -726,101 +776,153 @@ details summary{cursor:pointer;color:var(--brand);font-weight:600;min-height:32p
   <section class="live" id="ao-vivo" aria-labelledby="liveT">
     <div class="wrap live-grid">
       <div>
-        <h2 id="liveT">Uma marcação, do princípio ao fim.</h2>
-        <p>É assim que o teu cliente marca no modelo Studio. Sem mensagens para trás e para a frente, e tu recebes o aviso na hora.</p>
-        <ol class="steps" id="lvSteps">
-          <li>Escolhe o serviço</li><li>Escolhe o dia</li><li>Escolhe a hora</li><li>Confirma, e tu recebes o aviso</li>
-        </ol>
+        <h2 id="liveT">Vê cada modelo a funcionar.</h2>
+        <div class="lv-tabs" role="tablist" aria-label="Modelos" id="lvTabs">
+          <button role="tab" aria-selected="true" data-m="studio">Studio</button>
+          <button role="tab" aria-selected="false" data-m="rest">Restaurante</button>
+          <button role="tab" aria-selected="false" data-m="ninho">Ninho</button>
+          <button role="tab" aria-selected="false" data-m="quadro">Quadro</button>
+        </div>
+        <p id="lvP">É assim que o teu cliente marca no modelo Studio. Sem mensagens para trás e para a frente, e tu recebes o aviso na hora.</p>
+        <ol class="steps" id="lvSteps"><li></li><li></li><li></li><li></li></ol>
         <div class="live-actions">
           <a class="btn solid" href="#conta">Pedir proposta</a>
-          <a class="btn" href="#templates">Ver todos os modelos</a>
         </div>
       </div>
       <div class="lv-col">
         <div class="lv-stage" aria-hidden="true">
           <div class="lv-phone"><div class="lv-screen" id="lvScreen">
             <div class="lv-notch"></div>
-            <div class="lv-note" id="lvNote"><i>AW</i><div><b>Nova marcação</b><span>Marta S., sábado às 17:00</span></div></div>
-            <div class="lv-bar">Studio<span>Marcar online</span></div>
-            <div class="lv-body">
-              <div class="lv-h">Serviço</div>
-              <div class="lv-svc" data-s="a"><div>Corte e brushing<small>45 min</small></div><b>35 €</b></div>
-              <div class="lv-svc" data-s="b"><div>Coloração<small>1 h 30</small></div><b>60 €</b></div>
-              <div class="lv-sec" id="lvD"><div class="lv-h">Dia</div>
-                <div class="lv-days"><div class="lv-day"><b>13</b>Sex</div><div class="lv-day" id="lvDay"><b>14</b>Sáb</div><div class="lv-day"><b>16</b>Seg</div><div class="lv-day"><b>17</b>Ter</div></div></div>
-              <div class="lv-sec" id="lvT2"><div class="lv-h">Hora</div>
-                <div class="lv-slots"><div class="lv-slot">10:00</div><div class="lv-slot off">11:30</div><div class="lv-slot">15:00</div><div class="lv-slot" id="lvSlot">17:00</div><div class="lv-slot off">18:00</div><div class="lv-slot">18:30</div></div></div>
+
+            <div class="lv-scr act" data-m="studio">
+              <div class="lv-note" id="sNote"><i>AW</i><div><b>Nova marcação</b><span>Marta S., sábado às 17:00</span></div></div>
+              <div class="lv-bar">Studio<span>Marcar online</span></div>
+              <div class="lv-body">
+                <div class="lv-h">Serviço</div>
+                <div class="lv-svc" id="sSvc"><div>Corte e brushing<small>45 min</small></div><b>35 €</b></div>
+                <div class="lv-svc"><div>Coloração<small>1 h 30</small></div><b>60 €</b></div>
+                <div class="lv-sec" id="sD"><div class="lv-h">Dia</div>
+                  <div class="lv-days"><div class="lv-day"><b>13</b>Sex</div><div class="lv-day" id="sDay"><b>14</b>Sáb</div><div class="lv-day"><b>16</b>Seg</div><div class="lv-day"><b>17</b>Ter</div></div></div>
+                <div class="lv-sec" id="sT"><div class="lv-h">Hora</div>
+                  <div class="lv-slots"><div class="lv-slot">10:00</div><div class="lv-slot off">11:30</div><div class="lv-slot">15:00</div><div class="lv-slot" id="sSlot">17:00</div><div class="lv-slot off">18:00</div><div class="lv-slot">18:30</div></div></div>
+              </div>
+              <div class="lv-cta" id="sCta"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.3 3.3L13 4.5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Confirmar marcação</span></div>
             </div>
-            <div class="lv-cta" id="lvCta"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.3 3.3L13 4.5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="lvCtaT">Confirmar marcação</span></div>
+
+            <div class="lv-scr r" data-m="rest">
+              <div class="lv-note" id="rNote"><i>AW</i><div><b>Nova reserva</b><span>4 pessoas, hoje às 20:30</span></div></div>
+              <div class="lv-bar">Cantinho<span>Cardápio</span></div>
+              <div class="r-book">
+                <div class="r-page"><small>Prato do dia</small><br><h4>Bacalhau à Lagareiro<span class="r-ul" id="rUl"></span></h4><span class="r-price">14,50 €</span>
+                  <div class="r-al" id="rAl"><i>Peixe</i><i>Glúten</i><i>Sem lactose</i></div>
+                  <p style="margin:.7rem 0 0;font-size:.6rem;color:#2a1b12bb">Batata a murro, grelos e azeite novo.</p></div>
+                <div class="r-cover" id="rBook"><div><b>CARDÁPIO</b><span>Toca para abrir</span></div></div>
+              </div>
+              <div class="lv-body"><div class="lv-h" style="color:#d9b36c">Reservar mesa</div>
+                <div class="lv-slots r-s"><div class="lv-slot">19:30</div><div class="lv-slot" id="rHora">20:30</div><div class="lv-slot">21:30</div></div></div>
+              <div class="lv-cta" id="rCta"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.3 3.3L13 4.5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Reservar para 4</span></div>
+            </div>
+
+            <div class="lv-scr n" data-m="ninho">
+              <div class="lv-note" id="nNote"><i>AW</i><div><b>Novo pedido</b><span>Sábado 8, das 18h às 23h</span></div></div>
+              <div class="lv-bar">Ninho<span>Dias livres</span></div>
+              <div class="lv-body">
+                <div class="lv-h">Novembro</div>
+                <div class="n-cal"><b>S</b><b>T</b><b>Q</b><b>Q</b><b>S</b><b>S</b><b>D</b>
+                  <div class="n-d x">3</div><div class="n-d f">4</div><div class="n-d x">5</div><div class="n-d f">6</div><div class="n-d x">7</div><div class="n-d f" id="nDia">8</div><div class="n-d x">9</div>
+                  <div class="n-d f">10</div><div class="n-d x">11</div><div class="n-d x">12</div><div class="n-d f">13</div><div class="n-d f">14</div><div class="n-d x">15</div><div class="n-d f">16</div></div>
+                <div class="lv-sec" id="nH"><div class="lv-h">Horário</div>
+                  <div class="lv-slots"><div class="lv-slot">14h–18h</div><div class="lv-slot" id="nHora">18h–23h</div><div class="lv-slot">Noite toda</div></div></div>
+              </div>
+              <div class="lv-cta" id="nCta"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.3 3.3L13 4.5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Pedir este dia</span></div>
+            </div>
+
+            <div class="lv-scr q" data-m="quadro">
+              <div class="lv-note" id="qNote"><i>AW</i><div><b>Nova inscrição</b><span>Matemática 9.º ano, 3.ª e 5.ª</span></div></div>
+              <div class="lv-bar">Quadro<span>Turmas</span></div>
+              <div class="lv-body">
+                <div class="lv-h">Turmas abertas</div>
+                <div class="q-t"><div>Português 7.º<small>2.ª e 4.ª, 17:00</small></div><span class="q-v l">1 vaga</span></div>
+                <div class="q-t" id="qTurma"><div>Matemática 9.º<small>3.ª e 5.ª, 18:00</small></div><span class="q-v">4 vagas</span></div>
+                <div class="q-t"><div>Física e Química 10.º<small>6.ª, 17:30</small></div><span class="q-v">3 vagas</span></div>
+                <div class="q-form" id="qForm"><div class="q-f"><small>Aluno</small>Tomás, 9.º ano</div><div class="q-f"><small>Contacto</small>Encarregada de educação</div></div>
+              </div>
+              <div class="lv-cta" id="qCta"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.3 3.3L13 4.5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Inscrever o aluno</span></div>
+            </div>
+
             <div class="lv-tap" id="lvTap"></div>
           </div></div>
         </div>
         <button class="lv-replay" id="lvReplay" type="button">Ver outra vez</button>
-        <p class="sr-only" style="position:absolute;left:-9999px">Animação: o cliente escolhe o serviço Corte e brushing, o dia sábado 14 e as 17:00, confirma, e o dono do salão recebe a notificação de nova marcação.</p>
+        <p id="lvSr" style="position:absolute;left:-9999px"></p>
       </div>
-    </div>
-  </section>
-
-  <section class="percurso" id="percurso" aria-label="Percurso pelos modelos">
-    <div class="pc-track"><div class="pc-stick">
-      <canvas id="pcCanvas" aria-hidden="true"></canvas>
-      <div class="wrap pc-ui">
-        <h2 class="pc-title">Percorre os modelos.</h2>
-        <div class="pc-cap" aria-live="polite"><b id="pcName">Studio</b><span id="pcTxt">O site do salão: serviços, próxima vaga e avaliações.</span></div>
-        <div class="pc-rail" id="pcRail" aria-hidden="true"><i data-on></i><i></i><i></i><i></i><i></i></div>
-      </div>
-    </div></div>
-    <div class="wrap pc-flat">
-      <h2 class="pc-title">Os modelos</h2>
-      <figure><img src="img/frames/studio.jpg" alt="Modelo Studio" loading="lazy"><figcaption><b>Studio</b> O site do salão: serviços, próxima vaga e avaliações.</figcaption></figure>
-      <figure><img src="img/frames/restaurante.jpg" alt="Modelo Restaurante" loading="lazy"><figcaption><b>Restaurante</b> O site do restaurante, com o prato do dia e o cardápio.</figcaption></figure>
-      <figure><img src="img/frames/ninho.jpg" alt="Modelo Ninho" loading="lazy"><figcaption><b>Ninho</b> O site da babysitter: apresentação, preço e dias livres.</figcaption></figure>
-      <figure><img src="img/frames/quadro.jpg" alt="Modelo Quadro" loading="lazy"><figcaption><b>Quadro</b> O site do centro de explicações: turmas, vagas e preços.</figcaption></figure>
     </div>
   </section>
 
 <script>
 (function(){
   var sec=document.getElementById("ao-vivo"); if(!sec) return;
-  var scr=document.getElementById("lvScreen"), tap=document.getElementById("lvTap"), note=document.getElementById("lvNote"),
-      cta=document.getElementById("lvCta"), ctaT=document.getElementById("lvCtaT"), steps=[].slice.call(document.querySelectorAll("#lvSteps li"));
-  var svcA=scr.querySelector('[data-s="a"]'), day=document.getElementById("lvDay"), slot=document.getElementById("lvSlot"),
-      secD=document.getElementById("lvD"), secT=document.getElementById("lvT2");
-  var reduce=matchMedia("(prefers-reduced-motion: reduce)").matches, timers=[], ran=false;
-  function at(ms,fn){timers.push(setTimeout(fn,ms));}
-  function stepOn(i){steps.forEach(function(s,k){s.classList.toggle("on",k===i);});}
+  var scr=document.getElementById("lvScreen"), tap=document.getElementById("lvTap"), P=document.getElementById("lvP"), SR=document.getElementById("lvSr"),
+      steps=[].slice.call(document.querySelectorAll("#lvSteps li")), tabs=[].slice.call(document.querySelectorAll("#lvTabs button"));
+  var reduce=matchMedia("(prefers-reduced-motion: reduce)").matches, timers=[], cur="studio", visible=false;
+  var M={
+    studio:{p:"É assim que o teu cliente marca no modelo Studio. Sem mensagens para trás e para a frente, e tu recebes o aviso na hora.",
+      sr:"Animação: o cliente escolhe o serviço, o dia sábado 14 e as 17:00, confirma, e o dono do salão recebe a notificação de nova marcação.",
+      steps:["Escolhe o serviço","Escolhe o dia","Escolhe a hora","Confirma, e tu recebes o aviso"],
+      a:[[900,{s:0,tap:"#sSvc"}],[1150,{add:["#sSvc","sel"]}],[2200,{s:1,add:["#sD","on"]}],[2900,{tap:"#sDay"}],[3000,{add:["#sDay","sel"]}],[4000,{s:2,add:["#sT","on"]}],[4800,{tap:"#sSlot"}],[4900,{add:["#sSlot","sel"]}],[6200,{s:3,tap:"#sCta"}],[6450,{add:["#sCta","ok"],text:["#sCta span","Marcação confirmada"]}],[7500,{add:["#sNote","on"]}],[9000,{fin:1}]]},
+    rest:{p:"O cliente folheia o cardápio no telemóvel, vê o prato do dia e reserva mesa. Tu recebes a reserva na hora.",
+      sr:"Animação: o cliente abre o cardápio, vê o prato do dia e os alergénios, reserva mesa para 4 às 20:30, e o dono recebe a notificação de nova reserva.",
+      steps:["Abre o cardápio","Vê o prato do dia e os alergénios","Reserva a mesa","Tu recebes o aviso"],
+      a:[[900,{s:0,tap:"#rBook"}],[1150,{add:["#rBook","open"]}],[2900,{s:1,add:["#rUl","on"]}],[3900,{add:["#rAl","on"]}],[5300,{s:2,tap:"#rHora"}],[5400,{add:["#rHora","sel"]}],[6300,{tap:"#rCta"}],[6550,{add:["#rCta","ok"],text:["#rCta span","Mesa reservada"]}],[7600,{s:3,add:["#rNote","on"]}],[9200,{fin:1}]]},
+    ninho:{p:"Os pais veem logo os dias em que estás livre e pedem o horário que precisam, sem trocar dez mensagens.",
+      sr:"Animação: o calendário mostra os dias livres a pulsar, o cliente escolhe o sábado dia 8 e o horário das 18h às 23h, pede o dia, e a babysitter recebe o aviso.",
+      steps:["Vê os dias em que estás livre","Escolhe o dia","Escolhe o horário","Envia o pedido, e tu recebes o aviso"],
+      a:[[900,{s:0}],[2300,{s:1,tap:"#nDia"}],[2450,{add:["#nDia","sel"]}],[3600,{s:2,add:["#nH","on"]}],[4500,{tap:"#nHora"}],[4600,{add:["#nHora","sel"]}],[6000,{s:3,tap:"#nCta"}],[6250,{add:["#nCta","ok"],text:["#nCta span","Pedido enviado"]}],[7400,{add:["#nNote","on"]}],[9000,{fin:1}]]},
+    quadro:{p:"Os encarregados de educação veem as turmas e as vagas, e inscrevem o aluno. Tu recebes o aviso na hora.",
+      sr:"Animação: o cliente vê as turmas e as vagas, escolhe Matemática 9.º ano, inscreve o aluno, e o centro recebe a notificação de nova inscrição.",
+      steps:["Vê as turmas e as vagas","Escolhe a turma","Inscreve o aluno","Tu recebes o aviso"],
+      a:[[900,{s:0}],[2200,{s:1,tap:"#qTurma"}],[2350,{add:["#qTurma","sel"]}],[3300,{s:2,add:["#qForm","on"]}],[5200,{tap:"#qCta"}],[5450,{add:["#qCta","ok"],text:["#qCta span","Inscrição enviada"]}],[6800,{s:3,add:["#qNote","on"]}],[8600,{fin:1}]]}
+  };
+  var orig={};
+  [].forEach.call(scr.querySelectorAll(".lv-cta span"),function(e){orig[e.parentNode.id]=e.textContent;});
+  function sceneEl(m){return scr.querySelector('.lv-scr[data-m="'+m+'"]');}
+  function q(s){return scr.querySelector(s);}
+  function stepOn(i){steps.forEach(function(e,k){e.classList.toggle("on",k===i);});}
   function tapOn(el){
     var r=el.getBoundingClientRect(), s=scr.getBoundingClientRect(), k=s.width/scr.offsetWidth||1;
     tap.style.left=((r.left+r.width/2-s.left)/k)+"px"; tap.style.top=((r.top+r.height/2-s.top)/k)+"px";
     tap.classList.remove("hit"); void tap.offsetWidth; tap.classList.add("hit");
   }
   function reset(){
-    timers.forEach(clearTimeout); timers=[]; sec.classList.remove("fin");
-    [svcA,day,slot].forEach(function(e){e.classList.remove("sel");});
-    secD.classList.remove("on"); secT.classList.remove("on"); note.classList.remove("on");
-    cta.classList.remove("ok"); ctaT.textContent="Confirmar marcação"; stepOn(-1);
+    timers.forEach(clearTimeout); timers=[]; sec.classList.remove("fin"); stepOn(-1);
+    [].forEach.call(scr.querySelectorAll(".sel,.on,.ok,.open"),function(e){if(!e.classList.contains("act")) e.classList.remove("sel","on","ok","open");});
+    [].forEach.call(scr.querySelectorAll(".lv-cta"),function(c){c.querySelector("span").textContent=orig[c.id];});
   }
-  function done(){
-    svcA.classList.add("sel"); day.classList.add("sel"); slot.classList.add("sel"); secD.classList.add("on"); secT.classList.add("on");
-    cta.classList.add("ok"); ctaT.textContent="Marcação confirmada"; note.classList.add("on"); stepOn(3); sec.classList.add("fin");
+  function apply(a,instant){
+    if(a.s!==undefined) stepOn(a.s);
+    if(a.tap&&!instant) tapOn(q(a.tap));
+    if(a.add) q(a.add[0]).classList.add(a.add[1]);
+    if(a.text) q(a.text[0]).textContent=a.text[1];
+    if(a.fin) sec.classList.add("fin");
   }
   function play(){
-    reset();
-    at(900,function(){stepOn(0);tapOn(svcA);});
-    at(1150,function(){svcA.classList.add("sel");});
-    at(2200,function(){secD.classList.add("on");stepOn(1);});
-    at(2900,function(){tapOn(day);day.classList.add("sel");});
-    at(4000,function(){secT.classList.add("on");stepOn(2);});
-    at(4800,function(){tapOn(slot);slot.classList.add("sel");});
-    at(6200,function(){stepOn(3);tapOn(cta);});
-    at(6450,function(){cta.classList.add("ok");ctaT.textContent="Marcação confirmada";});
-    at(7500,function(){note.classList.add("on");});
-    at(9000,function(){sec.classList.add("fin");});
+    reset(); var steps_=M[cur].a;
+    steps_.forEach(function(x){timers.push(setTimeout(function(){apply(x[1]);},x[0]));});
   }
-  function start(){ if(ran) return; ran=true; sec.classList.add("go"); if(reduce){done();} else {play();} }
-  if(reduce||!("IntersectionObserver" in window)){ sec.classList.add("go"); done(); return; }
-  new IntersectionObserver(function(en,o){ if(en[0].isIntersecting){ start(); o.disconnect(); } },{threshold:.45}).observe(sec);
+  function finish(){ M[cur].a.forEach(function(x){apply(x[1],true);}); stepOn(3); }
+  function show(m){
+    cur=m; reset();
+    tabs.forEach(function(t){t.setAttribute("aria-selected",t.dataset.m===m?"true":"false");});
+    [].forEach.call(scr.querySelectorAll(".lv-scr"),function(e){e.classList.toggle("act",e.dataset.m===m);});
+    P.textContent=M[m].p; SR.textContent=M[m].sr;
+    steps.forEach(function(e,k){e.textContent=M[m].steps[k];});
+    if(reduce) finish(); else if(visible) play();
+  }
+  tabs.forEach(function(t){t.addEventListener("click",function(){show(t.dataset.m);});});
   document.getElementById("lvReplay").addEventListener("click",play);
+  show("studio");
+  if(reduce||!("IntersectionObserver" in window)){ visible=true; sec.classList.add("go"); finish(); return; }
+  new IntersectionObserver(function(en,o){ if(en[0].isIntersecting){ visible=true; sec.classList.add("go"); play(); o.disconnect(); } },{threshold:.45}).observe(sec);
 })();
 </script>
   <section class="block" id="quem">
