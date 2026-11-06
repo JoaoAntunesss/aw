@@ -124,6 +124,55 @@ nav a{text-decoration:none;color:var(--muted);font-weight:500;font-size:.98rem}
 .paint.lit{color:var(--brand)}
 @media (max-width:820px){#fio{display:none!important}}
 
+
+/* caso real: a imagem expande até ocupar o ecrã */
+.caso-track{height:260vh;position:relative}
+.caso-stick{position:sticky;top:calc(env(safe-area-inset-top,0px) + 72px);height:calc(100vh - 72px);height:calc(100svh - 72px - env(safe-area-inset-top,0px));overflow:hidden}
+.caso-fig{position:absolute;inset:0;margin:0;clip-path:inset(22% 8% 22% 46% round 28px);will-change:clip-path}
+.caso-fig img{width:100%;height:100%;object-fit:cover;display:block}
+.caso-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,18,32,.55) 0%,rgba(11,18,32,.78) 55%,rgba(11,18,32,.9) 100%);opacity:0;transition:opacity .2s}
+.caso-wrap{position:relative;height:100%}
+.caso-copy{position:absolute;left:clamp(1.2rem,4.5vw,3rem);top:50%;transform:translateY(-50%);width:min(40%,30rem)}
+.caso-title{font-size:clamp(2rem,4.2vw,3.6rem);line-height:1.02;letter-spacing:-.035em;margin:0 0 1.2rem;font-weight:700}
+.caso-copy p{margin:0;color:var(--muted);font-size:clamp(1.02rem,1.5vw,1.2rem);max-width:34ch}
+.caso-quote{position:absolute;left:clamp(1.2rem,4.5vw,3rem);right:clamp(1.2rem,4.5vw,3rem);bottom:clamp(1.5rem,5vh,3rem);margin:0;color:#fff;font-size:clamp(1.25rem,2.6vw,2.2rem);line-height:1.25;letter-spacing:-.02em;font-weight:600;max-width:36ch;opacity:0;pointer-events:none}
+.caso-quote cite{display:block;font-style:normal;font-size:1rem;font-weight:500;margin-top:.9rem;color:#C9D3F2}
+.caso-quote .ctas{margin-top:1.3rem}.caso-quote .btn{font-size:1rem;letter-spacing:0}
+.caso-quote .btn{border-color:rgba(255,255,255,.5);color:#fff}
+.caso-quote .btn.solid{background:#fff;color:#0B1220;border-color:#fff}
+@media (max-width:820px){
+  .caso-track{height:auto}.caso-stick{position:static;height:auto;overflow:visible;padding:2.5rem 0}
+  .caso-fig{position:relative;inset:auto;clip-path:none!important;margin:0 clamp(1.2rem,4.5vw,3rem);border-radius:20px;overflow:hidden;aspect-ratio:16/10}
+  .caso-wrap{height:auto}.caso-copy,.caso-quote{position:static;transform:none;width:auto;opacity:1!important;pointer-events:auto;margin-top:1.4rem;color:var(--ink)}
+  .caso-quote cite{color:var(--muted)}.caso-quote .btn{color:var(--ink);border-color:var(--line)}.caso-quote .btn.solid{background:var(--ink);color:var(--paper)}
+}
+@media (prefers-reduced-motion:reduce){
+  .caso-track{height:auto}.caso-stick{position:static;height:auto;overflow:visible;padding:3rem 0}
+  .caso-fig{position:relative;inset:auto;clip-path:none!important;margin:0 clamp(1.2rem,4.5vw,3rem);border-radius:20px;overflow:hidden;aspect-ratio:16/9}
+  .caso-wrap{height:auto}.caso-copy,.caso-quote{position:static;transform:none;width:auto;opacity:1!important;pointer-events:auto;margin-top:1.4rem;color:var(--ink)}
+  .caso-quote cite{color:var(--muted)}.caso-quote .btn{color:var(--ink);border-color:var(--line)}.caso-quote .btn.solid{background:var(--ink);color:var(--paper)}
+}
+
+/* percurso 3D pelos modelos */
+.percurso{background:#0B1220;color:#EEF2F8}
+.pc-track{height:480vh;position:relative}
+.pc-stick{position:sticky;top:calc(env(safe-area-inset-top,0px) + 72px);height:calc(100vh - 72px);height:calc(100svh - 72px - env(safe-area-inset-top,0px));overflow:hidden}
+.pc-stick canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.pc-ui{position:relative;height:100%;pointer-events:none}
+.pc-title{position:absolute;left:clamp(1.2rem,4.5vw,3rem);top:2.2rem;margin:0;font-size:clamp(1.6rem,3vw,2.4rem);letter-spacing:-.03em;font-weight:700;color:#EEF2F8}
+.pc-cap{text-shadow:0 2px 18px rgba(11,18,32,.9);position:absolute;left:clamp(1.2rem,4.5vw,3rem);bottom:2.4rem;max-width:26rem}
+.pc-cap b{display:block;font-size:clamp(2rem,4.5vw,3.6rem);letter-spacing:-.035em;line-height:1;font-weight:700;margin-bottom:.6rem}
+.pc-cap span{display:block;color:#B9C8F2;font-size:1.08rem;line-height:1.45;transition:opacity .3s}
+.pc-rail{position:absolute;right:clamp(1.2rem,4.5vw,3rem);top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:.7rem}
+.pc-rail i{display:block;width:2px;height:28px;background:rgba(238,242,248,.25);transition:background .3s,height .3s}
+.pc-rail i[data-on]{background:#7C93FF;height:48px}
+.pc-flat{display:none;padding-top:4rem;padding-bottom:4rem}
+.pc-flat figure{margin:2rem 0 0}.pc-flat img{width:100%;height:auto;border-radius:14px;display:block}
+.pc-flat figcaption{margin-top:.7rem;color:#B9C8F2}.pc-flat figcaption b{color:#EEF2F8;margin-right:.5rem}
+.percurso.flat .pc-track{display:none}.percurso.flat .pc-flat{display:block}
+@media (max-width:820px){.pc-track{display:none}.pc-flat{display:block}}
+@media (prefers-reduced-motion:reduce){.pc-track{display:none}.pc-flat{display:block}}
+
 .stage-wrap{margin-top:clamp(2.4rem,5vw,4rem)}
 .showcase{position:relative;border-radius:clamp(20px,3vw,32px);overflow:hidden;background:var(--lav)}
 .stage{position:relative;height:clamp(360px,52vw,600px);background:radial-gradient(55% 70% at 12% 8%,var(--peach) 0%,transparent 62%),radial-gradient(50% 65% at 92% 12%,var(--sky) 0%,transparent 60%),radial-gradient(70% 60% at 50% 105%,var(--sage) 0%,transparent 70%),var(--lav)}
@@ -180,7 +229,7 @@ p.intro{color:var(--muted);max-width:52ch;margin:0;font-size:1.1rem}
 .about p.lede{font-size:1.15rem;margin:.4rem 0 1.6rem;max-width:44ch}
 
 /* ===== Sobre mim: sistema em camadas (3D guiado pelo scroll) · paleta home office ===== */
-.eu{background:radial-gradient(120% 90% at 70% 40%,#EEF2FA 0%,#E3EAF7 60%,#D5DFF2 100%);color:#0B1220;position:relative}
+.eu{background:radial-gradient(120% 90% at 70% 40%,rgba(238,242,250,.9) 0%,rgba(227,234,247,.9) 60%,rgba(213,223,242,.9) 100%);color:#0B1220;position:relative}
 .eu-track{height:520vh;position:relative}
 .eu-stick{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden}
 .eu-stick canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
@@ -511,11 +560,14 @@ details summary{cursor:pointer;color:var(--brand);font-weight:600;min-height:32p
     </div>
   </section>
 
-  <section class="block client-strip" aria-label="O que diz uma cliente">
-    <div class="wrap strip">
-      <blockquote>“Ajuda muito a gerir, tanto a nível financeiro como a agilizar as marcações. Foi um passo em frente para o negócio.”<cite>Xana, <span translate="no">AT Beauty Studio & Estética</span></cite></blockquote>
-      <div class="ctas"><a class="btn solid" href="https://atbeautystudio.pt" target="_blank" rel="noopener">Ver o site do AT Beauty Studio</a><a class="btn" href="#trabalho">Ver todo o trabalho</a></div>
-    </div>
+  <section class="caso" id="caso" aria-label="Um caso real">
+    <div class="caso-track"><div class="caso-stick">
+      <figure class="caso-fig" id="casoFig"><img src="img/at-beauty-studio.jpg" alt="Site do AT Beauty Studio" width="1267" height="676"><div class="caso-shade"></div></figure>
+      <div class="wrap caso-wrap">
+        <div class="caso-copy" id="casoCopy"><h2 class="caso-title">Um site que já trabalha para uma cliente.</h2><p>O AT Beauty Studio recebe marcações online e gere os clientes num painel, com um site feito por mim.</p></div>
+        <blockquote class="caso-quote" id="casoQuote">“Ajuda muito a gerir, tanto a nível financeiro como a agilizar as marcações. Foi um passo em frente para o negócio.”<cite>Xana, <span translate="no">AT Beauty Studio & Estética</span></cite><div class="ctas"><a class="btn solid" href="https://atbeautystudio.pt" target="_blank" rel="noopener">Ver o site do AT Beauty Studio</a><a class="btn" href="#trabalho">Ver todo o trabalho</a></div></blockquote>
+      </div>
+    </div></div>
   </section>
 
   <section class="block" id="como">
@@ -554,6 +606,24 @@ details summary{cursor:pointer;color:var(--brand);font-weight:600;min-height:32p
           <div class="detail" id="detail" aria-live="polite"></div>
         </div>
       </div>
+    </div>
+  </section>
+
+  <section class="percurso" id="percurso" aria-label="Percurso pelos modelos">
+    <div class="pc-track"><div class="pc-stick">
+      <canvas id="pcCanvas" aria-hidden="true"></canvas>
+      <div class="wrap pc-ui">
+        <h2 class="pc-title">Percorre os modelos.</h2>
+        <div class="pc-cap" aria-live="polite"><b id="pcName">Studio</b><span id="pcTxt">O site do salão: serviços, próxima vaga e avaliações.</span></div>
+        <div class="pc-rail" id="pcRail" aria-hidden="true"><i data-on></i><i></i><i></i><i></i><i></i></div>
+      </div>
+    </div></div>
+    <div class="wrap pc-flat">
+      <h2 class="pc-title">Os modelos</h2>
+      <figure><img src="img/frames/studio.jpg" alt="Modelo Studio" loading="lazy"><figcaption><b>Studio</b> O site do salão: serviços, próxima vaga e avaliações.</figcaption></figure>
+      <figure><img src="img/frames/restaurante.jpg" alt="Modelo Restaurante" loading="lazy"><figcaption><b>Restaurante</b> O site do restaurante, com o prato do dia e o cardápio.</figcaption></figure>
+      <figure><img src="img/frames/ninho.jpg" alt="Modelo Ninho" loading="lazy"><figcaption><b>Ninho</b> O site da babysitter: apresentação, preço e dias livres.</figcaption></figure>
+      <figure><img src="img/frames/quadro.jpg" alt="Modelo Quadro" loading="lazy"><figcaption><b>Quadro</b> O site do centro de explicações: turmas, vagas e preços.</figcaption></figure>
     </div>
   </section>
 
@@ -1699,6 +1769,91 @@ else try{
   addEventListener("scroll",kick,{passive:true});
   let rt; addEventListener("resize",()=>{ clearTimeout(rt); rt=setTimeout(build,200); });
   build(); setTimeout(build,1500); addEventListener("load",()=>setTimeout(build,300));
+})();
+</script>
+
+<script type="module">
+/* caso real: expansão da imagem com o scroll */
+(()=>{
+  const track=document.querySelector(".caso-track"), fig=document.getElementById("casoFig");
+  if(!track||!fig) return;
+  const copy=document.getElementById("casoCopy"), quote=document.getElementById("casoQuote"), shade=fig.querySelector(".caso-shade"), img=fig.querySelector("img");
+  const still=()=>matchMedia("(max-width:820px)").matches||matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const clamp=(v,a,b)=>Math.min(b,Math.max(a,v)), lerp=(a,b,t)=>a+(b-a)*t, ease=t=>t*t*(3-2*t);
+  function draw(){
+    if(still()){ fig.style.clipPath=""; copy.style.opacity=quote.style.opacity=""; shade.style.opacity=0; img.style.transform=""; return; }
+    const r=track.getBoundingClientRect(), span=track.offsetHeight-innerHeight, p=span>0?clamp(-r.top/span,0,1):1;
+    const e=ease(clamp(p/.6,0,1));
+    fig.style.clipPath="inset("+lerp(22,0,e)+"% "+lerp(8,0,e)+"% "+lerp(22,0,e)+"% "+lerp(46,0,e)+"% round "+lerp(28,0,e)+"px)";
+    img.style.transform="scale("+lerp(1.18,1,e)+")";
+    shade.style.opacity=clamp((p-.45)/.25,0,1);
+    copy.style.opacity=clamp(1-(p-.04)/.16,0,1); copy.style.transform="translateY(-50%) translateX("+(-e*40)+"px)";
+    const q=clamp((p-.68)/.22,0,1); quote.style.opacity=q; quote.style.transform="translateY("+((1-q)*24)+"px)"; quote.style.pointerEvents=q>.8?"auto":"none";
+  }
+  let tk=false; const req=()=>{ if(tk) return; tk=true; requestAnimationFrame(()=>{tk=false;draw();}); };
+  addEventListener("scroll",req,{passive:true}); addEventListener("resize",req); draw();
+})();
+</script>
+<script type="module">
+/* percurso 3D: a câmara atravessa os modelos como numa sala */
+(async()=>{
+  const sec=document.getElementById("percurso"); if(!sec) return;
+  const flat=()=>{ sec.classList.add("flat"); };
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches||matchMedia("(max-width:820px)").matches){ flat(); return; }
+  let THREE; try{ THREE=await import("three"); }catch(e){ flat(); return; }
+  const cv=document.getElementById("pcCanvas"), track=sec.querySelector(".pc-track"); let R;
+  try{ R=new THREE.WebGLRenderer({canvas:cv,antialias:true}); }catch(e){ flat(); return; }
+  R.setPixelRatio(Math.min(devicePixelRatio,2)); R.setClearColor(0x0B1220,1);
+  const scene=new THREE.Scene(); scene.fog=new THREE.Fog(0x0B1220,7,24);
+  const cam=new THREE.PerspectiveCamera(40,1,.1,60);
+  const items=[
+    ["Studio","O site do salão: serviços, próxima vaga e avaliações.","img/frames/studio.jpg"],
+    ["Restaurante","O site do restaurante, com o prato do dia e o cardápio.","img/frames/restaurante.jpg"],
+    ["Ninho","O site da babysitter: apresentação, preço e dias livres.","img/frames/ninho.jpg"],
+    ["Quadro","O site do centro de explicações: turmas, vagas e preços.","img/frames/quadro.jpg"],
+    ["AT Beauty Studio","O site real de uma cliente, com marcações online.","img/at-beauty-studio.jpg"]
+  ];
+  const N=items.length, GAP=6.4, panels=[]; const loader=new THREE.TextureLoader();
+  items.forEach((it,i)=>{
+    const g=new THREE.Group(); const side=i%2?1:-1;
+    g.position.set(side*1.9,.15*Math.sin(i*1.7),-i*GAP); g.rotation.y=-side*.3;
+    const mat=new THREE.MeshBasicMaterial({color:0x888888,fog:true});
+    const mesh=new THREE.Mesh(new THREE.PlaneGeometry(4.4,2.2),mat); g.add(mesh);
+    const plate=new THREE.Mesh(new THREE.PlaneGeometry(4.4,2.2),new THREE.MeshBasicMaterial({color:0x2547F5,transparent:true,opacity:.28,depthWrite:false})); plate.position.set(.22,-.22,-.05); g.add(plate);
+    const plate2=plate.clone(); plate2.position.set(.44,-.44,-.1); plate2.material=plate.material.clone(); plate2.material.opacity=.14; g.add(plate2);
+    const edge=new THREE.LineSegments(new THREE.EdgesGeometry(mesh.geometry),new THREE.LineBasicMaterial({color:0x7C93FF})); g.add(edge);
+    loader.load(it[2],tx=>{ tx.colorSpace=THREE.SRGBColorSpace; tx.anisotropy=4; mat.map=tx; mat.needsUpdate=true;
+      const a=tx.image.width/tx.image.height; const w=2.2*a; [mesh,plate,plate2,edge].forEach(o=>o.scale.x=w/4.4); });
+    scene.add(g); panels.push({g,mat});
+  });
+  const grid=new THREE.GridHelper(80,80,0x2547F5,0x2547F5); grid.material.transparent=true; grid.material.opacity=.16; grid.position.set(0,-2,-12); scene.add(grid);
+  const pn=500, pp=new Float32Array(pn*3); for(let i=0;i<pn;i++){ pp[i*3]=(Math.random()-.5)*16; pp[i*3+1]=(Math.random()-.5)*7; pp[i*3+2]=-Math.random()*(N*GAP+8)+5; }
+  const pg=new THREE.BufferGeometry(); pg.setAttribute("position",new THREE.BufferAttribute(pp,3));
+  scene.add(new THREE.Points(pg,new THREE.PointsMaterial({color:0xB9C8F2,size:.035,transparent:true,opacity:.7,sizeAttenuation:true})));
+  const nameEl=document.getElementById("pcName"), txtEl=document.getElementById("pcTxt"), dots=[...document.querySelectorAll("#pcRail i")];
+  let lastAct=-1, mx=0, my=0, vis=true, cur=0;
+  function size(){ const w=cv.clientWidth,h=cv.clientHeight; R.setSize(w,h,false); cam.aspect=w/h; cam.updateProjectionMatrix(); }
+  size(); addEventListener("resize",size);
+  addEventListener("pointermove",e=>{ mx=e.clientX/innerWidth-.5; my=e.clientY/innerHeight-.5; },{passive:true});
+  new IntersectionObserver(es=>{ vis=es[0].isIntersecting; if(vis) loop(); }).observe(sec);
+  const clamp=(v,a,b)=>Math.min(b,Math.max(a,v)), sm=t=>t*t*(3-2*t);
+  let raf=0;
+  function loop(){
+    raf=0; if(!vis) return;
+    const r=track.getBoundingClientRect(), span=track.offsetHeight-innerHeight;
+    const p=span>0?clamp(-r.top/span,0,1):0; cur+=(p-cur)*.1;
+    const f=cur*(N-1), i0=Math.min(N-2,Math.floor(f)), fr=sm(f-i0);
+    const x0=panels[i0].g.position.x, x1=panels[i0+1].g.position.x, xt=x0+(x1-x0)*fr;
+    const camZ=5.8-cur*(N-1)*GAP;
+    cam.position.set(xt*.45+mx*.7, .55-my*.4, camZ);
+    cam.lookAt(xt*.85, 0, camZ-5);
+    panels.forEach((o,i)=>{ const a=1-Math.min(1,Math.abs(f-i)); o.mat.color.setScalar(.38+.62*sm(a)); });
+    R.render(scene,cam);
+    const act=Math.round(f);
+    if(act!==lastAct){ lastAct=act; nameEl.textContent=items[act][0]; txtEl.textContent=items[act][1]; dots.forEach((d,i)=>{ if(i===act) d.setAttribute("data-on",""); else d.removeAttribute("data-on"); }); }
+    raf=requestAnimationFrame(loop);
+  }
+  loop();
 })();
 </script>
 </body>
