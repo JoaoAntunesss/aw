@@ -3,27 +3,57 @@ service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() { return request.auth != null; }
     function isAdmin() { return signedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)); }
+    // dono do documento que está a ser criado
+    function meu() { return signedIn() && request.resource.data.uid == request.auth.uid; }
+    // string presente e dentro do limite de tamanho
+    function txt(v, max) { return v is string && v.size() <= max; }
 
     match /admins/{uid} {
       allow read: if signedIn() && request.auth.uid == uid;
       allow write: if false;
     }
+
     match /utilizadores/{uid} {
       allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
-      allow create, update: if signedIn() && request.auth.uid == uid;
+      allow create, update: if signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['nome','email','telefone','criadoEm'])
+        && txt(request.resource.data.nome, 120)
+        && txt(request.resource.data.email, 200)
+        && txt(request.resource.data.telefone, 40)
+        && request.resource.data.criadoEm is timestamp;
     }
+
     match /pedidos/{id} {
-      allow create: if signedIn() && request.resource.data.uid == request.auth.uid;
+      allow create: if meu()
+        && request.resource.data.keys().hasOnly(['uid','nome','email','telefone','template','respostas','estado','criadoEm','atualizadoEm'])
+        && request.resource.data.estado == 'recebido'
+        && request.resource.data.respostas is map
+        && txt(request.resource.data.nome, 120)
+        && txt(request.resource.data.email, 200)
+        && txt(request.resource.data.telefone, 40)
+        && txt(request.resource.data.template, 40)
+        && request.resource.data.criadoEm is timestamp;
       allow read: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin());
       allow update: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['estado','atualizadoEm'])
         && request.resource.data.estado in ['aceite','recusado']);
     }
+
     match /suporte/{id} {
-      allow create: if signedIn() && request.resource.data.uid == request.auth.uid && request.resource.data.estado == 'aberto';
+      allow create: if meu()
+        && request.resource.data.keys().hasOnly(['uid','nome','email','telefone','site','tipo','descricao','estado','criadoEm','atualizadoEm'])
+        && request.resource.data.estado == 'aberto'
+        && txt(request.resource.data.nome, 120)
+        && txt(request.resource.data.email, 200)
+        && txt(request.resource.data.telefone, 40)
+        && txt(request.resource.data.site, 120)
+        && txt(request.resource.data.tipo, 120)
+        && txt(request.resource.data.descricao, 4000)
+        && request.resource.data.criadoEm is timestamp;
       allow read: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin());
       allow update: if isAdmin();
     }
+
     // fichas dos teus clientes: só tu
     match /clientes/{id} {
       allow read, write: if isAdmin();
