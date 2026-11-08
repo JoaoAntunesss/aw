@@ -28,6 +28,7 @@ body{background:var(--fundo2)}
 .cod::placeholder{letter-spacing:.02em;text-transform:none;font-size:17px}
 .cod.email{font-size:17px;letter-spacing:0;text-transform:none}
 .demo-ent{display:grid;gap:8px;border-top:1px solid var(--linha);padding-top:16px;margin-top:4px}.demo-ent span{font-size:13px;color:var(--suave);text-align:center}
+.dados{background:var(--branco);border:1px solid var(--linha);border-radius:10px;padding:12px 14px;font-size:14px;line-height:1.7}.dados b{font-weight:600;user-select:all}
 .ajuda{font-size:14px;color:var(--suave)}
 .ajuda a{text-decoration:underline}
 
@@ -144,7 +145,7 @@ dialog .rod{display:flex;justify-content:space-between;align-items:center;gap:14
       <input class="inp" id="lPass" type="password" autocomplete="current-password" placeholder="Palavra-passe" aria-label="Palavra-passe" hidden>
       <p class="erro" id="lErro" role="alert"></p>
       <button class="btn btn-escuro" type="submit">Entrar <span class="seta">→</span></button>
-      <div class="demo-ent" id="lDemo" hidden><span>Demonstração: experimenta os dois lados</span><button type="button" class="btn btn-linha" id="dCli">Entrar como cliente</button><button type="button" class="btn btn-linha" id="dDono"></button></div>
+      <div class="demo-ent" id="lDemo" hidden><span>Demonstração: experimenta os dois lados</span><div class="dados" id="lDados"></div><button type="button" class="btn btn-linha" id="dCli">Entrar como cliente</button><button type="button" class="btn btn-linha" id="dDono"></button></div>
       <p class="ajuda" id="lAjuda"></p>
     </form>
   </div>
@@ -241,11 +242,13 @@ $('logo').innerHTML = A.logoHtml();
 $('lFoto').style.backgroundImage = `url("${M.hero.imagens.principal}")`; $('lFrase').innerHTML = A.enfase(M.hero.titulo);
 const C = M.contactos;
 $('lAjuda').innerHTML = `Não tens código? ${C.email ? `Pede-o por <a href="mailto:${esc(C.email)}">email</a>` : ''}${C.telefone ? ` ou <a href="https://wa.me/${A.telInt(C.telefone)}" target="_blank" rel="noopener">WhatsApp</a>` : ''}.`;
-const DONO = M.donoNome || 'dono do site';
+const DONO = M.donoNome || 'dono do site', DEMO_EMAIL = 'demo@' + (M.dominio || 'exemplo.pt');
 $('lTxt').textContent = `Clientes: escrevam o código que receberam por email ou WhatsApp. ${M.donoNome ? M.donoNome + ': entra' : 'Dono do site: entra'} com o teu email para abrir o painel.`;
-if (A.DEMO) { $('demoBarra').innerHTML = `<div class="demo-barra">Demonstração: os dados ficam só neste navegador.</div>`; $('lDemo').hidden = false; $('dDono').textContent = 'Entrar como ' + DONO; }
+if (A.DEMO) { $('demoBarra').innerHTML = `<div class="demo-barra">Demonstração: os dados ficam só neste navegador.</div>`; $('lDemo').hidden = false; $('dDono').textContent = 'Entrar como ' + DONO;
+  $('lDados').innerHTML = `Como cliente: código <b>DEMOANAPEDRO</b><br>Como ${esc(DONO)}: email <b>${esc(DEMO_EMAIL)}</b> e palavra-passe <b>demo123</b>`; }
 $('codigo').addEventListener('input', () => { const em = $('codigo').value.includes('@'); $('codigo').classList.toggle('email', em); $('lPass').hidden = !em; });
 async function entrarDono(email, pass) {
+  if (A.DEMO && (email.toLowerCase() !== DEMO_EMAIL || pass !== 'demo123')) { $('lErro').textContent = `Na demonstração usa ${DEMO_EMAIL} e demo123.`; return; }
   try { await A.iniciar(true); await A.auth.signInWithEmailAndPassword(email, pass); } catch (e) { $('lErro').textContent = 'Email ou palavra-passe errados.'; return; }
   location.href = 'admin.html';
 }
@@ -273,7 +276,7 @@ $('fLogin').addEventListener('submit', e => { e.preventDefault(); $('lErro').tex
   if (v.includes('@')) { if (!$('lPass').value) { $('lPass').hidden = false; $('lPass').focus(); return $('lErro').textContent = 'Escreve a tua palavra-passe.'; } return entrarDono(v, $('lPass').value); }
   entrar(v); });
 $('dCli').onclick = () => entrar('DEMOANAPEDRO');
-$('dDono').onclick = () => entrarDono('demo@exemplo.pt', 'demonstracao');
+$('dDono').onclick = () => entrarDono(DEMO_EMAIL, 'demo123');
 function sair() { if (ref) ref.off(); ref = null; COD = null; P = null; try { localStorage.removeItem(GUARDA); } catch (e) { } $('app').hidden = true; $('login').hidden = false; $('sair').hidden = true; $('codigo').value = ''; $('codigo').classList.remove('email'); $('lPass').hidden = true; }
 $('sair').onclick = sair;
 const q = new URLSearchParams(location.search).get('c'); let guardado = null; try { guardado = localStorage.getItem(GUARDA); } catch (e) { }

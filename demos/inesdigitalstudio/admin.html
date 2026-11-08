@@ -121,7 +121,7 @@ let PROJ = {}, PED = {}, modo = 'proj', sel = null, abaP = 'mensagens';
 /* ---------- entrar ---------- */
 (async () => {
   await A.iniciar(true);
-  if (A.DEMO) { $('eEmail').value = 'demo@exemplo.pt'; $('ePass').value = 'demonstracao'; $('eDemo').hidden = false; }
+  if (A.DEMO) { $('eEmail').value = 'demo@' + (M.dominio || 'exemplo.pt'); $('ePass').value = 'demo123'; $('eDemo').hidden = false; }
   A.auth.onAuthStateChanged(async u => {
     if (!u) { $('entrar').hidden = false; $('painel').hidden = true; return; }
     const s = await A.db.ref('admins/' + u.uid).once('value').catch(() => null);
