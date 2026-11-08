@@ -11,6 +11,7 @@ window.MARCA = {
   id: "lume", // identificador curto, sem espaços
   nome: "Lume",
   nomeCompleto: "Lume · Fotografia & Eventos",
+  donoNome: "Marta", // aparece no login: "Se és a Marta, entra com o teu email"
   slogan: "Fotografia, conteúdo e eventos",
   descricao: "Fotografia de casamentos, batizados e aniversários, conteúdo para marcas e organização de eventos.",
   site: "https://lume.pt", // endereço final do site (vai nos emails e no link da área de cliente)

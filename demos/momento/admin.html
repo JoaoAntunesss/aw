@@ -88,7 +88,7 @@ body{background:var(--fundo2)}
   <form id="fEntrar">
     <div id="logo"></div>
     <h1>Painel</h1>
-    <p class="sem" id="eDemo" hidden style="font-size:15px;color:var(--suave)">Demonstração: aqui vês o site como o dono, com os pedidos de orçamento e as áreas dos clientes. Carrega em Entrar.</p>
+    <p class="sem" id="eDemo" hidden style="font-size:15px;color:var(--suave)">Demonstração: aqui vês o site como o dono, com os pedidos de orçamento e as áreas dos clientes. Carrega em Entrar. Também podes entrar pela <a href="cliente.html" style="text-decoration:underline">área de cliente</a> com o teu email.</p>
     <div class="campo"><label for="eEmail">Email</label><input class="inp" id="eEmail" type="email" autocomplete="username"></div>
     <div class="campo"><label for="ePass">Palavra-passe</label><input class="inp" id="ePass" type="password" autocomplete="current-password"></div>
     <p class="erro" id="eErro" role="alert"></p>
@@ -132,7 +132,7 @@ let PROJ = {}, PED = {}, modo = 'proj', sel = null, abaP = 'mensagens';
 $('fEntrar').addEventListener('submit', e => { e.preventDefault(); $('eErro').textContent = ''; A.auth.signInWithEmailAndPassword($('eEmail').value.trim(), $('ePass').value).catch(() => $('eErro').textContent = 'Email ou palavra-passe errados.'); });
 $('eGoogle').onclick = () => { const p = A.DEMO ? null : new firebase.auth.GoogleAuthProvider(); A.auth.signInWithPopup(p).catch(() => $('eErro').textContent = 'Não foi possível entrar com Google.'); };
 $('eRec').onclick = () => { const e = $('eEmail').value.trim(); if (!e) return $('eErro').textContent = 'Escreve o teu email primeiro.'; A.auth.sendPasswordResetEmail(e).then(() => aviso('Enviei um email para mudares a palavra-passe.')).catch(() => $('eErro').textContent = 'Não foi possível enviar o email.'); };
-$('sair').onclick = () => A.auth.signOut().then(() => location.reload());
+$('sair').onclick = () => A.auth.signOut().then(() => { location.href = 'cliente.html'; });
 
 function ligar() {
   A.db.ref('projetos').on('value', s => { PROJ = s.val() || {}; contar(); desenharLista(); if (modo === 'proj' && sel && sel !== '__novo') { const f = document.activeElement; if (abaP !== 'mensagens' && f && f.closest && f.closest('#aba form')) return; desenharProjeto(); } });

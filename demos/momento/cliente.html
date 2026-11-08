@@ -25,6 +25,9 @@ body{background:var(--fundo2)}
 .login h1{font-size:52px;font-weight:300}
 .login p.s{color:var(--suave)}
 .cod{font-size:22px;letter-spacing:.2em;text-transform:uppercase;text-align:center;font-family:var(--f-texto)}
+.cod::placeholder{letter-spacing:.02em;text-transform:none;font-size:17px}
+.cod.email{font-size:17px;letter-spacing:0;text-transform:none}
+.demo-ent{display:grid;gap:8px;border-top:1px solid var(--linha);padding-top:16px;margin-top:4px}.demo-ent span{font-size:13px;color:var(--suave);text-align:center}
 .ajuda{font-size:14px;color:var(--suave)}
 .ajuda a{text-decoration:underline}
 
@@ -136,10 +139,12 @@ dialog .rod{display:flex;justify-content:space-between;align-items:center;gap:14
     <form id="fLogin">
       <span class="etq">Área de cliente</span>
       <h1>Bem-vindos.</h1>
-      <p class="s">Escreve o código que recebeste por email ou WhatsApp.</p>
-      <input class="inp cod" id="codigo" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="24" placeholder="ABCDE12345" aria-label="Código de acesso">
+      <p class="s" id="lTxt"></p>
+      <input class="inp cod" id="codigo" autocomplete="username" autocapitalize="off" spellcheck="false" maxlength="120" placeholder="Código ou email" aria-label="Código de acesso ou email">
+      <input class="inp" id="lPass" type="password" autocomplete="current-password" placeholder="Palavra-passe" aria-label="Palavra-passe" hidden>
       <p class="erro" id="lErro" role="alert"></p>
       <button class="btn btn-escuro" type="submit">Entrar <span class="seta">→</span></button>
+      <div class="demo-ent" id="lDemo" hidden><span>Demonstração: experimenta os dois lados</span><button type="button" class="btn btn-linha" id="dCli">Entrar como cliente</button><button type="button" class="btn btn-linha" id="dDono"></button></div>
       <p class="ajuda" id="lAjuda"></p>
     </form>
   </div>
@@ -236,7 +241,14 @@ $('logo').innerHTML = A.logoHtml();
 $('lFoto').style.backgroundImage = `url("${M.hero.imagens.principal}")`; $('lFrase').innerHTML = A.enfase(M.hero.titulo);
 const C = M.contactos;
 $('lAjuda').innerHTML = `Não tens código? ${C.email ? `Pede-o por <a href="mailto:${esc(C.email)}">email</a>` : ''}${C.telefone ? ` ou <a href="https://wa.me/${A.telInt(C.telefone)}" target="_blank" rel="noopener">WhatsApp</a>` : ''}.`;
-if (A.DEMO) { $('demoBarra').innerHTML = `<div class="demo-barra">Estás a ver como cliente (código <b>DEMOANAPEDRO</b>). Para ver o outro lado, abre o <a href="admin.html" target="_blank">painel</a> noutra aba e responde.</div>`; $('codigo').value = 'DEMOANAPEDRO'; }
+const DONO = M.donoNome || 'dono do site';
+$('lTxt').textContent = `Clientes: escrevam o código que receberam por email ou WhatsApp. ${M.donoNome ? M.donoNome + ': entra' : 'Dono do site: entra'} com o teu email para abrir o painel.`;
+if (A.DEMO) { $('demoBarra').innerHTML = `<div class="demo-barra">Demonstração: os dados ficam só neste navegador.</div>`; $('lDemo').hidden = false; $('dDono').textContent = 'Entrar como ' + DONO; }
+$('codigo').addEventListener('input', () => { const em = $('codigo').value.includes('@'); $('codigo').classList.toggle('email', em); $('lPass').hidden = !em; });
+async function entrarDono(email, pass) {
+  try { await A.iniciar(true); await A.auth.signInWithEmailAndPassword(email, pass); } catch (e) { $('lErro').textContent = 'Email ou palavra-passe errados.'; return; }
+  location.href = 'admin.html';
+}
 const aviso = t => { $('aviso').textContent = t; $('aviso').classList.add('on'); clearTimeout(aviso.t); aviso.t = setTimeout(() => $('aviso').classList.remove('on'), 3200); };
 const MAXB = (M.ficheiroMaxMB || 3) * 1048576;
 $('fLim').textContent = `Imagens, PDF ou Word, até ${M.ficheiroMaxMB || 3} MB cada. Maiores: por WeTransfer, nos links.`;
@@ -257,8 +269,12 @@ async function entrar(c, silencioso) {
   $('login').hidden = true; $('app').hidden = false; $('sair').hidden = false;
   ref = A.db.ref('projetos/' + c); ref.on('value', s => { P = s.val(); if (!P) return sair(); desenhar(); });
 }
-$('fLogin').addEventListener('submit', e => { e.preventDefault(); $('lErro').textContent = ''; entrar($('codigo').value); });
-function sair() { if (ref) ref.off(); ref = null; COD = null; P = null; try { localStorage.removeItem(GUARDA); } catch (e) { } $('app').hidden = true; $('login').hidden = false; $('sair').hidden = true; $('codigo').value = ''; }
+$('fLogin').addEventListener('submit', e => { e.preventDefault(); $('lErro').textContent = ''; const v = $('codigo').value.trim();
+  if (v.includes('@')) { if (!$('lPass').value) { $('lPass').hidden = false; $('lPass').focus(); return $('lErro').textContent = 'Escreve a tua palavra-passe.'; } return entrarDono(v, $('lPass').value); }
+  entrar(v); });
+$('dCli').onclick = () => entrar('DEMOANAPEDRO');
+$('dDono').onclick = () => entrarDono('demo@exemplo.pt', 'demonstracao');
+function sair() { if (ref) ref.off(); ref = null; COD = null; P = null; try { localStorage.removeItem(GUARDA); } catch (e) { } $('app').hidden = true; $('login').hidden = false; $('sair').hidden = true; $('codigo').value = ''; $('codigo').classList.remove('email'); $('lPass').hidden = true; }
 $('sair').onclick = sair;
 const q = new URLSearchParams(location.search).get('c'); let guardado = null; try { guardado = localStorage.getItem(GUARDA); } catch (e) { }
 if (q) entrar(q); else if (guardado) entrar(guardado, true);

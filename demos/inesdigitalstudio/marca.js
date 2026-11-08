@@ -3,6 +3,7 @@ window.MARCA = {
   id: "inesdigitalstudio",
   nome: "Inês Digital Studio",
   nomeCompleto: "Inês Digital Studio · Social Media & Creative Studio",
+  donoNome: "Inês",
   slogan: "Social Media & Creative Studio",
   descricao: "Gestão de redes sociais, conteúdo para marcas, casamentos e eventos.",
   site: "https://inesdigitalstudio.pt",

@@ -42,12 +42,11 @@
   const carregar = src => new Promise((ok, ko) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = ko; document.head.appendChild(s); });
   let _db = null, _auth = null;
   async function iniciar(comAuth) {
-    if (_db) return;
+    if (_db && (!comAuth || _auth)) return;
     if (!DEMO) {
       const v = '10.12.5', b = `https://www.gstatic.com/firebasejs/${v}/`;
-      await carregar(b + 'firebase-app-compat.js'); await carregar(b + 'firebase-database-compat.js');
-      if (comAuth) await carregar(b + 'firebase-auth-compat.js');
-      firebase.initializeApp(M.firebase); _db = firebase.database(); if (comAuth) _auth = firebase.auth();
+      if (!_db) { await carregar(b + 'firebase-app-compat.js'); await carregar(b + 'firebase-database-compat.js'); firebase.initializeApp(M.firebase); _db = firebase.database(); }
+      if (comAuth && !_auth) { await carregar(b + 'firebase-auth-compat.js'); _auth = firebase.auth(); }
       return;
     }
     _db = demoDB(); _auth = demoAuth();
@@ -84,10 +83,12 @@
     }
     return { ref, reset() { try { localStorage.removeItem(KEY); } catch (e) { } tree = semente(); guardar(); } };
   }
-  function demoAuth() {
-    let user = null; const cbs = [];
-    const set = u => { user = u; cbs.forEach(c => c(u)); return Promise.resolve({ user: u }); };
-    return { onAuthStateChanged(cb) { cbs.push(cb); setTimeout(() => cb(user), 0); }, signInWithEmailAndPassword: () => set({ uid: 'demo', email: 'demo@exemplo.pt' }), signInWithPopup: () => set({ uid: 'demo', email: 'demo@exemplo.pt' }), signOut: () => set(null), sendPasswordResetEmail: () => Promise.resolve() };
+  function demoAuth() { // a sessão fica guardada para passar da área de cliente para o painel
+    const KA = 'demo-momento-sessao-' + M.id; let user = null; try { user = JSON.parse(localStorage.getItem(KA)); } catch (e) { }
+    const cbs = [];
+    const set = u => { user = u; try { u ? localStorage.setItem(KA, JSON.stringify(u)) : localStorage.removeItem(KA); } catch (e) { } cbs.forEach(c => c(u)); return Promise.resolve({ user: u }); };
+    const demo = { uid: 'demo', email: 'demo@exemplo.pt' };
+    return { onAuthStateChanged(cb) { cbs.push(cb); setTimeout(() => cb(user), 0); }, signInWithEmailAndPassword: () => set(demo), signInWithPopup: () => set(demo), signOut: () => set(null), sendPasswordResetEmail: () => Promise.resolve() };
   }
 
   // Dados fictícios da demonstração (nomes inventados)
