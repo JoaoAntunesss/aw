@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; img-src 'self' data: blob: https://*.googleusercontent.com; font-src 'self' https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com; frame-src https://*.firebaseapp.com https://accounts.google.com; connect-src 'self' https://*.googleapis.com https://*.firebaseapp.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebasedatabase.app wss://*.firebasedatabase.app; upgrade-insecure-requests">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#F6F1EA">
+<title>Painel</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="img/icone.png">
+<link rel="stylesheet" href="base.css">
+<script src="marca.js"></script>
+<script src="core.js"></script>
+<style>
+body{background:var(--fundo2)}
+.entrar{min-height:100vh;display:grid;place-items:center;padding:24px}
+.entrar[hidden],.painel[hidden],[hidden]{display:none!important}
+.entrar form{width:min(380px,100%);background:var(--branco);border-radius:16px;padding:34px;display:grid;gap:14px}
+.entrar h1{font-size:40px;font-weight:300}
+.painel{display:grid;grid-template-columns:340px 1fr;height:100vh}
+.lado{background:var(--fundo);border-right:1px solid var(--linha);display:flex;flex-direction:column;min-height:0}
+.lado-top{padding:18px 20px;border-bottom:1px solid var(--linha);display:flex;justify-content:space-between;align-items:center}
+.seg{display:grid;grid-template-columns:1fr 1fr;margin:14px 16px 6px;background:var(--fundo2);border-radius:999px;padding:4px}
+.seg button{border:0;background:none;border-radius:999px;padding:9px;font-size:14px;cursor:pointer;color:var(--suave);display:flex;justify-content:center;gap:6px;align-items:center}
+.seg button[aria-pressed=true]{background:var(--branco);color:var(--texto);font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.procura{margin:8px 16px;width:calc(100% - 32px)}
+.lista{flex:1;overflow-y:auto;padding:4px 8px 16px}
+.li{display:block;width:100%;text-align:left;border:0;background:none;border-radius:12px;padding:12px 12px;cursor:pointer;margin-bottom:2px}
+.li:hover{background:var(--fundo2)}.li.on{background:var(--branco);box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.li .l1{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.li b{font-weight:500}.li small{color:var(--suave);font-size:13px}
+.bolinha{min-width:20px;height:20px;border-radius:10px;background:var(--destaque);color:#fff;font-size:11px;display:inline-grid;place-items:center;padding:0 6px}
+.est{font-size:11px;padding:3px 8px;border-radius:999px;background:var(--fundo2);color:var(--suave)}
+.est.novo{background:var(--destaque);color:#fff}
+.lado-fim{padding:14px 16px;border-top:1px solid var(--linha);display:flex;gap:8px;flex-wrap:wrap}
+.main{overflow-y:auto;min-height:0}
+.dentro{max-width:960px;margin:0 auto;padding:30px 30px 80px}
+.vazio{color:var(--suave);padding:60px 20px;text-align:center}
+.vazio h2{font-size:34px;color:var(--texto);margin-bottom:8px}
+.cab{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;flex-wrap:wrap;margin-bottom:20px}
+.cab h1{font-size:46px;font-weight:300}
+.cab .meta{color:var(--suave)}
+.acoes{display:flex;gap:8px;flex-wrap:wrap}
+.cx{background:var(--branco);border-radius:14px;padding:22px;margin-bottom:16px}
+.cx h3{font-size:24px;margin-bottom:12px}
+.dl{display:grid;grid-template-columns:140px 1fr;gap:8px 16px;font-size:15px;margin:0}.dl dt{color:var(--suave)}.dl dd{margin:0;white-space:pre-wrap}
+.codigo{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--fundo2);border-radius:12px;padding:14px 16px}
+.codigo code{font-size:20px;letter-spacing:.14em;font-weight:600}
+.etapas{display:flex;gap:6px;flex-wrap:wrap}
+.etapas button{border:1px solid var(--linha);background:none;border-radius:999px;padding:8px 14px;font-size:13px;cursor:pointer}
+.etapas button.on{background:var(--texto);color:var(--fundo);border-color:var(--texto)}
+.etapas button.feito{border-color:var(--destaque);color:var(--destaque-escuro)}
+.abas{display:flex;gap:4px;border-bottom:1px solid var(--linha);margin:22px 0 18px;overflow-x:auto}
+.abas button{background:none;border:0;padding:11px 14px;font-size:15px;color:var(--suave);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;display:flex;gap:6px;align-items:center}
+.abas button[aria-selected=true]{color:var(--texto);border-bottom-color:var(--texto);font-weight:500}
+.chat{display:flex;flex-direction:column;height:min(60vh,560px)}
+.fio{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding-bottom:14px}
+.msg{max-width:78%;padding:11px 15px;border-radius:16px 16px 16px 5px;background:var(--fundo2);font-size:15px;white-space:pre-wrap;word-wrap:break-word}
+.msg.minha{align-self:flex-end;background:var(--texto);color:var(--fundo);border-radius:16px 16px 5px 16px}
+.msg small{display:block;font-size:11px;opacity:.6;margin-top:4px}
+.escrever{display:flex;gap:10px;border-top:1px solid var(--linha);padding-top:14px}
+.escrever textarea{min-height:48px;height:48px;resize:none;flex:1}
+.rapidas{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.rapidas button{border:1px solid var(--linha);background:var(--fundo);border-radius:999px;padding:6px 12px;font-size:13px;cursor:pointer}
+.item{display:flex;align-items:center;gap:14px;padding:12px 0;border-top:1px solid var(--linha);font-size:15px}
+.item .mini{width:44px;height:44px;border-radius:8px;object-fit:cover;background:var(--fundo2);flex:none;display:grid;place-items:center;font-size:11px;font-weight:600;color:var(--suave)}
+.item .nm{flex:1;min-width:0}.item .nm b{font-weight:500;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.item .nm small{color:var(--suave);font-size:13px}
+.ul{margin:0;padding-left:18px}.ul li{margin:4px 0}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:2fr 1fr;gap:14px}
+.perigo{color:var(--erro);border-color:var(--erro-suave)}
+.perigo:hover{border-color:var(--erro)}
+.sem{color:var(--suave);font-size:15px}
+.voltar{display:none}
+@media (max-width:860px){
+  .painel{grid-template-columns:1fr;height:auto;min-height:100vh}
+  .painel.aberto .lado{display:none}.painel:not(.aberto) .main{display:none}
+  .voltar{display:inline-flex;margin-bottom:14px}
+  .dentro{padding:20px 16px 60px}.g2,.g3,.dl{grid-template-columns:1fr}.dl dt{margin-top:6px}
+}
+</style>
+</head>
+<body>
+<section class="entrar" id="entrar">
+  <form id="fEntrar">
+    <div id="logo"></div>
+    <h1>Painel</h1>
+    <div class="campo"><label for="eEmail">Email</label><input class="inp" id="eEmail" type="email" autocomplete="username"></div>
+    <div class="campo"><label for="ePass">Palavra-passe</label><input class="inp" id="ePass" type="password" autocomplete="current-password"></div>
+    <p class="erro" id="eErro" role="alert"></p>
+    <button class="btn btn-escuro" type="submit">Entrar</button>
+    <button class="btn btn-linha" type="button" id="eGoogle">Entrar com Google</button>
+    <button class="sair" type="button" id="eRec" style="background:none;border:0;color:var(--suave);text-decoration:underline;cursor:pointer;font-size:14px">Esqueci-me da palavra-passe</button>
+  </form>
+</section>
+
+<div class="painel" id="painel" hidden>
+  <aside class="lado">
+    <div class="lado-top"><a href="index.html" id="logo2"></a><button class="btn btn-linha btn-pq" id="sair">Sair</button></div>
+    <div class="seg"><button id="sProj" aria-pressed="true">Projetos <span class="bolinha" id="nProj" hidden></span></button><button id="sPed" aria-pressed="false">Pedidos <span class="bolinha" id="nPed" hidden></span></button></div>
+    <input class="inp procura" id="procura" placeholder="Procurar por nome" aria-label="Procurar">
+    <div class="lista" id="lista"></div>
+    <div class="lado-fim"><button class="btn btn-escuro btn-pq" id="novo">+ Novo projeto</button><a class="btn btn-linha btn-pq" href="cliente.html" target="_blank">Ver área de cliente</a></div>
+  </aside>
+  <main class="main"><div class="dentro" id="dentro"></div></main>
+</div>
+<div class="aviso" id="aviso" role="status"></div>
+
+<script>
+const A = APP, M = A.M, $ = id => document.getElementById(id), esc = A.esc;
+A.aplicarTema(); document.title = 'Painel · ' + M.nome;
+$('logo').innerHTML = A.logoHtml(); $('logo2').innerHTML = A.logoHtml();
+const aviso = t => { $('aviso').textContent = t; $('aviso').classList.add('on'); clearTimeout(aviso.t); aviso.t = setTimeout(() => $('aviso').classList.remove('on'), 3200); };
+const lista = o => Object.entries(o || {}).map(([k, v]) => ({ k, ...v })).sort((a, b) => (a.em || a.criadoEm || 0) - (b.em || b.criadoEm || 0));
+let PROJ = {}, PED = {}, modo = 'proj', sel = null, abaP = 'mensagens';
+
+/* ---------- entrar ---------- */
+(async () => {
+  await A.iniciar(true);
+  if (A.DEMO) { $('eEmail').value = 'demo@exemplo.pt'; $('ePass').value = 'demonstracao'; }
+  A.auth.onAuthStateChanged(async u => {
+    if (!u) { $('entrar').hidden = false; $('painel').hidden = true; return; }
+    const s = await A.db.ref('admins/' + u.uid).once('value').catch(() => null);
+    if (!s || s.val() !== true) { $('eErro').textContent = `Esta conta não tem acesso ao painel. Para a autorizar, junta o UID ${u.uid} a /admins (ver LEIA-ME).`; A.auth.signOut(); return; }
+    $('entrar').hidden = true; $('painel').hidden = false; ligar();
+  });
+})();
+$('fEntrar').addEventListener('submit', e => { e.preventDefault(); $('eErro').textContent = ''; A.auth.signInWithEmailAndPassword($('eEmail').value.trim(), $('ePass').value).catch(() => $('eErro').textContent = 'Email ou palavra-passe errados.'); });
+$('eGoogle').onclick = () => { const p = A.DEMO ? null : new firebase.auth.GoogleAuthProvider(); A.auth.signInWithPopup(p).catch(() => $('eErro').textContent = 'Não foi possível entrar com Google.'); };
+$('eRec').onclick = () => { const e = $('eEmail').value.trim(); if (!e) return $('eErro').textContent = 'Escreve o teu email primeiro.'; A.auth.sendPasswordResetEmail(e).then(() => aviso('Enviei um email para mudares a palavra-passe.')).catch(() => $('eErro').textContent = 'Não foi possível enviar o email.'); };
+$('sair').onclick = () => A.auth.signOut().then(() => location.reload());
+
+function ligar() {
+  A.db.ref('projetos').on('value', s => { PROJ = s.val() || {}; contar(); desenharLista(); if (modo === 'proj' && sel && sel !== '__novo') { const f = document.activeElement; if (abaP !== 'mensagens' && f && f.closest && f.closest('#aba form')) return; desenharProjeto(); } });
+  A.db.ref('pedidos').on('value', s => { PED = s.val() || {}; contar(); desenharLista(); if (modo === 'ped' && sel) desenharPedido(); });
+  if (!sel) vazio();
+}
+const porLer = p => { const v = (p.visto && p.visto.marca) || 0; return ['mensagens', 'ficheiros', 'links'].reduce((n, k) => n + lista(p[k]).filter(x => x.de === 'cliente' && x.em > v).length, 0); };
+function contar() { const np = Object.values(PROJ).filter(p => porLer(p) > 0).length, nd = Object.values(PED).filter(p => p.estado === 'novo').length; $('nProj').hidden = !np; $('nProj').textContent = np; $('nPed').hidden = !nd; $('nPed').textContent = nd; document.title = (np + nd ? `(${np + nd}) ` : '') + 'Painel · ' + M.nome; }
+
+/* ---------- lista ---------- */
+function setModo(m) { modo = m; sel = null; $('sProj').setAttribute('aria-pressed', m === 'proj'); $('sPed').setAttribute('aria-pressed', m === 'ped'); desenharLista(); vazio(); }
+$('sProj').onclick = () => setModo('proj'); $('sPed').onclick = () => setModo('ped'); $('procura').oninput = desenharLista;
+function desenharLista() {
+  const q = $('procura').value.trim().toLowerCase();
+  if (modo === 'proj') {
+    const xs = Object.entries(PROJ).map(([k, p]) => ({ k, p, n: porLer(p) })).filter(x => !q || (x.p.info.nome || '').toLowerCase().includes(q)).sort((a, b) => (b.n - a.n) || ((a.p.info.data || '9') < (b.p.info.data || '9') ? -1 : 1));
+    $('lista').innerHTML = xs.length ? xs.map(({ k, p, n }) => { const d = A.diasAte(p.info.data); return `<button class="li ${sel === k ? 'on' : ''}" data-k="${k}"><span class="l1"><b>${esc(p.info.nome)}</b>${n ? `<span class="bolinha">${n}</span>` : ''}</span><small>${esc(p.info.tipo || '')}${p.info.data ? ' · ' + A.dataLonga(p.info.data) : ''}${d != null && d >= 0 ? ` · faltam ${d} dias` : ''}</small></button>`; }).join('') : `<p class="sem" style="padding:16px">Sem projetos. Cria um a partir de um pedido ou em “Novo projeto”.</p>`;
+  } else {
+    const xs = Object.entries(PED).filter(([, p]) => !q || p.nome.toLowerCase().includes(q)).sort((a, b) => (b[1].estado === 'novo') - (a[1].estado === 'novo') || b[1].criadoEm - a[1].criadoEm);
+    $('lista').innerHTML = xs.length ? xs.map(([k, p]) => `<button class="li ${sel === k ? 'on' : ''}" data-k="${k}"><span class="l1"><b>${esc(p.nome)}</b><span class="est ${p.estado}">${{ novo: 'Novo', respondido: 'Respondido', convertido: 'Projeto criado' }[p.estado] || p.estado}</span></span><small>${esc(p.tipo)} · ${A.ha(p.criadoEm)}</small></button>`).join('') : `<p class="sem" style="padding:16px">Ainda não há pedidos. Chegam aqui pelo formulário do site.</p>`;
+  }
+}
+$('lista').addEventListener('click', e => { const b = e.target.closest('.li'); if (!b) return; sel = b.dataset.k; abaP = 'mensagens'; $('painel').classList.add('aberto'); desenharLista(); modo === 'proj' ? desenharProjeto(true) : desenharPedido(); });
+function vazio() { $('painel').classList.remove('aberto'); $('dentro').innerHTML = `<div class="vazio"><h2>${modo === 'proj' ? 'Escolhe um projeto' : 'Escolhe um pedido'}</h2><p>${modo === 'proj' ? 'As mensagens, notas e ficheiros dos clientes aparecem aqui.' : 'Os pedidos de orçamento do site aparecem aqui.'}</p></div>`; }
+const voltar = `<button class="btn btn-linha btn-pq voltar" onclick="sel=null;desenharLista();vazio()">← Voltar</button>`;
+
+/* ---------- pedidos ---------- */
+function desenharPedido() {
+  const p = PED[sel]; if (!p) return vazio(); const wa = A.telInt(p.telemovel);
+  $('dentro').innerHTML = `${voltar}<div class="cab"><div><span class="etq">Pedido de orçamento</span><h1>${esc(p.nome)}</h1><p class="meta">Recebido ${A.ha(p.criadoEm)}</p></div>
+    <div class="acoes">${p.estado === 'convertido' ? `<button class="btn btn-escuro btn-pq" id="irProj">Abrir projeto</button>` : `<button class="btn btn-escuro btn-pq" id="criar">Criar projeto e área de cliente</button>`}${p.estado === 'novo' ? `<button class="btn btn-linha btn-pq" id="resp">Marcar como respondido</button>` : ''}</div></div>
+    <div class="cx"><dl class="dl"><dt>Evento</dt><dd>${esc(p.tipo)}</dd><dt>Data</dt><dd>${p.data ? A.dataLonga(p.data) : 'Por definir'}</dd><dt>Local</dt><dd>${esc(p.local || '—')}</dd><dt>Convidados</dt><dd>${p.convidados || '—'}</dd><dt>Mensagem</dt><dd>${esc(p.mensagem || '—')}</dd></dl></div>
+    <div class="cx"><h3>Responder</h3><div class="acoes"><a class="btn btn-linha btn-pq" href="mailto:${esc(p.email)}?subject=${encodeURIComponent('O vosso ' + p.tipo.toLowerCase() + ' · ' + M.nome)}">Email: ${esc(p.email)}</a>${p.telemovel ? `<a class="btn btn-linha btn-pq" href="https://wa.me/${wa}" target="_blank" rel="noopener">WhatsApp: ${esc(A.telFmt(p.telemovel))}</a>` : ''}</div></div>
+    <button class="btn btn-linha btn-pq perigo" id="apagar">Apagar pedido</button>`;
+  const r = A.db.ref('pedidos/' + sel);
+  if ($('resp')) $('resp').onclick = () => r.update({ estado: 'respondido' });
+  if ($('irProj')) $('irProj').onclick = () => { const c = p.projeto; setModo('proj'); sel = c; desenharLista(); desenharProjeto(true); $('painel').classList.add('aberto'); };
+  if ($('criar')) $('criar').onclick = () => criarProjeto({ nome: p.nome, tipo: p.tipo, data: p.data, local: p.local, email: p.email, telemovel: p.telemovel }, sel);
+  $('apagar').onclick = () => { if (confirm(`Apagar o pedido de ${p.nome}? Não dá para desfazer.`)) r.remove().then(() => { sel = null; vazio(); }); };
+}
+async function criarProjeto(info, pedido) {
+  let c; for (let i = 0; i < 5; i++) { c = A.gerarCodigo(); const s = await A.db.ref('projetos/' + c + '/info').once('value'); if (!s.exists()) break; }
+  const primeiro = (info.nome || '').split(/\s|&/)[0];
+  await A.db.ref('projetos/' + c).set({ info: { ...info, criadoEm: A.agora() }, etapa: 0, mensagens: { m0: { de: 'marca', t: A.tpl(M.boasVindas, { nome: primeiro }), em: A.agora() } }, visto: { marca: A.agora() } });
+  if (pedido) await A.db.ref('pedidos/' + pedido).update({ estado: 'convertido', projeto: c });
+  aviso('Projeto criado. Envia o link ao cliente.'); setModo('proj'); sel = c; abaP = 'mensagens'; desenharLista(); desenharProjeto(true); $('painel').classList.add('aberto');
+}
+$('novo').onclick = () => { setModo('proj'); sel = '__novo'; $('painel').classList.add('aberto'); formInfo({}, true); };
+
+/* ---------- projeto ---------- */
+function desenharProjeto(entrar) {
+  const p = PROJ[sel]; if (!p) return vazio(); const I = p.info, link = A.linkCliente(sel), d = A.diasAte(I.data);
+  const marcar = () => A.db.ref(`projetos/${sel}/visto/marca`).set(A.agora());
+  if (entrar && porLer(p)) setTimeout(marcar, 600);
+  const n = { mensagens: lista(p.mensagens).filter(x => x.de === 'cliente' && x.em > ((p.visto || {}).marca || 0)).length, ficheiros: [...lista(p.ficheiros), ...lista(p.links)].filter(x => x.de === 'cliente' && x.em > ((p.visto || {}).marca || 0)).length };
+  const fio = document.querySelector('.fio'), rascunho = $('tMsg') ? $('tMsg').value : '', topo = fio ? fio.scrollHeight - fio.scrollTop - fio.clientHeight : 0;
+  const msgWa = encodeURIComponent(`Olá ${I.nome}! Já têm a vossa área de cliente: ${link}\nCódigo: ${sel}`);
+  $('dentro').innerHTML = `${voltar}<div class="cab"><div><span class="etq">${esc(I.tipo || 'Projeto')}</span><h1>${esc(I.nome)}</h1><p class="meta">${[I.data ? A.dataLonga(I.data) : 'Data por marcar', I.local].filter(Boolean).map(esc).join(' · ')}${d != null && d >= 0 ? ` · faltam ${d} dias` : ''}</p></div></div>
+    <div class="cx"><div class="codigo"><span>Código</span><code>${sel}</code><span class="acoes" style="margin-left:auto"><button class="btn btn-linha btn-pq" id="cp">Copiar link</button>${I.telemovel ? `<a class="btn btn-escuro btn-pq" target="_blank" rel="noopener" href="https://wa.me/${A.telInt(I.telemovel)}?text=${msgWa}">Enviar por WhatsApp</a>` : ''}${I.email ? `<a class="btn btn-linha btn-pq" href="mailto:${esc(I.email)}?subject=${encodeURIComponent('A vossa área de cliente · ' + M.nome)}&body=${msgWa}">Email</a>` : ''}</span></div>
+      <p class="sem" style="margin:16px 0 8px">Em que fase está?</p><div class="etapas" id="etapas">${M.etapas.map((t, i) => `<button data-e="${i}" class="${i === (p.etapa || 0) ? 'on' : i < (p.etapa || 0) ? 'feito' : ''}">${esc(t)}</button>`).join('')}</div></div>
+    <div class="abas" role="tablist">${[['mensagens', 'Mensagens', n.mensagens], ['notas', 'Notas do cliente', 0], ['ficheiros', 'Ficheiros e links', n.ficheiros], ['entregas', 'Entregas', 0], ['dados', 'Dados', 0]].map(([k, t, c]) => `<button role="tab" data-a="${k}" aria-selected="${abaP === k}">${t}${c ? ` <span class="bolinha">${c}</span>` : ''}</button>`).join('')}</div>
+    <div id="aba"></div>`;
+  $('cp').onclick = () => navigator.clipboard.writeText(link).then(() => aviso('Link copiado.'), () => prompt('Copia o link:', link));
+  $('etapas').onclick = e => { const b = e.target.closest('[data-e]'); if (b) A.db.ref(`projetos/${sel}/etapa`).set(+b.dataset.e); };
+  document.querySelector('.abas').onclick = e => { const b = e.target.closest('[data-a]'); if (b) { abaP = b.dataset.a; desenharProjeto(); if (porLer(PROJ[sel])) marcar(); } };
+  const ab = $('aba');
+  if (abaP === 'mensagens') {
+    ab.innerHTML = `<div class="cx chat"><div class="fio">${lista(p.mensagens).map(m => `<div class="msg ${m.de === 'marca' ? 'minha' : ''}">${esc(m.t)}<small>${m.de === 'marca' ? esc(M.nome) : esc(I.nome)} · ${A.dataCurta(m.em)}, ${A.hora(m.em)}</small></div>`).join('') || '<p class="sem">Sem mensagens.</p>'}</div>
+      <div class="rapidas">${['Já vi, obrigada!', 'Vou tratar disso e digo-vos.', 'As fotografias estão prontas na vossa área.'].map(t => `<button>${t}</button>`).join('')}</div>
+      <form class="escrever" id="fMsg"><textarea class="inp" id="tMsg" maxlength="2000" placeholder="Responder a ${esc(I.nome)}" aria-label="Mensagem"></textarea><button class="btn btn-escuro">Enviar</button></form></div>`;
+    const f = document.querySelector('.fio'); f.scrollTop = topo < 80 ? 1e9 : f.scrollHeight - f.clientHeight - topo; $('tMsg').value = rascunho;
+    document.querySelector('.rapidas').onclick = e => { if (e.target.tagName === 'BUTTON') { $('tMsg').value = e.target.textContent; $('tMsg').focus(); } };
+    $('tMsg').onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $('fMsg').requestSubmit(); } };
+    $('fMsg').onsubmit = e => { e.preventDefault(); const t = $('tMsg').value.trim(); if (!t) return; $('tMsg').value = ''; A.db.ref(`projetos/${sel}/mensagens`).push({ de: 'marca', t: t.slice(0, 2000), em: A.agora() }); marcar(); };
+  } else if (abaP === 'notas') {
+    const N = p.notas || {}, H = N.horarios || {}, L = o => { const v = Object.values(o || {}).filter(Boolean); return v.length ? `<ul class="ul">${v.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : '<p class="sem">Nada ainda.</p>'; };
+    ab.innerHTML = N.em ? `<p class="sem" style="margin-bottom:12px">Atualizadas ${A.ha(N.em)}</p><div class="g2"><div class="cx"><h3>Horários</h3><dl class="dl">${[['Cerimónia', H.cerimonia], ['Cocktail', H.cocktail], ['Refeição', H.jantar], ['Bolo', H.bolo]].map(([a, b]) => `<dt>${a}</dt><dd>${esc(b || '—')}</dd>`).join('')}</dl></div><div class="cx"><h3>Pedidos especiais</h3><p style="white-space:pre-wrap">${esc(N.pedidos || '—')}</p></div><div class="cx"><h3>Fotografias de grupo</h3>${L(N.grupos)}</div><div class="cx"><h3>Pessoas importantes</h3>${L(N.pessoas)}</div></div><button class="btn btn-linha btn-pq" id="imp">Imprimir para o dia</button>` : `<div class="cx"><p class="sem">O cliente ainda não preencheu as notas. Podes pedir nas mensagens.</p></div>`;
+    if ($('imp')) $('imp').onclick = () => print();
+  } else if (abaP === 'ficheiros') {
+    const fs = lista(p.ficheiros).reverse(), ls = lista(p.links).reverse();
+    ab.innerHTML = `<div class="g2"><div class="cx"><h3>Ficheiros</h3><label class="btn btn-linha btn-pq"><input type="file" id="up" hidden multiple>Enviar ficheiro ao cliente</label>${fs.map(f => `<div class="item">${f.url && /^image/.test(f.tipo) ? `<img class="mini" src="${esc(f.url)}" alt="">` : `<span class="mini">${esc((f.nome.split('.').pop() || '').toUpperCase().slice(0, 4))}</span>`}<span class="nm"><b>${esc(f.nome)}</b><small>${A.tamanho(f.tam || 0)} · ${f.de === 'cliente' ? 'do cliente' : 'enviado por ti'} · ${A.ha(f.em)}</small></span><button class="btn btn-linha btn-pq" data-f="${f.k}">Abrir</button><button class="btn btn-linha btn-pq perigo" data-x="${f.k}" aria-label="Apagar">✕</button></div>`).join('') || '<p class="sem" style="margin-top:12px">Sem ficheiros.</p>'}</div>
+      <div class="cx"><h3>Links</h3>${ls.map(l => `<div class="item"><span class="mini">↗</span><span class="nm"><b>${esc(l.desc || l.url)}</b><small>${l.de === 'cliente' ? 'do cliente' : 'teu'} · ${A.ha(l.em)}</small></span><a class="btn btn-linha btn-pq" href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">Abrir</a></div>`).join('') || '<p class="sem">Sem links.</p>'}</div></div>`;
+    ab.onclick = async e => { const o = e.target.closest('[data-f]'), x = e.target.closest('[data-x]');
+      if (o) { const f = p.ficheiros[o.dataset.f]; let url = f.url; if (!url) url = (await A.db.ref(`anexos/${sel}/${o.dataset.f}`).once('value')).val(); if (!url) return aviso('Ficheiro indisponível.'); const a = document.createElement('a'); a.href = url; a.download = f.nome; document.body.appendChild(a); a.click(); a.remove(); }
+      if (x && confirm('Apagar este ficheiro?')) { await A.db.ref(`anexos/${sel}/${x.dataset.x}`).remove(); await A.db.ref(`projetos/${sel}/ficheiros/${x.dataset.x}`).remove(); } };
+    $('up').onchange = async e => { for (const f of e.target.files) { if (f.size > (M.ficheiroMaxMB || 3) * 1048576) { aviso(`${f.name}: grande demais. Usa uma entrega por WeTransfer.`); continue; } const url = await new Promise(ok => { const r = new FileReader(); r.onload = () => ok(r.result); r.readAsDataURL(f); }); const r = A.db.ref(`projetos/${sel}/ficheiros`).push(); await A.db.ref(`anexos/${sel}/${r.key}`).set(url); await r.set({ nome: f.name.slice(0, 120), tipo: f.type || 'application/octet-stream', tam: f.size, de: 'marca', em: A.agora() }); } aviso('Enviado.'); };
+  } else if (abaP === 'entregas') {
+    const es = lista(p.entregas).reverse(), dv = new Date(); dv.setDate(dv.getDate() + 7);
+    ab.innerHTML = `<div class="cx"><h3>Nova entrega</h3><p class="sem" style="margin-bottom:14px">Cria o WeTransfer em wetransfer.com (“Obter link”) e cola o link aqui. O cliente recebe um aviso por email.</p>
+      <form id="fEnt" style="display:grid;gap:12px"><div class="g3"><div class="campo"><label for="eT">Título</label><input class="inp" id="eT" required maxlength="80" placeholder="Ex.: Fotografias do casamento"></div><div class="campo"><label for="eV">Link válido até</label><input class="inp" id="eV" type="date" value="${dv.toISOString().slice(0, 10)}"></div></div>
+      <div class="campo"><label for="eU">Link do WeTransfer (ou Google Drive)</label><input class="inp" id="eU" type="url" required placeholder="https://we.tl/..." maxlength="500"></div>
+      <div class="campo"><label for="eN">Nota</label><input class="inp" id="eN" maxlength="160" placeholder="Ex.: 420 fotografias editadas"></div><button class="btn btn-escuro">Publicar entrega</button></form></div>
+      <div class="cx"><h3>Entregas publicadas</h3>${es.map(x => `<div class="item"><span class="mini">WT</span><span class="nm"><b>${esc(x.titulo)}</b><small>${esc(x.nota || '')}${x.validade ? ' · até ' + A.dataLonga(x.validade) : ''}</small></span><a class="btn btn-linha btn-pq" href="${esc(x.url)}" target="_blank" rel="noopener noreferrer">Abrir</a><button class="btn btn-linha btn-pq perigo" data-x="${x.k}">✕</button></div>`).join('') || '<p class="sem">Nenhuma ainda.</p>'}</div>`;
+    $('fEnt').onsubmit = e => { e.preventDefault(); let u = $('eU').value.trim(); if (!/^https:\/\//i.test(u)) return aviso('O link tem de começar por https://'); A.db.ref(`projetos/${sel}/entregas`).push({ titulo: $('eT').value.trim(), url: u, nota: $('eN').value.trim(), validade: $('eV').value, em: A.agora() }).then(() => aviso('Entrega publicada.')); };
+    ab.onclick = e => { const x = e.target.closest('[data-x]'); if (x && confirm('Retirar esta entrega da área de cliente?')) A.db.ref(`projetos/${sel}/entregas/${x.dataset.x}`).remove(); };
+  } else formInfo(I, false, ab);
+}
+function formInfo(I, novo, onde) {
+  const h = `<div class="cx"><h3>${novo ? 'Novo projeto' : 'Dados do projeto'}</h3><form id="fInfo" style="display:grid;gap:12px">
+    <div class="g2"><div class="campo"><label for="iN">Nome (como aparece ao cliente)</label><input class="inp" id="iN" required maxlength="80" value="${esc(I.nome || '')}" placeholder="Ex.: Ana & Pedro"></div><div class="campo"><label for="iT">Tipo de evento</label><select class="inp" id="iT">${M.tiposEvento.map(t => `<option ${t === I.tipo ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select></div>
+    <div class="campo"><label for="iD">Data</label><input class="inp" id="iD" type="date" value="${esc(I.data || '')}"></div><div class="campo"><label for="iL">Local</label><input class="inp" id="iL" maxlength="120" value="${esc(I.local || '')}"></div>
+    <div class="campo"><label for="iE">Email do cliente</label><input class="inp" id="iE" type="email" maxlength="120" value="${esc(I.email || '')}"></div><div class="campo"><label for="iTel">Telemóvel</label><input class="inp" id="iTel" type="tel" maxlength="20" value="${esc(I.telemovel || '')}"></div></div>
+    <div class="acoes"><button class="btn btn-escuro">${novo ? 'Criar projeto e área de cliente' : 'Guardar'}</button>${novo ? '' : '<button type="button" class="btn btn-linha perigo" id="apP">Apagar projeto</button>'}</div></form></div>`;
+  if (novo) $('dentro').innerHTML = voltar + h; else onde.innerHTML = h;
+  $('fInfo').onsubmit = e => { e.preventDefault(); const o = { nome: $('iN').value.trim(), tipo: $('iT').value, data: $('iD').value, local: $('iL').value.trim(), email: $('iE').value.trim(), telemovel: $('iTel').value.trim() };
+    if (novo) criarProjeto(o); else A.db.ref(`projetos/${sel}/info`).update(o).then(() => aviso('Guardado.')); };
+  if ($('apP')) $('apP').onclick = async () => { if (!confirm(`Apagar o projeto de ${I.nome}? O cliente perde o acesso e as mensagens e ficheiros são apagados.`)) return; const c = sel; sel = null; await A.db.ref('anexos/' + c).remove(); await A.db.ref('projetos/' + c).remove(); vazio(); aviso('Projeto apagado.'); };
+}
+</script>
+</body>
+</html>

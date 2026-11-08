@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Área de cliente · Inês Digital Studio</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="assets/base.css">
+<style>
+body{min-height:100vh}
+.top .bar{height:72px}
+/* ---------- ENTRAR ---------- */
+.login{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center;min-height:calc(100vh - 72px);padding:40px 0}
+.login .ph{perspective:1400px}
+.login .ph .frame{background:var(--white);padding:12px;border-radius:4px;box-shadow:0 60px 90px -50px rgba(70,50,35,.55);transform:rotateY(14deg) rotateX(4deg);transition:transform 1.4s var(--ease)}
+.login .ph img{width:100%;aspect-ratio:4/5;object-fit:cover}
+.login h1{font-size:clamp(46px,5vw,72px);font-weight:300;margin:18px 0 16px}
+.login p.lead{color:var(--muted);font-size:18px;max-width:26em}
+.code{margin-top:34px;display:flex;gap:10px;max-width:30rem}
+.code input{flex:1;border:1px solid var(--line);background:var(--white);border-radius:999px;padding:15px 22px;font-size:17px;letter-spacing:.08em;text-transform:uppercase}
+.code input:focus{outline:none;border-color:var(--sage-deep)}
+.err{color:#9A3B30;font-size:14px;margin-top:12px;min-height:1.4em}
+.demo{margin-top:26px;max-width:30rem;border:1px dashed var(--line);border-radius:10px;padding:14px 18px;font-size:14px;color:var(--muted)}
+.demo b{color:var(--ink);letter-spacing:.06em}
+.login[hidden]{display:none}
+.out{animation:out .7s var(--ease) forwards}
+@keyframes out{to{opacity:0;transform:perspective(1200px) rotateX(-8deg) translateY(-30px)}}
+
+/* ---------- PAINEL ---------- */
+.app{display:none;grid-template-columns:250px 1fr;gap:44px;padding:36px 0 80px}
+.app.on{display:grid}
+.side{position:sticky;top:100px;align-self:start}
+.who{padding:0 0 22px;border-bottom:1px solid var(--line);margin-bottom:16px}
+.who b{display:block;font-family:var(--display);font-weight:400;font-size:30px;line-height:1.1}
+.who small{color:var(--muted);font-size:13px}
+.tabs{display:grid;gap:2px}
+.tab{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:none;border:0;border-radius:8px;padding:11px 12px;font-size:15px;color:var(--muted);cursor:pointer;transition:background .2s,color .2s}
+.tab:hover{background:var(--sand);color:var(--ink)}
+.tab[aria-selected=true]{background:var(--ink);color:var(--cream)}
+.tab .ic{width:20px;text-align:center;font-size:15px}
+.tab .n{margin-left:auto;background:var(--sage);color:#fff;font-size:11px;border-radius:999px;padding:1px 8px}
+.side .out-btn{margin-top:22px;font-size:14px;color:var(--muted);background:none;border:0;cursor:pointer;padding:0 12px}
+.panel{display:none}
+.panel.on{display:block;animation:rise3d .8s var(--ease) both}
+.ph2{display:flex;justify-content:space-between;align-items:end;gap:20px;flex-wrap:wrap;margin-bottom:28px}
+.ph2 h2{font-size:clamp(36px,3.6vw,52px);font-weight:300}
+.ph2 p{color:var(--muted);margin-top:8px;max-width:36em}
+.box{background:var(--white);border-radius:10px;padding:26px;box-shadow:0 1px 0 var(--line)}
+.box h3{font-family:var(--sans);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:500;margin-bottom:16px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.g3{display:grid;grid-template-columns:1.4fr 1fr;gap:20px}
+
+/* resumo */
+.hello{display:grid;grid-template-columns:1.25fr 1fr;gap:20px;margin-bottom:20px}
+.cover{position:relative;border-radius:10px;overflow:hidden;min-height:250px;color:#fff;display:flex;flex-direction:column;justify-content:end;padding:28px}
+.cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cover::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(30,22,16,.82),rgba(30,22,16,.1) 75%)}
+.cover>*{position:relative;z-index:1}
+.cover small{font-size:13px;letter-spacing:.14em;text-transform:uppercase;opacity:.9}
+.cover b{font-family:var(--display);font-weight:400;font-size:46px;line-height:1.05}
+.count{display:flex;flex-direction:column;justify-content:center;background:var(--sage-deep);color:#fff}
+.count .big{font-family:var(--display);font-size:92px;line-height:1;font-weight:300;margin-bottom:6px}
+.count span{color:#E4EAD9}
+.steps{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(6,1fr);gap:8px;counter-reset:s}
+.steps li{position:relative;padding-top:22px;font-size:13px;color:var(--muted);line-height:1.35}
+.steps li::before{content:"";position:absolute;top:0;left:0;right:0;height:5px;border-radius:5px;background:var(--line)}
+.steps li.d::before{background:var(--sage)}
+.steps li.now{color:var(--ink);font-weight:500}
+.steps li.now::before{background:linear-gradient(90deg,var(--sage) 50%,var(--line) 50%)}
+.next{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.next p{font-family:var(--display);font-size:24px;line-height:1.2}
+
+/* mensagens */
+.chat{display:flex;flex-direction:column;height:min(62vh,560px)}
+.msgs{flex:1;overflow:auto;display:flex;flex-direction:column;gap:14px;padding:6px 4px 16px}
+.m{max-width:74%;display:flex;flex-direction:column;gap:4px}
+.m .b{background:var(--sand);padding:12px 16px;border-radius:16px 16px 16px 4px;line-height:1.5}
+.m small{font-size:12px;color:var(--muted);padding:0 6px}
+.m.me{align-self:flex-end;align-items:flex-end}
+.m.me .b{background:var(--sage-deep);color:#fff;border-radius:16px 16px 4px 16px}
+.m.new{animation:pop .45s var(--ease)}
+@keyframes pop{from{opacity:0;transform:translateY(12px) scale(.97)}}
+.send{display:flex;gap:10px;border-top:1px solid var(--line);padding-top:16px}
+.send textarea{flex:1;border:1px solid var(--line);border-radius:22px;padding:12px 18px;resize:none;height:48px;background:var(--cream)}
+.send textarea:focus{outline:none;border-color:var(--sage-deep)}
+
+/* notas */
+.f{display:grid;gap:6px}
+.f label{font-size:13px;color:var(--muted)}
+.inp{border:1px solid var(--line);background:var(--cream);border-radius:6px;padding:11px 13px;font-size:15px;width:100%}
+.inp:focus{outline:none;border-color:var(--sage-deep)}
+.times{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.list{list-style:none;padding:0;margin:0 0 12px}
+.list li{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:15px}
+.list li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--sage);flex:none}
+.list li span{flex:1}
+.x{background:none;border:0;color:var(--muted);cursor:pointer;font-size:18px;line-height:1;padding:2px 6px;border-radius:6px}
+.x:hover{background:var(--sand);color:var(--ink)}
+.add{display:flex;gap:8px}
+textarea.inp{min-height:110px;resize:vertical}
+.savebar{display:flex;justify-content:flex-end;margin-top:20px}
+
+/* ficheiros */
+.drop{border:1.5px dashed var(--line);border-radius:10px;padding:34px;text-align:center;cursor:pointer;transition:all .25s;background:var(--cream)}
+.drop:hover,.drop.over{border-color:var(--sage-deep);background:#EEF1E8}
+.drop b{font-family:var(--display);font-size:26px;font-weight:400;display:block}
+.drop span{font-size:14px;color:var(--muted)}
+.files{list-style:none;padding:0;margin:18px 0 0;display:grid;gap:10px}
+.files li{display:grid;grid-template-columns:52px 1fr auto;gap:14px;align-items:center;background:var(--white);border-radius:10px;padding:10px 14px 10px 10px;box-shadow:0 1px 0 var(--line)}
+.files .th{width:52px;height:52px;border-radius:8px;background:var(--sand);display:grid;place-items:center;font-size:12px;font-weight:600;color:var(--taupe);overflow:hidden}
+.files .th img{width:100%;height:100%;object-fit:cover}
+.files b{font-weight:500;display:block}
+.files small{color:var(--muted);font-size:13px}
+
+/* fotografias / wetransfer */
+.deliv{display:grid;grid-template-columns:96px 1fr auto;gap:18px;align-items:center;padding:16px;border-radius:10px;background:var(--cream);margin-bottom:12px}
+.deliv .pv{width:96px;height:72px;border-radius:6px;object-fit:cover}
+.deliv .pv.lock{display:grid;place-items:center;background:var(--sand);color:var(--muted);font-size:22px}
+.deliv b{font-family:var(--display);font-size:24px;font-weight:400;display:block;line-height:1.1}
+.deliv small{color:var(--muted);font-size:13px;display:block;line-height:1.45;margin-top:2px}
+.badge{display:inline-block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:999px;background:#E4EAD9;color:var(--sage-deep);margin-bottom:6px}
+.badge.wait{background:var(--sand);color:var(--muted)}
+.tip{display:flex;gap:12px;margin-top:16px;padding:14px 16px;border-radius:10px;background:#F3EBDD;font-size:14px;color:var(--taupe)}
+.links{list-style:none;padding:0;margin:16px 0 0}
+.links li{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);font-size:14.5px}
+.links a{color:var(--sage-deep);text-decoration:underline;text-underline-offset:3px;word-break:break-all}
+
+/* guia */
+.guide{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.guide ol{list-style:none;padding:0;margin:0;counter-reset:g}
+.guide li{counter-increment:g;display:grid;grid-template-columns:38px 1fr;gap:14px;padding:14px 0;border-bottom:1px solid var(--line)}
+.guide li::before{content:counter(g);width:32px;height:32px;border-radius:50%;border:1px solid var(--sage);color:var(--sage-deep);display:grid;place-items:center;font-size:14px;font-weight:500}
+.guide li b{display:block;font-weight:500;margin-bottom:2px}
+.guide li span{color:var(--muted);font-size:15px}
+.guide h4{font-size:30px;font-weight:400;margin-bottom:6px}
+.guide .sub{color:var(--muted);font-size:15px;margin-bottom:10px}
+
+@media (max-width:980px){
+  .login{grid-template-columns:1fr;gap:30px}
+  .login .ph{display:none}
+  .app{grid-template-columns:1fr;gap:20px}
+  .side{position:relative;top:0}
+  .tabs{display:flex;overflow-x:auto;gap:6px;padding-bottom:4px}
+  .tab{white-space:nowrap;width:auto}
+  .hello,.g2,.g3,.guide{grid-template-columns:1fr}
+  .steps{grid-template-columns:repeat(3,1fr)}
+  .times{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<header class="top scrolled">
+  <div class="wrap bar">
+    <a class="logo" href="index.html"><img src="img/logo.png" alt=""><span>Inês Digital Studio</span></a>
+    <a class="btn btn-line btn-sm" href="index.html">Voltar ao site</a>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- ENTRAR -->
+  <section class="login" id="login">
+    <div class="ph r3"><div class="frame"><img src="img/portfolio-cerimonia.jpg" alt="Arco de cerimónia decorado com flores brancas" style="aspect-ratio:4/5;object-position:30% 50%"></div></div>
+    <div>
+      <span class="kicker r3">Área de cliente</span>
+      <h1 class="r3">Bem-vindos ao <span class="it">vosso espaço.</span></h1>
+      <p class="lead r3">Entra com o código que te enviei por mensagem. Aqui ficam as nossas conversas, as notas para o dia, os ficheiros e as tuas fotografias.</p>
+      <form class="code r3" id="codeForm">
+        <label for="code" class="sr" style="position:absolute;left:-9999px">Código de acesso</label>
+        <input id="code" autocomplete="off" placeholder="O teu código" spellcheck="false">
+        <button class="btn btn-dark" type="submit">Entrar</button>
+      </form>
+      <p class="err" id="err" role="alert"></p>
+      <div class="demo r3">Isto é uma demonstração. Usa o código <b>ANA-PEDRO</b>.</div>
+    </div>
+  </section>
+
+  <!-- PAINEL -->
+  <section class="app" id="app">
+    <aside class="side">
+      <div class="who"><b>Ana & Pedro</b><small>Casamento · 12 jun 2027</small></div>
+      <div class="tabs" role="tablist" aria-label="Secções">
+        <button class="tab" role="tab" data-p="resumo"><span class="ic">◌</span>Resumo</button>
+        <button class="tab" role="tab" data-p="mensagens"><span class="ic">✉</span>Mensagens<span class="n" id="unread">1</span></button>
+        <button class="tab" role="tab" data-p="notas"><span class="ic">✎</span>Notas para o dia</button>
+        <button class="tab" role="tab" data-p="ficheiros"><span class="ic">⧉</span>Ficheiros</button>
+        <button class="tab" role="tab" data-p="fotos"><span class="ic">↓</span>Fotografias</button>
+        <button class="tab" role="tab" data-p="guia"><span class="ic">?</span>Como usar o WeTransfer</button>
+      </div>
+      <button class="out-btn" id="logout">Sair</button>
+    </aside>
+
+    <div>
+      <!-- RESUMO -->
+      <div class="panel" id="p-resumo" role="tabpanel">
+        <div class="hello">
+          <div class="cover"><img src="img/portfolio-mesa.jpg" alt=""><small>O vosso casamento</small><b>Olá, Ana & Pedro</b><span>12 de junho de 2027 · Amarante</span></div>
+          <div class="box count"><span class="big" id="days">–</span><span>dias até ao grande dia</span></div>
+        </div>
+        <div class="box" style="margin-bottom:20px">
+          <h3>Onde estamos</h3>
+          <ol class="steps">
+            <li class="d">Reserva confirmada</li><li class="d">Reunião de preparação</li><li class="now">Notas para o dia</li><li>O grande dia</li><li>Seleção e edição</li><li>Entrega das fotografias</li>
+          </ol>
+        </div>
+        <div class="g2">
+          <div class="box next"><div><h3>Próximo passo</h3><p>Preencher as notas para o dia, sobretudo as fotos de grupo.</p></div><button class="btn btn-sage btn-sm" data-go="notas">Abrir notas</button></div>
+          <div class="box next"><div><h3>Última mensagem da Inês</h3><p style="font-size:20px" id="lastMsg"></p></div><button class="btn btn-line btn-sm" data-go="mensagens">Responder</button></div>
+        </div>
+      </div>
+
+      <!-- MENSAGENS -->
+      <div class="panel" id="p-mensagens" role="tabpanel">
+        <div class="ph2"><div><h2>Mensagens</h2><p>Uma conversa só para o vosso casamento. Recebo um aviso no telemóvel sempre que escrevem.</p></div></div>
+        <div class="box chat">
+          <div class="msgs" id="msgs" aria-live="polite"></div>
+          <form class="send" id="sendForm"><label for="txt" style="position:absolute;left:-9999px">Mensagem</label><textarea id="txt" placeholder="Escreve a tua mensagem"></textarea><button class="btn btn-dark" type="submit">Enviar</button></form>
+        </div>
+      </div>
+
+      <!-- NOTAS -->
+      <div class="panel" id="p-notas" role="tabpanel">
+        <div class="ph2"><div><h2>Notas para o dia</h2><p>Tudo o que preciso de saber para não falhar nenhum momento. Podem ir completando até à semana do casamento.</p></div></div>
+        <form id="notesForm">
+          <div class="box" style="margin-bottom:20px"><h3>Horários</h3>
+            <div class="times">
+              <div class="f"><label for="h1">Cerimónia</label><input class="inp" type="time" id="h1" name="cerimonia"></div>
+              <div class="f"><label for="h2">Cocktail</label><input class="inp" type="time" id="h2" name="cocktail"></div>
+              <div class="f"><label for="h3">Jantar</label><input class="inp" type="time" id="h3" name="jantar"></div>
+              <div class="f"><label for="h4">Corte do bolo</label><input class="inp" type="time" id="h4" name="bolo"></div>
+            </div></div>
+          <div class="g2" style="margin-bottom:20px">
+            <div class="box"><h3>Fotos de grupo</h3><ul class="list" id="grupos"></ul>
+              <div class="add"><input class="inp" id="grupoIn" placeholder="Ex.: noivos com os avós" aria-label="Novo grupo"><button class="btn btn-line btn-sm" type="button" id="grupoAdd">Adicionar</button></div></div>
+            <div class="box"><h3>Pessoas importantes</h3><ul class="list" id="pessoas"></ul>
+              <div class="add"><input class="inp" id="pessoaIn" placeholder="Ex.: Marta, irmã da Ana" aria-label="Nova pessoa"><button class="btn btn-line btn-sm" type="button" id="pessoaAdd">Adicionar</button></div></div>
+          </div>
+          <div class="box"><h3>Pedidos especiais</h3><textarea class="inp" id="pedidos" name="pedidos" aria-label="Pedidos especiais"></textarea></div>
+          <div class="savebar"><button class="btn btn-sage" type="submit">Guardar notas</button></div>
+        </form>
+      </div>
+
+      <!-- FICHEIROS -->
+      <div class="panel" id="p-ficheiros" role="tabpanel">
+        <div class="ph2"><div><h2>Ficheiros</h2><p>Convite, programa do dia, moodboard, referências. Fica tudo aqui, sem se perder no email.</p></div></div>
+        <label class="drop" id="drop"><input type="file" id="fileIn" multiple hidden><b>Arrasta ficheiros para aqui</b><span>ou clica para escolher do computador ou do telemóvel</span></label>
+        <ul class="files" id="files"></ul>
+      </div>
+
+      <!-- FOTOGRAFIAS -->
+      <div class="panel" id="p-fotos" role="tabpanel">
+        <div class="ph2"><div><h2>Fotografias</h2><p>As vossas fotografias chegam aqui por link WeTransfer. E se tiverem fotos para me mandar, partilhem o link em baixo.</p></div><button class="btn btn-line btn-sm" data-go="guia">Como usar o WeTransfer</button></div>
+        <div class="g3">
+          <div class="box"><h3>Da Inês para vocês</h3>
+            <div class="deliv"><img class="pv" src="img/portfolio-cerimonia.jpg" alt=""><div><span class="badge">Disponível</span><b>Pré-visualização</b><small>20 fotografias · link válido até 21 jun 2027</small></div><a class="btn btn-dark btn-sm" href="#" id="dl">Descarregar</a></div>
+            <div class="deliv"><span class="pv lock">◷</span><div><span class="badge wait">Em preparação</span><b>Galeria completa</b><small>Entrega prevista até 8 semanas depois do casamento</small></div><span></span></div>
+            <div class="tip"><span>!</span><span>Os links do WeTransfer expiram ao fim de alguns dias. Descarreguem logo e guardem uma cópia no computador ou na cloud.</span></div>
+          </div>
+          <div class="box"><h3>De vocês para a Inês</h3>
+            <form id="linkForm">
+              <div class="f" style="margin-bottom:12px"><label for="lk">Link do WeTransfer</label><input class="inp" id="lk" placeholder="https://we.tl/..." inputmode="url"></div>
+              <div class="f" style="margin-bottom:14px"><label for="ld">O que é?</label><input class="inp" id="ld" placeholder="Ex.: fotos dos convidados"></div>
+              <button class="btn btn-sage btn-sm" type="submit">Partilhar link</button>
+              <p class="err" id="lkErr" role="alert"></p>
+            </form>
+            <ul class="links" id="links"></ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- GUIA -->
+      <div class="panel" id="p-guia" role="tabpanel">
+        <div class="ph2"><div><h2>Como usar o WeTransfer</h2><p>Não é preciso criar conta. São só uns minutos.</p></div></div>
+        <div class="guide">
+          <div class="box"><h4>Receber as vossas fotos</h4><p class="sub">Quando aparecer "Disponível" em Fotografias.</p>
+            <ol>
+              <li><div><b>Abram o link</b><span>Carreguem em "Descarregar" na página Fotografias, ou no link que chegou por email.</span></div></li>
+              <li><div><b>Transfiram tudo</b><span>Na página do WeTransfer, carreguem no botão de transferir. As fotos chegam juntas num ficheiro .zip.</span></div></li>
+              <li><div><b>No computador</b><span>Abram o .zip (no Windows: botão direito, "Extrair tudo"; no Mac: duplo clique). Aparece uma pasta com as fotos.</span></div></li>
+              <li><div><b>No telemóvel</b><span>No iPhone o .zip vai para a app Ficheiros: toquem nele para o abrir, selecionem as fotos e escolham "Guardar imagens". No Android abram-no na app de ficheiros.</span></div></li>
+              <li><div><b>Guardem uma cópia</b><span>O link expira. Guardem as fotos num disco ou na cloud (Google Fotos, iCloud).</span></div></li>
+            </ol></div>
+          <div class="box"><h4>Enviar fotos à Inês</h4><p class="sub">Por exemplo, fotos dos convidados ou referências.</p>
+            <ol>
+              <li><div><b>Vão a wetransfer.com</b><span>No computador ou no telemóvel. Não é preciso conta.</span></div></li>
+              <li><div><b>Adicionem as fotos</b><span>Carreguem no botão de adicionar (+) e escolham as fotos, ou arrastem-nas para a página.</span></div></li>
+              <li><div><b>Escolham "obter link"</b><span>Nas opções da transferência, escolham receber um link em vez de enviar por email.</span></div></li>
+              <li><div><b>Transfiram e copiem o link</b><span>Esperem que chegue aos 100% e copiem o link que aparece.</span></div></li>
+              <li><div><b>Colem o link aqui</b><span>Em Fotografias, no quadro "De vocês para a Inês". Eu recebo um aviso.</span></div></li>
+            </ol>
+            <div class="tip"><span>i</span><span>Se forem muitas fotos, enviem em mais do que uma transferência.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const toast=t=>{ const el=$("toast"); el.textContent=t; el.classList.add("show"); clearTimeout(toast.t); toast.t=setTimeout(()=>el.classList.remove("show"),2600); };
+const fmt=d=>new Date(d).toLocaleDateString("pt-PT",{day:"numeric",month:"short"}).replace(".","");
+const KEY="ids-demo-ana-pedro", CODE="ANA-PEDRO", WEDDING=new Date("2027-06-12T16:00:00");
+
+/* dados de demonstração (na versão real ficam numa base de dados por cliente) */
+const SEED={
+  msgs:[
+    {me:false,t:"Olá Ana e Pedro! Bem-vindos à vossa área. Aqui podemos falar de tudo sobre o casamento e partilhar ficheiros sem se perder nada.",d:"2026-11-03"},
+    {me:true,t:"Olá Inês! Que bom. Já deixámos o convite e o moodboard nos ficheiros.",d:"2026-11-04"},
+    {me:false,t:"Já vi o vosso moodboard. Adorei os tons! Quando puderem, preencham as notas para o dia, sobretudo as fotos de grupo.",d:"2026-11-05"},
+  ],
+  notas:{cerimonia:"16:00",cocktail:"17:30",jantar:"20:00",bolo:"23:00",
+    grupos:["Noivos com os pais da Ana","Noivos com os pais do Pedro","Noivos com os padrinhos","Foto com a avó Rosa"],
+    pessoas:["Marta, irmã da Ana e madrinha","Rui, padrinho do Pedro","Sofia, wedding planner"],
+    pedidos:"Gostávamos muito de uma foto do momento em que o Pedro vê a Ana pela primeira vez."},
+  files:[
+    {n:"Convite.pdf",s:"240 KB",d:"2026-11-04",k:"PDF"},
+    {n:"Moodboard.jpg",s:"1,2 MB",d:"2026-11-04",k:"IMG",src:"img/portfolio-flores.jpg"},
+    {n:"Programa do dia.pdf",s:"96 KB",d:"2026-11-05",k:"PDF"},
+  ],
+  links:[{u:"https://we.tl/t-exemplo",t:"Referências de poses que gostamos",d:"2026-11-05"}],
+};
+let S; try{ S=JSON.parse(localStorage.getItem(KEY)); }catch(e){} if(!S) S=structuredClone(SEED);
+const save=()=>{ try{ localStorage.setItem(KEY,JSON.stringify({...S,files:S.files.filter(f=>!f.blob)})); }catch(e){} };
+
+/* entrar */
+document.querySelectorAll(".r3").forEach((el,i)=>setTimeout(()=>{el.style.animationDelay="0ms";el.classList.add("on")},120+i*90));
+$("codeForm").addEventListener("submit",e=>{
+  e.preventDefault(); const c=$("code").value.trim().toUpperCase().replace(/\s+/g,"");
+  if(c!==CODE){ $("err").textContent="Esse código não está certo. Confirma a mensagem que te enviei."; return; }
+  $("err").textContent=""; $("login").classList.add("out");
+  setTimeout(()=>{ $("login").hidden=true; $("app").classList.add("on"); show("resumo"); scrollTo(0,0); },650);
+});
+$("logout").onclick=()=>{ $("app").classList.remove("on"); $("login").hidden=false; $("login").classList.remove("out"); $("code").value=""; };
+
+/* separadores */
+function show(p){ document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",t.dataset.p===p));
+  document.querySelectorAll(".panel").forEach(x=>x.classList.toggle("on",x.id==="p-"+p));
+  if(p==="mensagens"){ $("unread").hidden=true; const m=$("msgs"); m.scrollTop=m.scrollHeight; } }
+window.__show=show;
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>show(t.dataset.p));
+document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>show(b.dataset.go));
+
+/* resumo */
+$("days").textContent=Math.max(0,Math.ceil((WEDDING-new Date())/864e5));
+const lastInes=()=>[...S.msgs].reverse().find(m=>!m.me);
+$("lastMsg").textContent="“"+lastInes().t.split(". ")[0].replace(/\.$/,"")+".”";
+
+/* mensagens */
+function renderMsgs(newIdx){ $("msgs").innerHTML=S.msgs.map((m,i)=>`<div class="m ${m.me?"me":""} ${i===newIdx?"new":""}"><div class="b">${esc(m.t)}</div><small>${m.me?"Ana & Pedro":"Inês"} · ${fmt(m.d)}${m.st?" · "+m.st:""}</small></div>`).join(""); const el=$("msgs"); el.scrollTop=el.scrollHeight; }
+renderMsgs();
+$("sendForm").addEventListener("submit",e=>{ e.preventDefault(); const t=$("txt").value.trim(); if(!t) return;
+  S.msgs.push({me:true,t,d:new Date().toISOString(),st:"enviada"}); $("txt").value=""; renderMsgs(S.msgs.length-1); save(); toast("Mensagem enviada. A Inês recebe um aviso no telemóvel."); });
+$("txt").addEventListener("keydown",e=>{ if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); $("sendForm").requestSubmit(); } });
+
+/* notas */
+const N=S.notas;
+["cerimonia","cocktail","jantar","bolo"].forEach(k=>$("notesForm").elements[k].value=N[k]||"");
+$("pedidos").value=N.pedidos||"";
+function renderList(id,arr){ $(id).innerHTML=arr.map((x,i)=>`<li><span>${esc(x)}</span><button type="button" class="x" data-i="${i}" aria-label="Remover ${esc(x)}">×</button></li>`).join("");
+  $(id).querySelectorAll(".x").forEach(b=>b.onclick=()=>{ arr.splice(+b.dataset.i,1); renderList(id,arr); }); }
+renderList("grupos",N.grupos); renderList("pessoas",N.pessoas);
+const adder=(inp,btn,arr,id)=>{ const go=()=>{ const v=$(inp).value.trim(); if(!v) return; arr.push(v); $(inp).value=""; renderList(id,arr); };
+  $(btn).onclick=go; $(inp).addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); go(); } }); };
+adder("grupoIn","grupoAdd",N.grupos,"grupos"); adder("pessoaIn","pessoaAdd",N.pessoas,"pessoas");
+$("notesForm").addEventListener("submit",e=>{ e.preventDefault(); const f=e.target.elements;
+  ["cerimonia","cocktail","jantar","bolo"].forEach(k=>N[k]=f[k].value); N.pedidos=$("pedidos").value; save(); toast("Notas guardadas. A Inês já as pode ver."); });
+
+/* ficheiros */
+const size=b=>b>1048576?(b/1048576).toFixed(1).replace(".",",")+" MB":Math.max(1,Math.round(b/1024))+" KB";
+function renderFiles(){ $("files").innerHTML=S.files.map((f,i)=>`<li><span class="th">${f.src?`<img src="${f.src}" alt="">`:esc(f.k)}</span><div><b>${esc(f.n)}</b><small>${f.s} · enviado por Ana & Pedro · ${fmt(f.d)}</small></div><button class="x" data-i="${i}" aria-label="Remover ${esc(f.n)}">×</button></li>`).join("");
+  $("files").querySelectorAll(".x").forEach(b=>b.onclick=()=>{ S.files.splice(+b.dataset.i,1); renderFiles(); save(); }); }
+renderFiles();
+function addFiles(list){ [...list].forEach(f=>{ const img=f.type.startsWith("image/"); S.files.unshift({n:f.name,s:size(f.size),d:new Date().toISOString(),k:(f.name.split(".").pop()||"FICH").toUpperCase().slice(0,4),src:img?URL.createObjectURL(f):"",blob:true}); }); renderFiles(); toast(list.length>1?`${list.length} ficheiros enviados.`:"Ficheiro enviado."); }
+$("fileIn").onchange=e=>addFiles(e.target.files);
+const dz=$("drop"); ["dragenter","dragover"].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add("over")}));
+["dragleave","drop"].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove("over")}));
+dz.addEventListener("drop",e=>addFiles(e.dataTransfer.files));
+
+/* fotografias */
+$("dl").onclick=e=>{ e.preventDefault(); toast("Na versão real abre o link do WeTransfer com as fotografias."); };
+function renderLinks(){ $("links").innerHTML=S.links.map(l=>`<li><span><a href="${esc(l.u)}" target="_blank" rel="noopener">${esc(l.u.replace(/^https?:\/\//,""))}</a><br><small style="color:var(--muted)">${esc(l.t||"Sem descrição")}</small></span><small style="color:var(--muted);white-space:nowrap">${fmt(l.d)}</small></li>`).join(""); }
+renderLinks();
+$("linkForm").addEventListener("submit",e=>{ e.preventDefault(); let u=$("lk").value.trim();
+  if(u&&!/^https?:\/\//.test(u)) u="https://"+u;
+  let ok=false; try{ const h=new URL(u).hostname; ok=/(^|\.)we\.tl$|(^|\.)wetransfer\.com$/.test(h); }catch(_){}
+  if(!ok){ $("lkErr").textContent="Cola um link do WeTransfer (começa por we.tl ou wetransfer.com)."; return; }
+  $("lkErr").textContent=""; S.links.unshift({u,t:$("ld").value.trim(),d:new Date().toISOString()}); $("lk").value=""; $("ld").value=""; renderLinks(); save(); toast("Link partilhado. A Inês recebe um aviso."); });
+</script>
+</body>
+</html>

@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Inês Digital Studio · Social Media & Creative Studio</title>
+<meta name="description" content="Conteúdo com intenção. Memórias com emoção. Gestão de redes sociais, conteúdo para marcas, casamentos e eventos.">
+<link rel="icon" href="img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="assets/base.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.min.js"}}</script>
+<style>
+/* ---------- HERO ---------- */
+.hero{position:relative;padding:56px 0 40px}
+.hero-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:center;min-height:calc(100vh - 160px)}
+.hero h1{font-size:clamp(42px,4.6vw,70px);font-weight:300;letter-spacing:-.02em;line-height:.95;margin:22px 0 0}
+.hero h1 .l1,.hero h1 .l2{display:block;white-space:nowrap}.hero h1 .l2{font-style:italic;color:var(--taupe);padding-left:.5em}
+.hero .lead{margin-top:30px;font-size:19px;color:var(--muted);max-width:27em}
+.hero .ctas{margin-top:38px;display:flex;gap:14px;flex-wrap:wrap}
+.h-in{opacity:0;transform:translateY(26px)}
+.ready .h-in{animation:hin 1.1s var(--ease) both}
+.ready .h-in:nth-child(2){animation-delay:.12s}.ready .h-in:nth-child(3){animation-delay:.24s}.ready .h-in:nth-child(4){animation-delay:.36s}
+@keyframes hin{to{opacity:1;transform:none}}
+
+/* palco 3D: começa deitado (isométrico) e levanta-se */
+.stage{position:relative;height:min(74vh,640px);perspective:1800px;container-type:size}
+.stack{position:absolute;inset:0;transform-style:preserve-3d;transform:rotateX(56deg) rotateY(0deg) rotateZ(-30deg) scale(.8);transition:transform 1.8s var(--ease)}
+.stack.up{transform:rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1)}
+.stack.live{transition:none}
+.card,.note,.seal{position:absolute;left:50%;top:50%;transform-style:preserve-3d;
+  transform:translate(-50%,-50%) translate3d(var(--x,0),var(--y,0),var(--z,0)) rotateZ(var(--r,0deg));
+  transition:transform 1.8s var(--ease),opacity 1s ease}
+.card{margin:0;border-radius:6px;overflow:hidden;background:var(--white);padding:10px 10px 10px;box-shadow:0 40px 70px -30px rgba(70,50,35,.45),0 2px 6px rgba(70,50,35,.08)}
+.card img{width:100%;height:100%;object-fit:cover;border-radius:2px}
+.card figcaption{position:absolute;left:22px;bottom:20px;color:#fff;font-size:12px;letter-spacing:.14em;text-transform:uppercase;text-shadow:0 1px 8px rgba(0,0,0,.35)}
+.c-back{width:58cqh;height:39cqh;--z:0px}
+.c-main{width:44cqh;height:64cqh;--z:24px}
+.c-front{width:36cqh;height:40cqh;--z:48px}
+.note{--z:70px;opacity:0;background:var(--white);padding:18px 22px;border-radius:4px;box-shadow:0 30px 50px -24px rgba(70,50,35,.4);font-family:var(--display);font-size:21px;line-height:1.2;width:max-content;white-space:nowrap}
+.note em{color:var(--sage-deep)}
+.seal{--z:90px;opacity:0;width:132px;height:132px;border-radius:50%;background:var(--cream);box-shadow:0 20px 40px -18px rgba(70,50,35,.45);display:grid;place-items:center}
+.seal svg{position:absolute;inset:0;animation:spin 26s linear infinite}
+.seal img{width:84px;height:84px;object-fit:cover;border-radius:50%;mix-blend-mode:multiply}
+@keyframes spin{to{transform:rotate(360deg)}}
+.stack.up .c-back{--x:-18cqw;--y:-21cqh;--z:-140px;--r:-4deg;transition-delay:.05s}
+.stack.up .c-main{--x:15cqw;--y:-1cqh;--z:0px;--r:2.5deg;transition-delay:.15s}
+.stack.up .c-front{--x:-19cqw;--y:24cqh;--z:120px;--r:-3deg;transition-delay:.25s}
+.stack.up .note{--x:16cqw;--y:40cqh;--z:200px;opacity:1;transition-delay:.6s}
+.stack.up .seal{--x:36cqw;--y:-38cqh;--z:170px;opacity:1;transition-delay:.7s}
+
+/* faixa */
+.strip{border-block:1px solid var(--line);overflow:hidden;white-space:nowrap;background:var(--sand)}
+.strip .run{display:inline-flex;animation:run 38s linear infinite}
+.strip span{font-family:var(--display);font-style:italic;font-size:26px;color:var(--taupe);padding:18px 28px}
+.strip b{font-weight:400;color:var(--sage);font-style:normal}
+@keyframes run{to{transform:translateX(-50%)}}
+
+section.block{padding:120px 0}
+.head{max-width:44rem;margin-bottom:56px}
+.head h2{font-size:clamp(40px,5vw,68px);font-weight:300;margin-top:18px}
+.head p{margin-top:18px;color:var(--muted);font-size:18px}
+
+/* ---------- SOBRE ---------- */
+.about{display:grid;grid-template-columns:.85fr 1.15fr;gap:80px;align-items:start}
+.portrait{position:sticky;top:110px;perspective:1200px}
+.portrait .frame{transform-style:preserve-3d;transition:transform .5s var(--ease);background:var(--white);padding:12px;border-radius:4px;box-shadow:0 50px 80px -40px rgba(70,50,35,.5)}
+.portrait img{width:100%;aspect-ratio:4/5;object-fit:cover;object-position:50% 30%}
+.portrait .cap{display:flex;justify-content:space-between;align-items:baseline;padding:14px 6px 4px;font-family:var(--display);font-size:22px}
+.portrait .cap small{font-family:var(--sans);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.about h2{font-size:clamp(38px,4.4vw,60px);font-weight:300;margin:18px 0 30px}
+.about .big{font-family:var(--display);font-size:27px;line-height:1.35;color:var(--taupe);margin-bottom:26px}
+.about p{color:var(--muted);margin-bottom:18px;max-width:36em}
+.more{display:grid;grid-template-rows:0fr;transition:grid-template-rows .6s var(--ease)}
+.more>div{overflow:hidden}
+.more.open{grid-template-rows:1fr}
+.pull{font-family:var(--display);font-style:italic;font-size:34px;color:var(--sage-deep);margin:30px 0 8px}
+.sign{font-family:var(--display);font-size:24px;margin-top:10px}
+.linkbtn{background:none;border:0;padding:0;cursor:pointer;color:var(--ink);font-weight:500;border-bottom:1px solid var(--ink);padding-bottom:2px}
+
+/* ---------- SERVIÇOS ---------- */
+.svc-wrap{background:var(--sand)}
+.svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;perspective:1400px}
+.svc{position:relative;background:var(--white);border-radius:4px;padding:40px 34px 34px;min-height:400px;display:flex;flex-direction:column;transform-style:preserve-3d;transition:transform .45s var(--ease),box-shadow .45s;box-shadow:0 1px 0 var(--line)}
+.svc:hover{box-shadow:0 40px 60px -36px rgba(70,50,35,.45)}
+.svc .glyph{font-size:44px;line-height:1;color:var(--sage);transform:translateZ(40px)}
+.svc .kind{margin-top:34px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);transform:translateZ(20px)}
+.svc h3{font-size:34px;font-weight:400;margin:10px 0 14px;transform:translateZ(30px)}
+.svc p{color:var(--muted);font-size:16px;transform:translateZ(16px)}
+.svc .go{margin-top:auto;padding-top:28px;font-weight:500;display:inline-flex;gap:8px;align-items:center;transform:translateZ(24px)}
+.svc .go:hover{color:var(--sage-deep)}
+
+/* ---------- PORTEFÓLIO (three.js) ---------- */
+.port{background:linear-gradient(var(--cream),var(--sand))}
+.carousel{position:relative;height:min(72vh,600px);margin-top:-30px}
+.carousel canvas{display:block;width:100%;height:100%;cursor:grab;touch-action:pan-y}
+.carousel canvas.drag{cursor:grabbing}.carousel canvas.point{cursor:zoom-in}
+.carousel .flat{display:none;grid-template-columns:repeat(4,1fr);gap:16px}
+.carousel.noGL{height:auto}.carousel.noGL canvas{display:none}.carousel.noGL .flat{display:grid}
+.carousel .flat img{aspect-ratio:3/4;object-fit:cover;border-radius:4px;cursor:zoom-in}
+.c-ui{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-top:8px;flex-wrap:wrap}
+.c-cap .k{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--sage-deep)}
+.c-cap .t{font-family:var(--display);font-size:40px;line-height:1.1;display:block;transition:opacity .3s}
+.c-nav{display:flex;align-items:center;gap:14px;color:var(--muted);font-size:14px}
+.c-nav button{width:52px;height:52px;border-radius:50%;border:1px solid var(--line);background:var(--white);cursor:pointer;font-size:18px;transition:all .25s}
+.c-nav button:hover{border-color:var(--ink);background:var(--ink);color:var(--cream)}
+.hint{font-size:13px;color:var(--muted);margin-top:18px}
+.lb{position:fixed;inset:0;z-index:120;background:rgba(36,29,24,.92);display:none;place-items:center;padding:30px}
+.lb.open{display:grid;animation:fade .3s ease}
+.lb img{max-height:82vh;max-width:min(90vw,1100px);border-radius:3px;box-shadow:0 40px 80px rgba(0,0,0,.5)}
+.lb p{color:var(--cream);font-family:var(--display);font-size:26px;text-align:center;margin-top:16px}
+.lb button{position:absolute;top:22px;right:26px;background:none;border:1px solid rgba(246,241,234,.4);color:var(--cream);border-radius:999px;padding:10px 18px;cursor:pointer}
+@keyframes fade{from{opacity:0}}
+
+/* ---------- ÁREA DE CLIENTE (teaser) ---------- */
+.ca{background:var(--ink);color:var(--cream);overflow:hidden}
+.ca .kicker{color:var(--gold)}.ca .kicker::before{background:var(--gold)}
+.ca h2{color:var(--cream)}
+.ca .head p{color:#CDBFAE}
+.ca-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:70px;align-items:center}
+.feats{list-style:none;padding:0;margin:0 0 40px;display:grid;gap:2px}
+.feats li{display:grid;grid-template-columns:44px 1fr;gap:4px 14px;padding:18px 0;border-top:1px solid rgba(246,241,234,.12)}
+.feats .ic{grid-row:span 2;width:40px;height:40px;border-radius:50%;border:1px solid rgba(195,161,115,.5);display:grid;place-items:center;color:var(--gold);font-size:17px}
+.feats b{font-weight:500;color:var(--cream)}
+.feats span{color:#BFB1A0;font-size:15px}
+.ca .btn-line{border-color:rgba(246,241,234,.35);color:var(--cream)}
+.ca .btn-line:hover{border-color:var(--cream)}
+.mock-stage{perspective:1600px;display:grid;place-items:center}
+.mock{width:min(560px,100%);background:var(--cream);color:var(--ink);border-radius:14px;padding:22px;box-shadow:0 60px 100px -40px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.06);
+  transform:rotateY(-28deg) rotateX(10deg) translateY(40px);opacity:.35;transition:transform 1.6s var(--ease),opacity 1s ease}
+.mock.go{transform:rotateY(-10deg) rotateX(4deg);opacity:1}
+.m-top{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:14px}
+.m-top b{font-family:var(--display);font-size:26px;font-weight:400}
+.m-top small{font-size:12px;color:var(--muted)}
+.m-pill{background:var(--sand);border-radius:999px;padding:6px 12px;font-size:12px}
+.m-steps{display:flex;gap:6px;margin:16px 0}
+.m-steps i{flex:1;height:5px;border-radius:5px;background:var(--line)}
+.m-steps i.d{background:var(--sage)}
+.m-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.m-box{background:var(--white);border-radius:10px;padding:14px;font-size:13px}
+.m-box h5{margin:0 0 8px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.bub{background:var(--sand);border-radius:12px 12px 12px 4px;padding:8px 11px;margin-bottom:6px;line-height:1.4}
+.bub.me{background:var(--sage-deep);color:#fff;border-radius:12px 12px 4px 12px;margin-left:24px}
+.wt{display:flex;align-items:center;gap:10px;margin-top:12px;background:var(--white);border-radius:10px;padding:12px 14px;font-size:13px}
+.wt .lg{width:34px;height:34px;border-radius:8px;background:#E8F0E1;color:var(--sage-deep);display:grid;place-items:center;font-weight:600}
+.wt .dl{margin-left:auto;background:var(--ink);color:var(--cream);border-radius:999px;padding:6px 12px;font-size:12px}
+
+/* ---------- CONTACTO ---------- */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:start}
+.contact h2{font-size:clamp(44px,5.6vw,78px);font-weight:300;margin-top:18px}
+.contact .lead{color:var(--muted);margin-top:18px;font-size:18px;max-width:26em}
+.chan{margin-top:40px;display:grid;gap:12px;max-width:28rem}
+.chan a{display:flex;justify-content:space-between;align-items:center;padding:18px 0;border-bottom:1px solid var(--line);font-size:17px;transition:padding .3s var(--ease),color .2s}
+.chan a:hover{padding-left:10px;color:var(--sage-deep)}
+.chan small{color:var(--muted);font-size:14px}
+form.ask{background:var(--white);border-radius:6px;padding:38px;box-shadow:0 40px 70px -46px rgba(70,50,35,.45)}
+.f{display:grid;gap:7px;margin-bottom:18px}
+.f label{font-size:13px;color:var(--muted)}
+.f input,.f select,.f textarea{border:1px solid var(--line);background:var(--cream);border-radius:4px;padding:13px 14px;font-size:16px;transition:border-color .2s}
+.f input:focus,.f select:focus,.f textarea:focus{outline:none;border-color:var(--sage-deep)}
+.f textarea{min-height:110px;resize:vertical}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips label{cursor:pointer}
+.chips input{position:absolute;opacity:0;pointer-events:none}
+.chips span{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:9px 15px;font-size:14px;color:var(--ink);transition:all .2s}
+.chips input:checked+span{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+.chips input:focus-visible+span{outline:2px solid var(--sage-deep);outline-offset:2px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ask .btn{width:100%;margin-top:6px}
+.ask small{display:block;text-align:center;margin-top:12px;color:var(--muted);font-size:13px}
+
+@media (max-width:920px){
+  .hero-grid,.about,.ca-grid,.contact-grid{grid-template-columns:1fr}
+  .hero-grid{min-height:0}
+  .stage{height:110vw;order:-1}
+  .portrait{position:relative;top:0}
+  .svc-grid{grid-template-columns:1fr}
+  .svc{min-height:0}
+  .carousel .flat{grid-template-columns:1fr 1fr}
+  section.block{padding:84px 0}
+  .two{grid-template-columns:1fr}
+  .top .btn-dark{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .stack,.card,.note,.seal,.mock{transition:none}
+  .h-in{opacity:1;transform:none}
+  .strip .run,.seal svg{animation:none}
+}
+</style>
+</head>
+<body>
+
+<header class="top" id="top">
+  <div class="wrap bar">
+    <a class="logo" href="#inicio"><img src="img/logo.png" alt=""><span>Inês Digital Studio</span></a>
+    <nav class="menu" aria-label="Principal">
+      <a href="#sobre">Sobre</a>
+      <a href="#servicos">Serviços</a>
+      <a href="#portefolio">Portefólio</a>
+      <a href="#contactos">Contactos</a>
+    </nav>
+    <div class="top-actions">
+      <a class="btn btn-line btn-sm" href="cliente.html">Área de cliente</a>
+      <a class="btn btn-dark btn-sm" href="#contactos">Vamos conversar</a>
+    </div>
+  </div>
+</header>
+
+<main id="inicio">
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="kicker h-in">Social Media & Creative Studio</span>
+      <h1 class="h-in"><span class="l1">Conteúdo com intenção.</span> <span class="l2">Memórias com emoção.</span></h1>
+      <p class="lead h-in">Ideias, imagens e histórias que aproximam marcas e pessoas, com um olhar atento ao que torna cada projeto especial.</p>
+      <div class="ctas h-in">
+        <a class="btn btn-dark" href="#servicos">Conhecer os serviços <span class="ar">→</span></a>
+        <a class="btn btn-line" href="#contactos">Pedir orçamento</a>
+      </div>
+    </div>
+    <div class="stage" id="stage" aria-hidden="true">
+      <div class="stack" id="stack">
+        <figure class="card c-back"><img src="img/portfolio-cerimonia.jpg" alt=""></figure>
+        <figure class="card c-main"><img src="img/inicio-fotografia.jpg" alt=""></figure>
+        <figure class="card c-front"><img src="img/inicio-flores.jpg" alt=""></figure>
+        <div class="note">Estratégia com sensibilidade.<br><em>Conteúdo feito para sentir.</em></div>
+        <div class="seal">
+          <svg viewBox="0 0 132 132"><defs><path id="circ" d="M66,66 m-52,0 a52,52 0 1,1 104,0 a52,52 0 1,1 -104,0"/></defs>
+            <text font-family="DM Sans, sans-serif" font-size="9.6" fill="#5E4E43"><textPath href="#circ" textLength="322" lengthAdjust="spacing">FEITO COM INTENÇÃO E CARINHO · HISTÓRIAS QUE FICAM · </textPath></text></svg>
+          <img src="img/logo.png" alt="">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="strip" aria-hidden="true"><div class="run">
+  <span>Conteúdo com intenção <b>✳</b></span><span>Memórias com emoção <b>✳</b></span><span>Histórias para partilhar <b>✳</b></span><span>Pequenos detalhes <b>✳</b></span>
+  <span>Conteúdo com intenção <b>✳</b></span><span>Memórias com emoção <b>✳</b></span><span>Histórias para partilhar <b>✳</b></span><span>Pequenos detalhes <b>✳</b></span>
+</div></div>
+
+<!-- SOBRE -->
+<section class="block" id="sobre">
+  <div class="wrap about">
+    <div class="portrait r3"><div class="frame" data-tilt="8">
+      <img src="img/ines-retrato.jpg" alt="Inês, fundadora do Inês Digital Studio">
+      <div class="cap">Olá, sou a Inês <small>O início de uma boa história</small></div>
+    </div></div>
+    <div>
+      <span class="kicker r3">Um pouco sobre mim</span>
+      <h2 class="r3">Há sempre uma história bonita <span class="it">à espera de ser contada.</span></h2>
+      <p class="big r3">Por detrás da Inês Digital Studio, estou eu. Tenho 23 anos e sou mãe do Tomás, o meu maior amor e a parte mais bonita da minha vida.</p>
+      <p class="r3">A maternidade trouxe-me uma nova forma de olhar para o mundo, mas também uma vontade ainda maior de crescer, de aprender e de construir algo que fosse verdadeiramente meu.</p>
+      <p class="r3">Sempre gostei de tudo o que envolve criatividade, comunicação e redes sociais. Sou apaixonada pelos pequenos detalhes e acredito que são muitas vezes eles que fazem toda a diferença.</p>
+      <div class="more" id="more"><div>
+        <p>Foi dessa vontade de criar, aliada ao desejo de abraçar um novo desafio, que nasceu a Inês Digital Studio.</p>
+        <p>Não tenho uma história de grandes conquistas profissionais para contar nesta área, pelo menos para já. Tenho ideias, dedicação, vontade de aprender e muita vontade de fazer este projeto crescer.</p>
+        <p>Entre o trabalho, a maternidade e a vida de todos os dias, decidi reservar também um espaço para os meus próprios sonhos.</p>
+        <p class="pull">E este é um deles.</p>
+        <p>Obrigada por estarem desse lado e por acompanharem o início desta nova etapa.</p>
+      </div></div>
+      <button class="linkbtn r3" id="moreBtn" aria-expanded="false" aria-controls="more">Continuar a ler</button>
+      <p class="sign r3">Com carinho, <span class="it">Inês</span></p>
+    </div>
+  </div>
+</section>
+
+<!-- SERVIÇOS -->
+<section class="block svc-wrap" id="servicos">
+  <div class="wrap">
+    <div class="head">
+      <span class="kicker r3">O que posso fazer por ti</span>
+      <h2 class="r3">Ideias que ganham forma.</h2>
+      <p class="r3">Um olhar criativo e cuidado para comunicar o que faz o teu projeto ser só teu.</p>
+    </div>
+    <div class="svc-grid">
+      <article class="svc r3" data-tilt="7">
+        <span class="glyph" aria-hidden="true">✳</span>
+        <span class="kind">Estratégia</span>
+        <h3>Gestão de Redes Sociais</h3>
+        <p>Planeamento e criação de conteúdos, publicações, stories e reels alinhados com a identidade da tua marca.</p>
+        <a class="go" href="#" data-wa="Gestão de Redes Sociais">Pedir informações <span>→</span></a>
+      </article>
+      <article class="svc r3" data-tilt="7">
+        <span class="glyph" aria-hidden="true">✿</span>
+        <span class="kind">Criação</span>
+        <h3>Criação de Conteúdo para Marcas</h3>
+        <p>Fotografia e vídeo com intenção, para comunicar a personalidade da tua marca de forma autêntica.</p>
+        <a class="go" href="#" data-wa="Criação de Conteúdo para Marcas">Pedir informações <span>→</span></a>
+      </article>
+      <article class="svc r3" data-tilt="7">
+        <span class="glyph" aria-hidden="true">♡</span>
+        <span class="kind">Celebração</span>
+        <h3>Casamentos e Eventos</h3>
+        <p>Captação de momentos especiais e conteúdo pronto a partilhar, sem perder a emoção do instante.</p>
+        <a class="go" href="#" data-wa="Casamentos e Eventos">Pedir informações <span>→</span></a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- PORTEFÓLIO -->
+<section class="block port" id="portefolio">
+  <div class="wrap">
+    <div class="head">
+      <span class="kicker r3">Um olhar sobre o meu trabalho</span>
+      <h2 class="r3">Pequenos detalhes. <span class="it">Grandes histórias.</span></h2>
+      <p class="r3">Fotografia e conteúdo visual para celebrar marcas, momentos e histórias especiais.</p>
+    </div>
+    <div class="carousel" id="carousel">
+      <canvas id="scene" tabindex="0" role="img" aria-label="Portefólio em 3D. Usa as setas esquerda e direita para mudar de imagem e Enter para ampliar."></canvas>
+      <div class="flat" id="flat"></div>
+    </div>
+    <div class="c-ui">
+      <div class="c-cap" aria-live="polite"><span class="k" id="capK">Casamentos</span><span class="t" id="capT">Um dia para recordar</span></div>
+      <div class="c-nav"><button id="prev" aria-label="Anterior">←</button><span id="count">1 / 4</span><button id="next" aria-label="Seguinte">→</button></div>
+    </div>
+    <p class="hint">Arrasta para os lados ou usa as setas. Clica na imagem da frente para a ver em tamanho maior.</p>
+  </div>
+</section>
+
+<!-- ÁREA DE CLIENTE -->
+<section class="block ca" id="area-cliente">
+  <div class="wrap ca-grid">
+    <div>
+      <div class="head" style="margin-bottom:34px">
+        <span class="kicker r3">Área de cliente</span>
+        <h2 class="r3">O teu projeto, <span class="it">num só sítio.</span></h2>
+        <p class="r3">Cada casal e cada marca com quem trabalho tem um espaço privado. Sem perder mensagens no Instagram nem ficheiros no email.</p>
+      </div>
+      <ul class="feats">
+        <li class="r3"><span class="ic">✉</span><b>Mensagens comigo</b><span>Uma conversa só para o teu projeto, sempre à mão.</span></li>
+        <li class="r3"><span class="ic">✎</span><b>Notas para o dia</b><span>Horários, fotos de grupo, pessoas importantes e pedidos especiais.</span></li>
+        <li class="r3"><span class="ic">⧉</span><b>Ficheiros</b><span>Convite, programa, moodboard e referências que queiras partilhar.</span></li>
+        <li class="r3"><span class="ic">↓</span><b>Fotografias por WeTransfer</b><span>Recebe as tuas fotos aqui, com um guia passo a passo.</span></li>
+      </ul>
+      <a class="btn btn-line r3" href="cliente.html">Experimentar a área de cliente <span class="ar">→</span></a>
+    </div>
+    <div class="mock-stage">
+      <div class="mock" id="mock" aria-hidden="true">
+        <div class="m-top"><div><b>Ana & Pedro</b><br><small>Casamento · 12 de junho de 2027</small></div><span class="m-pill">Faltam 217 dias</span></div>
+        <div class="m-steps"><i class="d"></i><i class="d"></i><i class="d"></i><i></i><i></i><i></i></div>
+        <div class="m-row">
+          <div class="m-box"><h5>Mensagens</h5><div class="bub">Já vi o vosso moodboard. Adorei os tons!</div><div class="bub me">Obrigada! Deixámos as fotos de grupo nas notas.</div></div>
+          <div class="m-box"><h5>Notas para o dia</h5>Cerimónia · 16h00<br>Cocktail · 17h30<br>Fotos de grupo · 8 grupos<br>Pedido: foto com a avó Rosa</div>
+        </div>
+        <div class="wt"><span class="lg">WT</span><div><b>Pré-visualização</b><br><small style="color:var(--muted)">20 fotografias · WeTransfer</small></div><span class="dl">Descarregar</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACTOS -->
+<section class="block contact" id="contactos">
+  <div class="wrap contact-grid">
+    <div>
+      <span class="kicker r3">Vamos conversar</span>
+      <h2 class="r3">A tua próxima história <span class="it">começa aqui.</span></h2>
+      <p class="lead r3">Conta-me um pouco sobre a tua ideia. Será um gosto saber mais sobre o teu projeto ou evento.</p>
+      <div class="chan r3">
+        <a href="https://www.instagram.com/inesdigitalstudio_/" target="_blank" rel="noopener">Instagram <small>@inesdigitalstudio_</small></a>
+        <a href="https://wa.me/351917801077" target="_blank" rel="noopener">WhatsApp <small>+351 917 801 077</small></a>
+        <a href="mailto:ola@inesdigitalstudio.pt">Email <small>ola@inesdigitalstudio.pt</small></a>
+      </div>
+    </div>
+    <form class="ask r3" id="ask">
+      <div class="f"><label for="nome">O teu nome</label><input id="nome" name="nome" autocomplete="name" required></div>
+      <div class="f"><span style="font-size:13px;color:var(--muted)">O que procuras</span>
+        <div class="chips">
+          <label><input type="radio" name="tipo" value="Casamento" checked><span>Casamento</span></label>
+          <label><input type="radio" name="tipo" value="Evento"><span>Evento</span></label>
+          <label><input type="radio" name="tipo" value="Conteúdo para marca"><span>Conteúdo para marca</span></label>
+          <label><input type="radio" name="tipo" value="Gestão de redes sociais"><span>Redes sociais</span></label>
+        </div></div>
+      <div class="two">
+        <div class="f"><label for="data">Data (se já tiveres)</label><input id="data" name="data" type="date"></div>
+        <div class="f"><label for="local">Local ou marca</label><input id="local" name="local"></div>
+      </div>
+      <div class="f"><label for="msg">Conta-me a tua ideia</label><textarea id="msg" name="msg"></textarea></div>
+      <button class="btn btn-sage" type="submit">Enviar pelo WhatsApp <span class="ar">→</span></button>
+      <small>Abre o WhatsApp com a mensagem já escrita.</small>
+    </form>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div><p class="tag">Conteúdo com intenção.<br><span class="it">Memórias com emoção.</span></p>
+        <span class="domain"><i></i>inesdigitalstudio.pt</span></div>
+      <div style="display:flex;gap:70px;flex-wrap:wrap">
+        <div><h4>Navegar</h4><a href="#sobre">Sobre</a><a href="#servicos">Serviços</a><a href="#portefolio">Portefólio</a><a href="cliente.html">Área de cliente</a></div>
+        <div><h4>Contactos</h4><a href="https://www.instagram.com/inesdigitalstudio_/" target="_blank" rel="noopener">Instagram</a><a href="https://wa.me/351917801077" target="_blank" rel="noopener">WhatsApp</a><a href="mailto:ola@inesdigitalstudio.pt">ola@inesdigitalstudio.pt</a></div>
+      </div>
+    </div>
+    <div class="foot-end"><span>© 2026 Inês Digital Studio</span><a href="#inicio">Voltar ao início ↑</a></div>
+  </div>
+</footer>
+
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Imagem ampliada"><button id="lbX">Fechar</button><div><img id="lbImg" alt=""><p id="lbCap"></p></div></div>
+
+<script>
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const $=id=>document.getElementById(id);
+const WA="351917801077";
+
+/* cabeçalho */
+addEventListener("scroll",()=>$("top").classList.toggle("scrolled",scrollY>10),{passive:true});
+
+/* entradas rise3d */
+const io=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add("on"); io.unobserve(e.target);} }),{threshold:.15,rootMargin:"0px 0px -6% 0px"});
+document.querySelectorAll(".r3").forEach((el,i)=>{ el.style.animationDelay=(i%4)*90+"ms"; io.observe(el); });
+
+/* HERO: intro + inclinação 3D com o rato (ou balanço suave sem rato) */
+const stack=$("stack"), stage=$("stage");
+let px=0,py=0,tx=0,ty=0,hasPtr=false,t0=performance.now();
+requestAnimationFrame(()=>{ document.body.classList.add("ready"); setTimeout(()=>stack.classList.add("up"),reduce?0:350); });
+if(!reduce){
+  setTimeout(()=>{ stack.classList.add("live"); loop(); },2600);
+  document.querySelector(".hero").addEventListener("pointermove",e=>{ if(e.pointerType!=="mouse") return; hasPtr=true; const r=stage.getBoundingClientRect(); tx=((e.clientX-r.left)/r.width-.5)*2; ty=((e.clientY-r.top)/r.height-.5)*2; });
+  document.querySelector(".hero").addEventListener("pointerleave",()=>{ hasPtr=false; });
+}
+function loop(now=performance.now()){
+  const s=(now-t0)/1000;
+  const gx=hasPtr?tx:Math.sin(s*.55)*.55, gy=hasPtr?ty:Math.cos(s*.42)*.35;
+  px+=(gx-px)*.06; py+=(gy-py)*.06;
+  stack.style.transform=`rotateX(${-py*9}deg) rotateY(${px*14}deg) rotateZ(0deg) scale(1)`;
+  requestAnimationFrame(loop);
+}
+
+/* inclinação 3D em cartões (serviços, retrato) */
+if(matchMedia("(hover:hover) and (pointer:fine)").matches&&!reduce){
+  document.querySelectorAll("[data-tilt]").forEach(el=>{
+    const m=+el.dataset.tilt;
+    el.addEventListener("pointermove",e=>{ const r=el.getBoundingClientRect(); const x=(e.clientX-r.left)/r.width-.5, y=(e.clientY-r.top)/r.height-.5; el.style.transform=`perspective(900px) rotateY(${x*m*2}deg) rotateX(${-y*m*2}deg) translateZ(10px)`; });
+    el.addEventListener("pointerleave",()=>{ el.style.transform=""; });
+  });
+}
+
+/* sobre: continuar a ler */
+$("moreBtn").addEventListener("click",e=>{ const o=$("more").classList.toggle("open"); e.currentTarget.setAttribute("aria-expanded",o); e.currentTarget.textContent=o?"Mostrar menos":"Continuar a ler"; });
+
+/* área de cliente: o ecrã endireita-se quando aparece */
+new IntersectionObserver(([en])=>{ if(en.isIntersecting) $("mock").classList.add("go"); },{threshold:.3}).observe($("mock"));
+
+/* pedir informações → WhatsApp */
+document.querySelectorAll("[data-wa]").forEach(a=>{ a.href=`https://wa.me/${WA}?text=${encodeURIComponent(`Olá Inês! Gostava de saber mais sobre ${a.dataset.wa}.`)}`; a.target="_blank"; a.rel="noopener"; });
+$("ask").addEventListener("submit",e=>{
+  e.preventDefault(); const f=new FormData(e.target);
+  const d=f.get("data")?new Date(f.get("data")+"T12:00").toLocaleDateString("pt-PT",{day:"numeric",month:"long",year:"numeric"}):"";
+  const linhas=[`Olá Inês! Sou ${f.get("nome")}.`,`Procuro: ${f.get("tipo")}`];
+  if(d) linhas.push(`Data: ${d}`); if(f.get("local")) linhas.push(`Local/marca: ${f.get("local")}`); if(f.get("msg")) linhas.push("",f.get("msg"));
+  window.open(`https://wa.me/${WA}?text=${encodeURIComponent(linhas.join("\n"))}`,"_blank","noopener");
+});
+</script>
+
+<script type="module">
+/* PORTEFÓLIO: carrossel 3D (three.js), com arrastar, reflexo, sombra e parallax */
+const ITEMS=[
+  {img:"img/portfolio-fotografia.jpg",k:"Casamentos",t:"Um dia para recordar"},
+  {img:"img/portfolio-flores.jpg",k:"Marcas",t:"Flores com identidade"},
+  {img:"img/portfolio-mesa.jpg",k:"Eventos",t:"À volta da mesa"},
+  {img:"img/portfolio-cerimonia.jpg",k:"Casamentos",t:"Instantes felizes"},
+];
+const $=id=>document.getElementById(id), reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+let current=0, onSelect=()=>{};
+function select(i){ current=Math.max(0,Math.min(ITEMS.length-1,i)); const it=ITEMS[current];
+  $("capK").textContent=it.k; $("capT").textContent=it.t; $("count").textContent=`${current+1} / ${ITEMS.length}`; onSelect(); }
+function openLB(i){ const it=ITEMS[i]; $("lbImg").src=it.img; $("lbImg").alt=`${it.k}: ${it.t}`; $("lbCap").textContent=it.t; $("lb").classList.add("open"); $("lbX").focus(); }
+$("lbX").onclick=()=>$("lb").classList.remove("open");
+$("lb").addEventListener("click",e=>{ if(e.target.id==="lb") $("lb").classList.remove("open"); });
+addEventListener("keydown",e=>{ if(e.key==="Escape") $("lb").classList.remove("open"); });
+$("prev").onclick=()=>select(current-1); $("next").onclick=()=>select(current+1);
+window.__carousel={select:i=>select(i),get current(){return current}};
+
+function flat(){ $("carousel").classList.add("noGL");
+  $("flat").innerHTML=ITEMS.map((it,i)=>`<img src="${it.img}" alt="${it.k}: ${it.t}" data-i="${i}">`).join("");
+  $("flat").addEventListener("click",e=>{ const i=e.target.dataset?.i; if(i!==undefined){ select(+i); openLB(+i);} }); }
+
+const gl=(()=>{try{const c=document.createElement("canvas");return !!(c.getContext("webgl2")||c.getContext("webgl"));}catch(e){return false;}})();
+try{ if(!gl) throw 0; const THREE=await import("three"); await start(THREE); }catch(e){ flat(); }
+
+async function start(THREE){
+  const canvas=$("scene"), small=matchMedia("(max-width:700px)").matches;
+  const R=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  R.setPixelRatio(Math.min(devicePixelRatio,small?1.5:2)); R.outputColorSpace=THREE.SRGBColorSpace;
+  const scene=new THREE.Scene(), cam=new THREE.PerspectiveCamera(32,1,.1,50);
+  const loader=new THREE.TextureLoader();
+  const texs=await Promise.all(ITEMS.map(it=>loader.loadAsync(it.img)));
+  /* grelha verde-sálvia que se acende do centro para fora */
+  const gridMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,
+    uniforms:{uColor:{value:new THREE.Color(0x7C8C6E)},uReveal:{value:reduce?9:0}},
+    vertexShader:`varying vec3 vW; void main(){ vec4 w=modelMatrix*vec4(position,1.); vW=w.xyz; gl_Position=projectionMatrix*viewMatrix*w; }`,
+    fragmentShader:`uniform vec3 uColor; uniform float uReveal; varying vec3 vW;
+      float ln(float x){ float w=fwidth(x); return 1.-smoothstep(0.,w*1.4,abs(fract(x-.5)-.5)); }
+      void main(){ vec2 c=vW.xz*2.2; float g=max(ln(c.x),ln(c.y)); float d=length(vW.xz-vec2(0.,-.4));
+        float fade=smoothstep(4.6,.3,d); float front=smoothstep(uReveal,uReveal-.8,d); float edge=smoothstep(.35,0.,abs(d-uReveal))*step(uReveal,8.5);
+        gl_FragColor=vec4(uColor,(g*.22*front+edge*g*.7)*fade); }`});
+  const grid=new THREE.Mesh(new THREE.PlaneGeometry(14,14),gridMat); grid.rotation.x=-Math.PI/2; grid.position.y=-.78; scene.add(grid);
+  const sc=document.createElement("canvas"); sc.width=sc.height=128; const sx=sc.getContext("2d");
+  const g=sx.createRadialGradient(64,64,4,64,64,64); g.addColorStop(0,"rgba(70,50,35,.5)"); g.addColorStop(1,"rgba(70,50,35,0)"); sx.fillStyle=g; sx.fillRect(0,0,128,128);
+  const shadowTex=new THREE.CanvasTexture(sc);
+  const fc=document.createElement("canvas"); fc.width=4; fc.height=128; const fx=fc.getContext("2d");
+  const fg=fx.createLinearGradient(0,0,0,128); fg.addColorStop(0,"#000"); fg.addColorStop(.6,"#1a1a1a"); fg.addColorStop(1,"#fff"); fx.fillStyle=fg; fx.fillRect(0,0,4,128);
+  const fadeTex=new THREE.CanvasTexture(fc);
+  const PW=1.05, PH=1.4, pa=PW/PH;
+  const edge=new THREE.MeshBasicMaterial({color:0xFFFDF9});
+  const panels=texs.map(tex=>{
+    tex.colorSpace=THREE.SRGBColorSpace; tex.anisotropy=R.capabilities.getMaxAnisotropy();
+    const ta=tex.image.width/tex.image.height;  /* recorte "cover" */
+    if(ta>pa){ tex.repeat.set(pa/ta,1); tex.offset.set((1-pa/ta)/2,0); } else { tex.repeat.set(1,ta/pa); tex.offset.set(0,(1-ta/pa)/2); }
+    const front=new THREE.MeshBasicMaterial({map:tex,toneMapped:false});
+    const group=new THREE.Group();
+    const border=new THREE.Mesh(new THREE.BoxGeometry(PW+.07,PH+.07,.03),edge); border.position.z=-.018; group.add(border);
+    const pic=new THREE.Mesh(new THREE.PlaneGeometry(PW,PH),front); group.add(pic); scene.add(group);
+    const shadow=new THREE.Mesh(new THREE.PlaneGeometry(PW*1.5,.7),new THREE.MeshBasicMaterial({map:shadowTex,transparent:true,depthWrite:false}));
+    shadow.rotation.x=-Math.PI/2; scene.add(shadow);
+    const reflTex=tex.clone(); reflTex.needsUpdate=true;
+    const refl=new THREE.Mesh(new THREE.PlaneGeometry(PW,PH),new THREE.MeshBasicMaterial({map:reflTex,alphaMap:fadeTex,transparent:true,opacity:.18,depthWrite:false,toneMapped:false}));
+    scene.add(refl); return {group,pic,front,refl,shadow,lift:0};
+  });
+  let offset=0, spread=reduce?1:0, introK=reduce?1:0, introGo=false, introT=0, dragging=false, hover=-1, running=false, visible=false, last=0, camDist=4.2, par={x:0,y:0}, parT={x:0,y:0}, scrollT=0, scrollC=0;
+  const fine=matchMedia("(hover:hover) and (pointer:fine)").matches&&!reduce;
+  const easeIO=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+  function resize(){ const w=canvas.clientWidth,h=canvas.clientHeight; if(!w||!h) return; R.setSize(w,h,false); cam.aspect=w/h; camDist=Math.max(5.4,5.9/cam.aspect); place(); cam.updateProjectionMatrix(); wake(); }
+  function place(){ const e=easeIO(introK), d=camDist*(.5+.5*e); cam.position.set(par.x*.5,.1+.25*e+par.y*.2+scrollC*.5,d); cam.lookAt(0,-.18-scrollC*.15,-.4); }
+  function layout(){ panels.forEach((p,i)=>{
+    const d=i-offset, ad=Math.abs(d), sg=Math.sign(d), n1=Math.min(ad,1), rest=Math.max(ad-1,0), near=Math.max(0,1-ad);
+    const s=1+.1*near, x=sg*(n1*1.25+rest*.6)*spread, z=-(n1*1.0+rest*.35)*spread-(1-spread)*ad*.06, y=.06*near+p.lift;
+    p.group.position.set(x,y,z); p.group.rotation.y=-sg*n1*.62*spread; p.group.scale.set(s,s,1);
+    const lit=(1-Math.min(1,ad)*.28)*(.25+.75*Math.min(1,introK*1.4)); p.front.color.setScalar(lit);
+    p.refl.position.set(x,y-PH*s-.08,z); p.refl.rotation.y=p.group.rotation.y; p.refl.scale.set(s,-s,1);
+    p.refl.material.opacity=.2*spread*(.35+.65*near)*Math.min(1,introK*1.4);
+    p.shadow.position.set(x,-.77,z+.05); p.shadow.material.opacity=(.35+.45*near)*spread+.1; }); }
+  function frame(now){ const dt=Math.min(.12,(now-(last||now))/1000); last=now; let mv=false;
+    if(!dragging){ const n=offset+(current-offset)*(1-Math.exp(-dt*8)); if(Math.abs(current-n)>.0005){offset=n;mv=true;} else offset=current; } else mv=true;
+    if(introGo&&introK<1){ introK=Math.min(1,introK+dt/2); mv=true; place(); }
+    if(introGo&&introK>.3&&spread<1){ introT+=dt/1.3; spread=1-Math.pow(1-Math.min(1,introT),3); mv=true; }
+    if(introGo&&gridMat.uniforms.uReveal.value<9){ gridMat.uniforms.uReveal.value=Math.min(9,gridMat.uniforms.uReveal.value+dt*5); mv=true; }
+    if(!reduce){ const n=scrollC+(scrollT-scrollC)*(1-Math.exp(-dt*10)); if(Math.abs(scrollT-n)>.0005){scrollC=n;mv=true;place();} else scrollC=scrollT; }
+    if(fine){ const k=1-Math.exp(-dt*5); par.x+=(parT.x-par.x)*k; par.y+=(parT.y-par.y)*k; if(Math.abs(parT.x-par.x)+Math.abs(parT.y-par.y)>.001) mv=true; place(); }
+    panels.forEach((p,i)=>{ const t=i===hover?.07:0, n=p.lift+(t-p.lift)*(1-Math.exp(-dt*14)); if(Math.abs(n-t)>.0005){p.lift=n;mv=true;} else p.lift=t; });
+    layout(); R.render(scene,cam); if(mv&&visible) requestAnimationFrame(frame); else {running=false; last=0;} }
+  function wake(){ if(!running&&visible){ running=true; requestAnimationFrame(frame); } }
+  onSelect=wake;
+  window.__carouselState=()=>({introK,spread,offset,current});
+  const ray=new THREE.Raycaster(), ptr=new THREE.Vector2();
+  function pick(e){ const r=canvas.getBoundingClientRect(); ptr.set(((e.clientX-r.left)/r.width)*2-1,-((e.clientY-r.top)/r.height)*2+1);
+    ray.setFromCamera(ptr,cam); const hit=ray.intersectObjects(panels.map(p=>p.pic))[0]; return hit?panels.findIndex(p=>p.pic===hit.object):-1; }
+  let downX=0,startOff=0,moved=false,down=false;
+  canvas.addEventListener("pointerdown",e=>{down=true;moved=false;downX=e.clientX;startOff=offset;canvas.setPointerCapture(e.pointerId);});
+  canvas.addEventListener("pointermove",e=>{ if(down){ const dx=e.clientX-downX; if(Math.abs(dx)>6){moved=true;dragging=true;canvas.classList.add("drag");}
+      if(dragging){ offset=Math.max(-.4,Math.min(ITEMS.length-.6,startOff-dx/(canvas.clientWidth*.3))); wake(); } return; }
+    if(fine){ const r=canvas.getBoundingClientRect(); parT.x=((e.clientX-r.left)/r.width)*2-1; parT.y=-(((e.clientY-r.top)/r.height)*2-1); wake(); }
+    const h=pick(e); if(h!==hover){hover=h;canvas.classList.toggle("point",h===current);wake();} });
+  canvas.addEventListener("pointerup",e=>{ if(!down) return; down=false; canvas.classList.remove("drag");
+    if(dragging){dragging=false;select(Math.round(offset));} else if(!moved){ const h=pick(e); if(h===current) openLB(h); else if(h>=0) select(h); } wake(); });
+  canvas.addEventListener("pointercancel",()=>{down=false;dragging=false;canvas.classList.remove("drag");select(Math.round(offset));});
+  canvas.addEventListener("pointerleave",()=>{ parT.x=0;parT.y=0; if(!down&&hover!==-1){hover=-1;canvas.classList.remove("point");} wake(); });
+  canvas.addEventListener("keydown",e=>{ if(e.key==="ArrowRight"){select(current+1);e.preventDefault();} else if(e.key==="ArrowLeft"){select(current-1);e.preventDefault();} else if(e.key==="Enter"){openLB(current);} });
+  if(!reduce) addEventListener("scroll",()=>{ if(!visible) return; const r=canvas.getBoundingClientRect(); scrollT=Math.max(-.6,Math.min(1,(innerHeight*.5-(r.top+r.height*.5))/innerHeight)); wake(); },{passive:true});
+  new ResizeObserver(resize).observe(canvas);
+  new IntersectionObserver(([en])=>{ visible=en.isIntersecting; if(visible){ if(!introGo) introGo=true; wake(); } },{threshold:.2}).observe(canvas);
+  resize(); layout(); R.render(scene,cam);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; img-src 'self' data: blob:; font-src 'self' https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://www.gstatic.com; connect-src 'self' https://*.googleapis.com https://*.firebaseapp.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebasedatabase.app wss://*.firebasedatabase.app; upgrade-insecure-requests">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#F6F1EA">
+<title>Área de cliente</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="img/icone.png">
+<link rel="stylesheet" href="base.css">
+<script src="marca.js"></script>
+<script src="core.js"></script>
+<style>
+body{background:var(--fundo2)}
+.login{min-height:calc(100vh - 76px);display:grid;grid-template-columns:1fr 1fr}
+.login[hidden],.app[hidden]{display:none}
+.login .foto{background:center/cover no-repeat;position:relative}
+.login .foto::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 50%,rgba(30,22,16,.55))}
+.login .foto p{position:absolute;left:40px;bottom:36px;z-index:1;color:#fff;font-family:var(--f-titulo);font-size:34px;line-height:1.15;max-width:14em}
+.login .cx{display:grid;place-items:center;padding:40px 24px;background:var(--fundo)}
+.login form{width:min(400px,100%);display:grid;gap:18px}
+.login h1{font-size:52px;font-weight:300}
+.login p.s{color:var(--suave)}
+.cod{font-size:22px;letter-spacing:.2em;text-transform:uppercase;text-align:center;font-family:var(--f-texto)}
+.ajuda{font-size:14px;color:var(--suave)}
+.ajuda a{text-decoration:underline}
+
+.app{max-width:var(--maxw);margin:0 auto;padding:34px 32px 80px}
+.cabeca{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;padding-bottom:26px}
+.cabeca h1{font-size:clamp(42px,6vw,64px);font-weight:300}
+.cabeca .meta{color:var(--suave);margin-top:6px}
+.contagem{background:var(--branco);border-radius:16px;padding:14px 22px;text-align:center;min-width:150px}
+.contagem b{display:block;font-family:var(--f-titulo);font-size:46px;line-height:1;font-weight:400;color:var(--destaque-escuro)}
+.contagem span{font-size:13px;color:var(--suave)}
+.etapas{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:6px;margin-bottom:28px;list-style:none;padding:0}
+.etapas li{font-size:13px;color:var(--suave)}
+.etapas li::before{content:"";display:block;height:5px;border-radius:5px;background:var(--linha);margin-bottom:8px;transition:background .6s}
+.etapas li.feito::before{background:var(--destaque)}
+.etapas li.agora{color:var(--texto);font-weight:500}
+.etapas li.agora::before{background:linear-gradient(90deg,var(--destaque) 50%,var(--linha) 50%)}
+
+.abas{display:flex;gap:4px;border-bottom:1px solid var(--linha);margin-bottom:26px;overflow-x:auto;scrollbar-width:none}
+.abas button{background:none;border:0;padding:12px 16px;font-size:15px;color:var(--suave);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;display:flex;gap:8px;align-items:center}
+.abas button[aria-selected=true]{color:var(--texto);border-bottom-color:var(--texto);font-weight:500}
+.bolinha{min-width:20px;height:20px;border-radius:10px;background:var(--destaque);color:#fff;font-size:11px;display:inline-grid;place-items:center;padding:0 6px}
+.painel[hidden]{display:none}
+.cartao{background:var(--branco);border-radius:14px;padding:24px}
+.cartao h2{font-size:30px;margin-bottom:6px}
+.cartao h3{font-size:24px;margin-bottom:6px}
+.sub{color:var(--suave);font-size:15px;margin-bottom:18px}
+.grelha{display:grid;grid-template-columns:1.3fr 1fr;gap:18px}
+.lista-info{display:grid;gap:0;margin:0}
+.lista-info div{display:flex;justify-content:space-between;gap:16px;padding:11px 0;border-top:1px solid var(--linha);font-size:15px}
+.lista-info dt{color:var(--suave)}.lista-info dd{margin:0;text-align:right}
+.atalho{display:flex;align-items:center;gap:14px;padding:14px 0;border-top:1px solid var(--linha);cursor:pointer;background:none;border-left:0;border-right:0;border-bottom:0;width:100%;text-align:left;font-size:15px}
+.atalho:hover{color:var(--destaque-escuro)}
+.atalho .ic{width:38px;height:38px;border-radius:50%;background:var(--fundo2);display:grid;place-items:center;flex:none;color:var(--destaque-escuro)}
+.atalho small{display:block;color:var(--suave);font-size:13px}
+
+/* mensagens */
+.chat{display:flex;flex-direction:column;height:min(64vh,620px)}
+.fio{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:4px 4px 16px}
+.msg{max-width:78%;padding:11px 15px;border-radius:16px 16px 16px 5px;background:var(--fundo2);font-size:15px;line-height:1.5;white-space:pre-wrap;word-wrap:break-word}
+.msg.minha{align-self:flex-end;background:var(--destaque-escuro);color:#fff;border-radius:16px 16px 5px 16px}
+.msg small{display:block;font-size:11px;opacity:.65;margin-top:4px}
+.dia{align-self:center;font-size:12px;color:var(--suave);padding:4px 10px}
+.escrever{display:flex;gap:10px;border-top:1px solid var(--linha);padding-top:14px}
+.escrever textarea{min-height:48px;height:48px;resize:none;flex:1}
+
+/* notas */
+.notas-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.horas{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.lista-ed{display:grid;gap:8px}
+.lista-ed .linha{display:flex;gap:8px}
+.lista-ed .linha .inp{flex:1}
+.x{border:1px solid var(--linha);background:none;border-radius:8px;width:44px;cursor:pointer;color:var(--suave)}
+.x:hover{color:var(--erro);border-color:var(--erro)}
+.mais{background:none;border:1px dashed var(--linha);border-radius:8px;padding:10px;cursor:pointer;color:var(--suave);font-size:14px}
+.mais:hover{border-color:var(--destaque);color:var(--destaque-escuro)}
+.gravar{display:flex;align-items:center;gap:14px;margin-top:18px}
+.gravar small{color:var(--suave)}
+
+/* ficheiros */
+.solta{border:1.5px dashed var(--linha);border-radius:14px;padding:30px;text-align:center;cursor:pointer;transition:all .2s;background:var(--fundo)}
+.solta:hover,.solta.sobre{border-color:var(--destaque);background:var(--branco)}
+.solta b{font-family:var(--f-titulo);font-size:24px;font-weight:400;display:block}
+.solta small{color:var(--suave)}
+.itens{display:grid;gap:0;margin-top:14px}
+.item{display:flex;align-items:center;gap:14px;padding:12px 0;border-top:1px solid var(--linha);font-size:15px}
+.item .mini{width:46px;height:46px;border-radius:8px;object-fit:cover;background:var(--fundo2);flex:none;display:grid;place-items:center;font-size:12px;color:var(--suave);font-weight:600}
+.item .nm{flex:1;min-width:0}
+.item .nm b{font-weight:500;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item .nm small{color:var(--suave);font-size:13px}
+.vazio{color:var(--suave);font-size:15px;padding:16px 0}
+
+/* entregas */
+.entrega{display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;padding:20px;border:1px solid var(--linha);border-radius:14px;margin-bottom:12px;background:var(--fundo)}
+.entrega .lg{width:54px;height:54px;border-radius:12px;background:var(--texto);color:var(--fundo);display:grid;place-items:center;font-weight:600;letter-spacing:.02em}
+.entrega h3{font-size:26px;margin:0}
+.entrega small{color:var(--suave);font-size:14px}
+.prazo{color:var(--erro)!important}
+.guia{list-style:none;padding:0;margin:0;display:grid;gap:0;counter-reset:g}
+.guia li{counter-increment:g;display:grid;grid-template-columns:40px 1fr;gap:4px 14px;padding:16px 0;border-top:1px solid var(--linha)}
+.guia li::before{content:counter(g);grid-row:span 2;width:32px;height:32px;border-radius:50%;background:var(--fundo2);display:grid;place-items:center;font-family:var(--f-titulo);font-size:20px;color:var(--destaque-escuro)}
+.guia b{font-weight:500}.guia span{color:var(--suave);font-size:15px}
+.dica-cx{background:var(--fundo2);border-radius:12px;padding:16px 18px;font-size:15px;margin-top:16px}
+
+.sair{font-size:14px;color:var(--suave);background:none;border:0;cursor:pointer;text-decoration:underline}
+dialog{border:0;border-radius:14px;padding:0;max-width:min(92vw,900px);background:var(--branco)}
+dialog::backdrop{background:rgba(30,22,16,.7)}
+dialog img{max-height:78vh;display:block}
+dialog .rod{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:12px 16px}
+
+@media (max-width:820px){
+  .login{grid-template-columns:1fr}.login .foto{display:none}
+  .grelha,.notas-grid{grid-template-columns:1fr}
+  .etapas li{font-size:0}.etapas li.agora{font-size:12px}
+  .entrega{grid-template-columns:auto 1fr}.entrega .btn{grid-column:1/-1}
+  .msg{max-width:88%}
+  .app{padding:24px 16px 70px}
+}
+</style>
+</head>
+<body>
+<div id="demoBarra"></div>
+<header class="topo rolou">
+  <div class="wrap barra"><a class="logo" href="index.html" id="logo"></a><div class="topo-acoes"><button class="sair" id="sair" hidden>Sair</button><a class="btn btn-linha btn-pq" href="index.html">Voltar ao site</a></div></div>
+</header>
+
+<section class="login" id="login">
+  <div class="foto" id="lFoto"><p id="lFrase"></p></div>
+  <div class="cx">
+    <form id="fLogin">
+      <span class="etq">Área de cliente</span>
+      <h1>Bem-vindos.</h1>
+      <p class="s">Escreve o código que recebeste por email ou WhatsApp.</p>
+      <input class="inp cod" id="codigo" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="24" placeholder="ABCDE12345" aria-label="Código de acesso">
+      <p class="erro" id="lErro" role="alert"></p>
+      <button class="btn btn-escuro" type="submit">Entrar <span class="seta">→</span></button>
+      <p class="ajuda" id="lAjuda"></p>
+    </form>
+  </div>
+</section>
+
+<main class="app" id="app" hidden>
+  <div class="cabeca">
+    <div><span class="etq" id="pTipo"></span><h1 id="pNome"></h1><p class="meta" id="pMeta"></p></div>
+    <div class="contagem" id="contagem"></div>
+  </div>
+  <ol class="etapas" id="etapas"></ol>
+
+  <div class="abas" role="tablist" id="abas">
+    <button role="tab" data-p="resumo" aria-selected="true">Resumo</button>
+    <button role="tab" data-p="mensagens">Mensagens <span class="bolinha" id="bMsg" hidden></span></button>
+    <button role="tab" data-p="notas">Notas para o dia</button>
+    <button role="tab" data-p="ficheiros">Ficheiros e links</button>
+    <button role="tab" data-p="entregas">Fotografias <span class="bolinha" id="bEnt" hidden></span></button>
+  </div>
+
+  <section class="painel" id="p-resumo">
+    <div class="grelha">
+      <div class="cartao"><h2>O vosso evento</h2><p class="sub">Se algum dado estiver errado, digam-me nas mensagens.</p><dl class="lista-info" id="info"></dl></div>
+      <div class="cartao"><h2>O que fazer agora</h2><p class="sub" id="proxima"></p>
+        <button class="atalho" data-ir="notas"><span class="ic">✎</span><span>Preencher as notas para o dia<small id="aNotas"></small></span></button>
+        <button class="atalho" data-ir="ficheiros"><span class="ic">⧉</span><span>Enviar convite ou moodboard<small id="aFich"></small></span></button>
+        <button class="atalho" data-ir="mensagens"><span class="ic">✉</span><span>Falar comigo<small id="aMsg"></small></span></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="painel" id="p-mensagens" hidden>
+    <div class="cartao chat"><div class="fio" id="fio" aria-live="polite"></div>
+      <form class="escrever" id="fMsg"><textarea class="inp" id="tMsg" maxlength="2000" placeholder="Escreve uma mensagem" aria-label="Mensagem"></textarea><button class="btn btn-escuro" type="submit">Enviar</button></form>
+    </div>
+  </section>
+
+  <section class="painel" id="p-notas" hidden>
+    <form id="fNotas">
+      <div class="notas-grid">
+        <div class="cartao"><h3>Horários</h3><p class="sub">Assim sei onde tenho de estar e quando.</p>
+          <div class="horas">
+            <div class="campo"><label for="hCer">Cerimónia</label><input class="inp" type="time" id="hCer"></div>
+            <div class="campo"><label for="hCoc">Cocktail ou receção</label><input class="inp" type="time" id="hCoc"></div>
+            <div class="campo"><label for="hJan">Refeição</label><input class="inp" type="time" id="hJan"></div>
+            <div class="campo"><label for="hBol">Bolo</label><input class="inp" type="time" id="hBol"></div>
+          </div>
+        </div>
+        <div class="cartao"><h3>Pedidos especiais</h3><p class="sub">Uma fotografia que não pode faltar, uma surpresa, algo a evitar.</p><textarea class="inp" id="nPed" maxlength="2000" style="min-height:150px"></textarea></div>
+        <div class="cartao"><h3>Fotografias de grupo</h3><p class="sub">Uma linha por fotografia. Ex.: noivos com os avós.</p><div class="lista-ed" id="lGrupos"></div></div>
+        <div class="cartao"><h3>Pessoas importantes</h3><p class="sub">Quem são, para eu as reconhecer no dia.</p><div class="lista-ed" id="lPessoas"></div></div>
+      </div>
+      <div class="gravar"><button class="btn btn-escuro" type="submit" id="bNotas">Guardar notas</button><small id="nEm"></small></div>
+    </form>
+  </section>
+
+  <section class="painel" id="p-ficheiros" hidden>
+    <div class="grelha">
+      <div class="cartao"><h3>Ficheiros</h3><p class="sub" id="fSub"></p>
+        <label class="solta" id="solta"><input type="file" id="fFile" multiple hidden accept="image/*,application/pdf,.doc,.docx,.txt"><b>Larga aqui ou escolhe ficheiros</b><small id="fLim"></small></label>
+        <div class="itens" id="lFich"></div>
+      </div>
+      <div class="cartao"><h3>Links</h3><p class="sub">Pinterest, Google Drive, WeTransfer, playlists…</p>
+        <form id="fLink" style="display:grid;gap:10px"><input class="inp" id="lUrl" type="url" placeholder="https://" maxlength="500" aria-label="Endereço do link"><input class="inp" id="lDesc" placeholder="O que é? Ex.: ideias de decoração" maxlength="120" aria-label="Descrição do link"><button class="btn btn-linha" type="submit">Adicionar link</button></form>
+        <div class="itens" id="lLinks"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="painel" id="p-entregas" hidden>
+    <div class="grelha">
+      <div class="cartao"><h2>As vossas fotografias</h2><p class="sub">Cada entrega tem um link de WeTransfer. Descarreguem antes de o prazo acabar.</p><div id="lEnt"></div></div>
+      <div class="cartao"><h3>Como descarregar do WeTransfer</h3><p class="sub">Não precisam de conta nem de instalar nada.</p>
+        <ol class="guia">
+          <li><b>Abram o link</b><span>Carreguem em “Descarregar” ao lado da entrega. Abre a página do WeTransfer.</span></li>
+          <li><b>Carreguem em “Download”</b><span>Se aparecer um aviso de cookies, podem recusar. Não é preciso email.</span></li>
+          <li><b>Encontrem o ficheiro .zip</b><span>Fica na pasta Transferências. No telemóvel, na app Ficheiros.</span></li>
+          <li><b>Abram o .zip</b><span>No computador, duplo clique. No iPhone, toquem no ficheiro. No Android, “Extrair”.</span></li>
+          <li><b>Guardem uma cópia</b><span>Num disco externo ou na nuvem. O link do WeTransfer expira.</span></li>
+        </ol>
+        <div class="dica-cx"><b>Para me enviarem ficheiros grandes</b> (vídeos, muitas fotos): em wetransfer.com, “Obter link de transferência”, e colem o link em Ficheiros e links.</div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<dialog id="ver"><img id="verImg" alt=""><div class="rod"><span id="verNome"></span><span style="display:flex;gap:8px"><a class="btn btn-escuro btn-pq" id="verDl" download>Descarregar</a><button class="btn btn-linha btn-pq" id="verX">Fechar</button></span></div></dialog>
+<div class="aviso" id="aviso" role="status"></div>
+
+<script>
+const A = APP, M = A.M, $ = id => document.getElementById(id), esc = A.esc;
+A.aplicarTema(); document.title = 'Área de cliente · ' + M.nome;
+$('logo').innerHTML = A.logoHtml();
+$('lFoto').style.backgroundImage = `url("${M.hero.imagens.principal}")`; $('lFrase').innerHTML = A.enfase(M.hero.titulo);
+const C = M.contactos;
+$('lAjuda').innerHTML = `Não tens código? ${C.email ? `Pede-o por <a href="mailto:${esc(C.email)}">email</a>` : ''}${C.telefone ? ` ou <a href="https://wa.me/${A.telInt(C.telefone)}" target="_blank" rel="noopener">WhatsApp</a>` : ''}.`;
+if (A.DEMO) { $('demoBarra').innerHTML = `<div class="demo-barra">Demonstração: usa o código <b>DEMOANAPEDRO</b>. Abre o <a href="admin.html" target="_blank">painel</a> noutra aba para responder.</div>`; $('codigo').value = 'DEMOANAPEDRO'; }
+const aviso = t => { $('aviso').textContent = t; $('aviso').classList.add('on'); clearTimeout(aviso.t); aviso.t = setTimeout(() => $('aviso').classList.remove('on'), 3200); };
+const MAXB = (M.ficheiroMaxMB || 3) * 1048576;
+$('fLim').textContent = `Imagens, PDF ou Word, até ${M.ficheiroMaxMB || 3} MB cada. Maiores: por WeTransfer, nos links.`;
+$('fSub').textContent = 'Convite, programa, moodboard, lista de convidados.';
+
+let COD = null, ref = null, P = null, abaAtual = 'resumo';
+const GUARDA = 'momento-codigo-' + M.id;
+
+/* ---------- entrar ---------- */
+async function entrar(c, silencioso) {
+  c = A.limparCodigo(c); if (c.length < 6) { if (!silencioso) $('lErro').textContent = 'O código tem pelo menos 6 letras e números.'; return; }
+  try {
+    await A.iniciar(); const s = await A.db.ref('projetos/' + c + '/info').once('value');
+    if (!s.exists()) { if (!silencioso) $('lErro').textContent = 'Não encontrei esse código. Confirma as letras ou pede-me outro.'; try { localStorage.removeItem(GUARDA); } catch (e) { } return; }
+  } catch (e) { if (!silencioso) $('lErro').textContent = 'Não encontrei esse código. Confirma as letras ou pede-me outro.'; return; }
+  COD = c; try { localStorage.setItem(GUARDA, c); } catch (e) { }
+  history.replaceState(null, '', location.pathname);
+  $('login').hidden = true; $('app').hidden = false; $('sair').hidden = false;
+  ref = A.db.ref('projetos/' + c); ref.on('value', s => { P = s.val(); if (!P) return sair(); desenhar(); });
+}
+$('fLogin').addEventListener('submit', e => { e.preventDefault(); $('lErro').textContent = ''; entrar($('codigo').value); });
+function sair() { if (ref) ref.off(); ref = null; COD = null; P = null; try { localStorage.removeItem(GUARDA); } catch (e) { } $('app').hidden = true; $('login').hidden = false; $('sair').hidden = true; $('codigo').value = ''; }
+$('sair').onclick = sair;
+const q = new URLSearchParams(location.search).get('c'); let guardado = null; try { guardado = localStorage.getItem(GUARDA); } catch (e) { }
+if (q) entrar(q); else if (guardado) entrar(guardado, true);
+
+/* ---------- abas ---------- */
+function aba(n) { abaAtual = n; document.querySelectorAll('#abas button').forEach(b => b.setAttribute('aria-selected', b.dataset.p === n)); document.querySelectorAll('.painel').forEach(p => p.hidden = p.id !== 'p-' + n); if (n === 'mensagens') { marcarVisto(); setTimeout(() => { $('fio').scrollTop = 1e9; $('tMsg').focus({ preventScroll: true }); }, 30); } if (n === 'entregas') marcarVisto(); }
+$('abas').addEventListener('click', e => { const b = e.target.closest('button'); if (b) aba(b.dataset.p); });
+document.querySelectorAll('[data-ir]').forEach(b => b.onclick = () => aba(b.dataset.ir));
+function marcarVisto() { if (!COD) return; A.db.ref(`projetos/${COD}/visto/cliente`).set(A.agora()); }
+const lista = o => Object.entries(o || {}).map(([k, v]) => ({ k, ...v })).sort((a, b) => (a.em || 0) - (b.em || 0));
+
+/* ---------- desenhar ---------- */
+let notasSujas = false;
+function desenhar() {
+  const I = P.info || {}, vis = (P.visto && P.visto.cliente) || 0;
+  $('pTipo').textContent = I.tipo || ''; $('pNome').textContent = I.nome || '';
+  $('pMeta').textContent = [I.data ? A.dataLonga(I.data) : '', I.local].filter(Boolean).join(', ');
+  const d = A.diasAte(I.data);
+  $('contagem').innerHTML = d == null ? '<span>Data por marcar</span>' : d > 1 ? `<b>${d}</b><span>dias para o grande dia</span>` : d === 1 ? '<b>1</b><span>dia. É amanhã!</span>' : d === 0 ? '<b>Hoje</b><span>é o grande dia</span>' : '<b>✓</b><span>O grande dia já passou</span>';
+  const et = M.etapas, e = Math.max(0, Math.min(et.length - 1, P.etapa || 0));
+  $('etapas').style.setProperty('--n', et.length);
+  $('etapas').innerHTML = et.map((t, i) => `<li class="${i < e ? 'feito' : i === e ? 'agora' : ''}"${i === e ? ' aria-current="step"' : ''}>${esc(t)}</li>`).join('');
+  $('info').innerHTML = [['Evento', I.tipo], ['Data', I.data ? A.dataLonga(I.data) : 'Por marcar'], ['Local', I.local], ['Email', I.email], ['Telemóvel', I.telemovel ? A.telFmt(I.telemovel) : '']].filter(x => x[1]).map(([a, b]) => `<div><dt>${a}</dt><dd>${esc(b)}</dd></div>`).join('');
+  const N = P.notas || {}, nG = Object.values(N.grupos || {}).filter(Boolean).length, fic = lista(P.ficheiros).length + lista(P.links).length;
+  $('aNotas').textContent = N.em ? `Atualizadas ${A.ha(N.em)}. ${nG} fotos de grupo.` : 'Ainda não preenchidas.';
+  $('aFich').textContent = fic ? `${fic} partilhados até agora.` : 'Nada partilhado ainda.';
+  $('proxima').textContent = `Estamos na fase “${et[e]}”.` + (e < et.length - 1 ? ` A seguir: ${et[e + 1].toLowerCase()}.` : '');
+  // mensagens
+  const ms = lista(P.mensagens), novas = ms.filter(m => m.de === 'marca' && m.em > vis).length;
+  $('bMsg').hidden = !novas || abaAtual === 'mensagens'; $('bMsg').textContent = novas;
+  $('aMsg').textContent = novas ? `${novas} mensagem${novas > 1 ? 's' : ''} nova${novas > 1 ? 's' : ''}.` : ms.length ? `Última ${A.ha(ms[ms.length - 1].em)}.` : 'Ainda sem mensagens.';
+  let ult = '', h = '';
+  ms.forEach(m => { const dd = A.dataCurta(m.em); if (dd !== ult) { h += `<span class="dia">${dd}</span>`; ult = dd; } h += `<div class="msg ${m.de === 'cliente' ? 'minha' : ''}">${esc(m.t)}<small>${m.de === 'cliente' ? 'Vocês' : esc(M.nome)} · ${A.hora(m.em)}</small></div>`; });
+  const fio = $('fio'), noFim = fio.scrollHeight - fio.scrollTop - fio.clientHeight < 60; fio.innerHTML = h || '<p class="vazio">Escrevam a primeira mensagem.</p>'; if (noFim || !fio.dataset.ok) { fio.scrollTop = 1e9; fio.dataset.ok = 1; }
+  if (abaAtual === 'mensagens' && novas) marcarVisto();
+  // notas (não apaga o que a pessoa está a escrever)
+  if (!notasSujas) preencherNotas(N);
+  // ficheiros e links
+  const fs = lista(P.ficheiros).reverse();
+  $('lFich').innerHTML = fs.length ? fs.map(f => `<div class="item">${/^image\//.test(f.tipo) && f.url ? `<img class="mini" src="${esc(f.url)}" alt="">` : `<span class="mini">${esc((f.nome.split('.').pop() || '').toUpperCase().slice(0, 4))}</span>`}<span class="nm"><b>${esc(f.nome)}</b><small>${A.tamanho(f.tam || 0)} · ${f.de === 'cliente' ? 'enviado por vocês' : 'de ' + esc(M.nome)} · ${A.ha(f.em)}</small></span><button class="btn btn-linha btn-pq" data-f="${esc(f.k)}">Abrir</button></div>`).join('') : '<p class="vazio">Ainda não há ficheiros.</p>';
+  const ls = lista(P.links).reverse();
+  $('lLinks').innerHTML = ls.length ? ls.map(l => `<div class="item"><span class="mini">↗</span><span class="nm"><b>${esc(l.desc || l.url)}</b><small>${esc(l.url.replace(/^https?:\/\//, '').slice(0, 46))} · ${A.ha(l.em)}</small></span><a class="btn btn-linha btn-pq" href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">Abrir</a></div>`).join('') : '<p class="vazio">Ainda não há links.</p>';
+  // entregas
+  const es = lista(P.entregas).reverse(), novasE = es.filter(x => x.em > vis).length;
+  $('bEnt').hidden = !novasE || abaAtual === 'entregas'; $('bEnt').textContent = novasE;
+  $('lEnt').innerHTML = es.length ? es.map(x => { const dv = A.diasAte(x.validade); const pz = x.validade ? (dv < 0 ? '<small class="prazo">O link expirou. Peçam-me outro nas mensagens.</small>' : `<small class="${dv <= 3 ? 'prazo' : ''}">Disponível até ${A.dataLonga(x.validade)}${dv <= 3 ? ` (faltam ${dv} dia${dv === 1 ? '' : 's'})` : ''}</small>`) : ''; return `<div class="entrega"><span class="lg">WT</span><div><h3>${esc(x.titulo)}</h3><small>${esc(x.nota || '')}</small><br>${pz}</div><a class="btn btn-escuro" href="${esc(x.url)}" target="_blank" rel="noopener noreferrer">Descarregar</a></div>`; }).join('') : `<p class="vazio">As fotografias aparecem aqui quando estiverem prontas. Aviso-vos por email.</p>`;
+}
+
+/* ---------- mensagens ---------- */
+$('fMsg').addEventListener('submit', async e => { e.preventDefault(); const t = $('tMsg').value.trim(); if (!t) return; $('tMsg').value = ''; try { await A.db.ref(`projetos/${COD}/mensagens`).push({ de: 'cliente', t: t.slice(0, 2000), em: A.agora() }); marcarVisto(); } catch (x) { $('tMsg').value = t; aviso('A mensagem não foi enviada. Verifica a ligação e tenta outra vez.'); } });
+$('tMsg').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey && matchMedia('(pointer:fine)').matches) { e.preventDefault(); $('fMsg').requestSubmit(); } });
+
+/* ---------- notas ---------- */
+function linhaEd(v, ph) { return `<div class="linha"><input class="inp" value="${esc(v)}" maxlength="140" placeholder="${esc(ph)}"><button type="button" class="x" aria-label="Remover">✕</button></div>`; }
+function listaEd(id, vals, ph) { const el = $(id); el.innerHTML = (vals.length ? vals : ['']).map(v => linhaEd(v, ph)).join('') + `<button type="button" class="mais">+ Adicionar</button>`; el.dataset.ph = ph; }
+['lGrupos', 'lPessoas'].forEach(id => $(id).addEventListener('click', e => { const el = $(id); if (e.target.classList.contains('x')) { e.target.parentElement.remove(); notasSujas = true; } if (e.target.classList.contains('mais')) { e.target.insertAdjacentHTML('beforebegin', linhaEd('', el.dataset.ph)); e.target.previousElementSibling.querySelector('input').focus(); } }));
+function preencherNotas(N) { const H = N.horarios || {}; $('hCer').value = H.cerimonia || ''; $('hCoc').value = H.cocktail || ''; $('hJan').value = H.jantar || ''; $('hBol').value = H.bolo || ''; $('nPed').value = N.pedidos || ''; listaEd('lGrupos', Object.values(N.grupos || {}), 'Ex.: noivos com os avós'); listaEd('lPessoas', Object.values(N.pessoas || {}), 'Ex.: Marta, irmã da noiva'); $('nEm').textContent = N.em ? `Guardadas ${A.ha(N.em)}` : ''; }
+$('fNotas').addEventListener('input', () => { notasSujas = true; $('nEm').textContent = 'Alterações por guardar'; });
+const valores = id => [...$(id).querySelectorAll('input')].map(i => i.value.trim().slice(0, 140)).filter(Boolean).slice(0, 40);
+$('fNotas').addEventListener('submit', async e => { e.preventDefault(); const b = $('bNotas'); b.disabled = true;
+  const N = { horarios: { cerimonia: $('hCer').value, cocktail: $('hCoc').value, jantar: $('hJan').value, bolo: $('hBol').value }, grupos: valores('lGrupos'), pessoas: valores('lPessoas'), pedidos: $('nPed').value.trim().slice(0, 2000), em: A.agora() };
+  try { await A.db.ref(`projetos/${COD}/notas`).set(N); notasSujas = false; aviso('Notas guardadas.'); desenhar(); } catch (x) { aviso('Não foi possível guardar. Tenta outra vez.'); } b.disabled = false; });
+
+/* ---------- ficheiros ---------- */
+const lerURL = f => new Promise((ok, ko) => { const r = new FileReader(); r.onload = () => ok(r.result); r.onerror = ko; r.readAsDataURL(f); });
+async function reduzir(f) { // fotografias grandes: reduz para 2000 px antes de enviar
+  if (!/^image\/(jpeg|png|webp)$/.test(f.type)) return null;
+  const img = await createImageBitmap(f).catch(() => null); if (!img) return null;
+  const k = Math.min(1, 2000 / Math.max(img.width, img.height)), c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+  c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); return c.toDataURL('image/jpeg', .85);
+}
+async function enviar(fs) {
+  for (const f of fs) {
+    try {
+      let url = await reduzir(f), tipo = url ? 'image/jpeg' : f.type || 'application/octet-stream';
+      if (!url) { if (f.size > MAXB) { aviso(`“${f.name}” tem mais de ${M.ficheiroMaxMB} MB. Envia por WeTransfer e cola o link.`); continue; } url = await lerURL(f); }
+      const tam = Math.round(url.length * .75); if (tam > MAXB) { aviso(`“${f.name}” é grande demais. Envia por WeTransfer.`); continue; }
+      aviso(`A enviar “${f.name}”…`);
+      const r = A.db.ref(`projetos/${COD}/ficheiros`).push(), nome = f.name.slice(0, 120);
+      await A.db.ref(`anexos/${COD}/${r.key}`).set(url);
+      await r.set({ nome, tipo, tam, de: 'cliente', em: A.agora(), ...(/^image\//.test(tipo) && A.DEMO ? { url } : {}) });
+      aviso(`“${nome}” enviado.`);
+    } catch (x) { aviso(`Não foi possível enviar “${f.name}”.`); }
+  }
+}
+$('fFile').addEventListener('change', e => { enviar([...e.target.files]); e.target.value = ''; });
+const sl = $('solta'); ['dragenter', 'dragover'].forEach(t => sl.addEventListener(t, e => { e.preventDefault(); sl.classList.add('sobre'); })); ['dragleave', 'drop'].forEach(t => sl.addEventListener(t, () => sl.classList.remove('sobre')));
+sl.addEventListener('drop', e => { e.preventDefault(); enviar([...e.dataTransfer.files]); });
+$('lFich').addEventListener('click', async e => { const b = e.target.closest('[data-f]'); if (!b) return; const f = P.ficheiros[b.dataset.f]; let url = f.url;
+  if (!url) { b.disabled = true; const s = await A.db.ref(`anexos/${COD}/${b.dataset.f}`).once('value'); url = s.val(); b.disabled = false; }
+  if (!url) return aviso('Este ficheiro já não está disponível.');
+  if (/^image\//.test(f.tipo)) { $('verImg').src = url; $('verNome').textContent = f.nome; $('verDl').href = url; $('verDl').download = f.nome; $('ver').showModal(); }
+  else { const a = document.createElement('a'); a.href = url; a.download = f.nome; document.body.appendChild(a); a.click(); a.remove(); } });
+$('verX').onclick = () => $('ver').close(); $('ver').addEventListener('click', e => { if (e.target.id === 'ver') $('ver').close(); });
+$('fLink').addEventListener('submit', async e => { e.preventDefault(); let u = $('lUrl').value.trim(); if (u && !/^https?:\/\//i.test(u)) u = 'https://' + u;
+  try { const x = new URL(u); if (!/^https?:$/.test(x.protocol)) throw 0; } catch (x) { return aviso('Esse link não parece válido. Copia-o outra vez do navegador.'); }
+  await A.db.ref(`projetos/${COD}/links`).push({ url: u.slice(0, 500), desc: $('lDesc').value.trim().slice(0, 120), de: 'cliente', em: A.agora() }); $('lUrl').value = ''; $('lDesc').value = ''; aviso('Link adicionado.'); });
+</script>
+</body>
+</html>
