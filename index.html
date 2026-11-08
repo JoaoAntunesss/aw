@@ -247,7 +247,9 @@ body:has(#app:not([hidden])) #fio{display:none!important}
 .r-cover.open{transform:rotateY(-168deg)}
 .r .lv-cta{background:#b8862f;color:#1d1410}.r .lv-cta,.r .lv-cta span{color:#1d1410}.r .lv-cta.ok{background:#4f9a6b}.r .lv-cta.ok,.r .lv-cta.ok span{color:#fff}
 .r .lv-cta svg path{stroke:#fff}
-.r-s .lv-slot{background:#2b1d15;border-color:#4a3524;color:#f1e4cf}.r-s .lv-slot.sel{background:#b8862f;border-color:#b8862f;color:#1d1410}
+.r-ord{display:grid;gap:.35rem}.r-it{display:flex;justify-content:space-between;align-items:center;background:#2b1d15;border:1.5px solid #4a3524;color:#f1e4cf;border-radius:.7rem;padding:.45rem .6rem;font-weight:600;font-size:.62rem;transition:all .3s}
+.r-it b{width:1.3rem;height:1.3rem;border-radius:50%;display:grid;place-items:center;background:#b8862f;color:#1d1410;font-size:.7rem;transition:all .3s}
+.r-it.sel{border-color:#b8862f;transform:scale(1.03)}.r-it.sel b{background:#f1e4cf}
 /* ninho */
 .lv-scr.n{background:#eef8f5;color:#12332d}
 .n .lv-bar{color:#1f8a7a}.n .lv-bar span{color:#12332d99}
@@ -813,17 +815,17 @@ details summary{cursor:pointer;color:var(--brand);font-weight:600;min-height:32p
             </div>
 
             <div class="lv-scr r" data-m="rest">
-              <div class="lv-note" id="rNote"><i>AW</i><div><b>Nova reserva</b><span>4 pessoas, hoje às 20:30</span></div></div>
-              <div class="lv-bar">Cantinho<span>Cardápio</span></div>
+              <div class="lv-note" id="rNote"><i>AW</i><div><b>Novo pedido · Mesa 4</b><span>Bacalhau à Lagareiro e vinho da casa</span></div></div>
+              <div class="lv-bar">Cantinho<span>Mesa 4</span></div>
               <div class="r-book">
                 <div class="r-page"><small>Prato do dia</small><br><h4>Bacalhau à Lagareiro<span class="r-ul" id="rUl"></span></h4><span class="r-price">14,50 €</span>
                   <div class="r-al" id="rAl"><i>Peixe</i><i>Glúten</i><i>Sem lactose</i></div>
                   <p style="margin:.7rem 0 0;font-size:.6rem;color:#2a1b12bb">Batata a murro, grelos e azeite novo.</p></div>
                 <div class="r-cover" id="rBook"><div><b>CARDÁPIO</b><span>Toca para abrir</span></div></div>
               </div>
-              <div class="lv-body"><div class="lv-h" style="color:#d9b36c">Reservar mesa</div>
-                <div class="lv-slots r-s"><div class="lv-slot">19:30</div><div class="lv-slot" id="rHora">20:30</div><div class="lv-slot">21:30</div></div></div>
-              <div class="lv-cta" id="rCta"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.3 3.3L13 4.5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Reservar para 4</span></div>
+              <div class="lv-body"><div class="lv-h" style="color:#d9b36c">O teu pedido</div>
+                <div class="r-ord"><div class="r-it" id="rI1"><span>Bacalhau à Lagareiro</span><b>+</b></div><div class="r-it" id="rI2"><span>Vinho da casa</span><b>+</b></div></div></div>
+              <div class="lv-cta" id="rCta"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.3 3.3L13 4.5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Enviar pedido</span></div>
             </div>
 
             <div class="lv-scr n" data-m="ninho">
@@ -873,10 +875,10 @@ details summary{cursor:pointer;color:var(--brand);font-weight:600;min-height:32p
       sr:"Animação: o cliente escolhe o serviço, o dia sábado 14 e as 17:00, confirma, e o dono do salão recebe a notificação de nova marcação.",
       steps:["Escolhe o serviço","Escolhe o dia","Escolhe a hora","Confirma, e tu recebes o aviso"],
       a:[[900,{s:0,tap:"#sSvc"}],[1150,{add:["#sSvc","sel"]}],[2200,{s:1,add:["#sD","on"]}],[2900,{tap:"#sDay"}],[3000,{add:["#sDay","sel"]}],[4000,{s:2,add:["#sT","on"]}],[4800,{tap:"#sSlot"}],[4900,{add:["#sSlot","sel"]}],[6200,{s:3,tap:"#sCta"}],[6450,{add:["#sCta","ok"],text:["#sCta span","Marcação confirmada"]}],[7500,{add:["#sNote","on"]}],[9000,{fin:1}]]},
-    rest:{p:"O cliente folheia o cardápio no telemóvel, vê o prato do dia e reserva mesa. Tu recebes a reserva na hora.",
-      sr:"Animação: o cliente abre o cardápio, vê o prato do dia e os alergénios, reserva mesa para 4 às 20:30, e o dono recebe a notificação de nova reserva.",
-      steps:["Abre o cardápio","Vê o prato do dia e os alergénios","Reserva a mesa","Tu recebes o aviso"],
-      a:[[900,{s:0,tap:"#rBook"}],[1150,{add:["#rBook","open"]}],[2900,{s:1,add:["#rUl","on"]}],[3900,{add:["#rAl","on"]}],[5300,{s:2,tap:"#rHora"}],[5400,{add:["#rHora","sel"]}],[6300,{tap:"#rCta"}],[6550,{add:["#rCta","ok"],text:["#rCta span","Mesa reservada"]}],[7600,{s:3,add:["#rNote","on"]}],[9200,{fin:1}]]},
+    rest:{p:"O cliente lê o QR da mesa, folheia o cardápio e faz o pedido no telemóvel. Tu recebes o pedido na mesa certa, na hora.",
+      sr:"Animação: o cliente abre o cardápio da Mesa 4, vê o prato do dia e os alergénios, junta o bacalhau e o vinho ao pedido e envia, e o restaurante recebe o aviso do novo pedido da Mesa 4.",
+      steps:["Abre o cardápio pelo QR da mesa","Vê o prato do dia e os alergénios","Faz o pedido","Tu recebes o pedido"],
+      a:[[900,{s:0,tap:"#rBook"}],[1150,{add:["#rBook","open"]}],[2900,{s:1,add:["#rUl","on"]}],[3900,{add:["#rAl","on"]}],[5100,{s:2,tap:"#rI1"}],[5200,{add:["#rI1","sel"],text:["#rI1 b","1"]}],[5900,{tap:"#rI2"}],[6000,{add:["#rI2","sel"],text:["#rI2 b","1"]}],[6800,{tap:"#rCta"}],[7050,{add:["#rCta","ok"],text:["#rCta span","Pedido enviado"]}],[8000,{s:3,add:["#rNote","on"]}],[9600,{fin:1}]]},
     ninho:{p:"Os pais veem logo os dias em que estás livre e pedem o horário que precisam, sem trocar dez mensagens.",
       sr:"Animação: o calendário mostra os dias livres a pulsar, o cliente escolhe o sábado dia 8 e o horário das 18h às 23h, pede o dia, e a babysitter recebe o aviso.",
       steps:["Vê os dias em que estás livre","Escolhe o dia","Escolhe o horário","Envia o pedido, e tu recebes o aviso"],
@@ -900,6 +902,7 @@ details summary{cursor:pointer;color:var(--brand);font-weight:600;min-height:32p
     timers.forEach(clearTimeout); timers=[]; sec.classList.remove("fin"); stepOn(-1);
     [].forEach.call(scr.querySelectorAll(".sel,.on,.ok,.open"),function(e){if(!e.classList.contains("act")) e.classList.remove("sel","on","ok","open");});
     [].forEach.call(scr.querySelectorAll(".lv-cta"),function(c){c.querySelector("span").textContent=orig[c.id];});
+    [].forEach.call(scr.querySelectorAll(".r-it b"),function(b){b.textContent="+";});
   }
   function apply(a,instant){
     if(a.s!==undefined) stepOn(a.s);
@@ -1058,7 +1061,7 @@ details summary{cursor:pointer;color:var(--brand);font-weight:600;min-height:32p
         <li><button type="button" data-f="educacao" aria-pressed="false">Educação</button></li>
       </ul>
       <ul class="works" id="works">
-        <li class="work" data-t="site"><h3>Modelo Restaurante</h3><p>Site com cardápio em livro, aberto pelo QR de cada mesa, e painel para o dono mudar pratos e preços.</p><span class="tech">Firebase, PWA</span><span class="links"><a href="https://joaoantunesss.github.io/Template-Restaurant/" target="_blank" rel="noopener">Experimentar</a><a href="https://github.com/JoaoAntunesss/Template-Restaurant" target="_blank" rel="noopener">Código</a></span></li>
+        <li class="work" data-t="site"><h3>Modelo Restaurante</h3><p>Site com cardápio em livro e pedidos pela mesa: cada mesa tem o seu QR, e o painel mostra os pedidos de cada mesa e deixa mudar pratos e preços.</p><span class="tech">Firebase, PWA</span><span class="links"><a href="https://joaoantunesss.github.io/Template-Restaurant/" target="_blank" rel="noopener">Experimentar</a><a href="https://github.com/JoaoAntunesss/Template-Restaurant" target="_blank" rel="noopener">Código</a></span></li>
         <li class="work" data-t="site"><h3>Modelo Studio</h3><p>Marcações online em três passos, agenda por profissional, faturação e aviso no telemóvel.</p><span class="tech">Firebase, PWA</span><span class="links"><a href="https://joaoantunesss.github.io/template-studio/" target="_blank" rel="noopener">Experimentar</a><a href="https://github.com/JoaoAntunesss/template-studio" target="_blank" rel="noopener">Código</a></span></li>
         <li class="work" data-t="site"><h3>Ninho</h3><p>Para babysitters: dias livres, pedidos com as idades das crianças, fichas privadas e conversa com cada família.</p><span class="tech">Firebase, PWA</span><span class="links"><a href="demos/ninho/" target="_blank" rel="noopener">Experimentar</a></span></li>
         <li class="work" data-t="site"><h3>Quadro</h3><p>Para explicadores: salas por turma com link de Teams ou Zoom, fichas e conversas com os encarregados.</p><span class="tech">Firebase, PWA</span><span class="links"><a href="demos/quadro/" target="_blank" rel="noopener">Experimentar</a></span></li>
@@ -1188,14 +1191,14 @@ const PROPOSTA = [
 /* ---------- templates ---------- */
 /* vídeos de cada template (vazio = sem botão) */
 const VIDEOS = { restaurante:"videos/restaurante.mp4", studio:"videos/studio.mp4", ninho:"videos/ninho.mp4", quadro:"videos/quadro.mp4" };
-const VIDEO_TXT = { restaurante:"O template Restaurante a funcionar, do cliente ao painel do dono", studio:"O modelo Studio a funcionar, da marcação online ao painel do salão",
+const VIDEO_TXT = { restaurante:"O template Restaurante a funcionar: o pedido feito na mesa e o painel do restaurante", studio:"O modelo Studio a funcionar, da marcação online ao painel do salão",
   ninho:"O template Ninho a funcionar, do lado da família e da babysitter", quadro:"O modelo Quadro a funcionar, do lado do aluno, do explicador e do encarregado" };
 
 const TEMPLATES = [
   { id:"restaurante", nome:"Restaurante", exemplo:"Brasa & Alecrim", para:"Restaurantes e cafés",
     demo:"https://joaoantunesss.github.io/Template-Restaurant/",
-    desc:"Site do restaurante com um cardápio digital em forma de livro, aberto pelo QR de cada mesa. O que mudas no painel aparece logo no cardápio, sem reimprimir nada.",
-    funcoes:["Cardápio em livro aberto pelo QR das mesas","Prato do dia, esgotados e alergénios","Painel para mudar pratos, preços e fotos","Reservas por telefone ou WhatsApp"],
+    desc:"Site do restaurante com um cardápio digital em forma de livro. Cada mesa tem o seu QR: o cliente faz o pedido no telemóvel e ele chega logo ao painel, mesa a mesa. Quando a conta é paga, limpa-se a mesa num toque.",
+    funcoes:["Cardápio em livro aberto pelo QR de cada mesa","Pedidos pela mesa, direto ao painel","Chamar o empregado e pedir a conta","Prato do dia, esgotados e alergénios","Painel para mudar pratos, preços e fotos"],
     perguntas:[
       { id:"tipo", label:"Que tipo de espaço é?", type:"radio", opts:["Restaurante","Café ou pastelaria","Bar","Take-away"], req:true },
       { id:"mesas", label:"Quantas mesas precisam de QR?", type:"number" },
