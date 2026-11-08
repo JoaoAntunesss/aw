@@ -70,6 +70,7 @@ section.bloco{padding:120px 0}
 /* SERVIÇOS */
 .serv-fundo{background:var(--fundo2)}
 .serv-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;perspective:1400px}
+.serv-grid:has(>:nth-child(3):last-child){grid-template-columns:repeat(3,1fr)}
 .serv{position:relative;background:var(--branco);border-radius:4px;padding:38px 34px 32px;display:flex;flex-direction:column;transform-style:preserve-3d;transition:transform .45s var(--ease),box-shadow .45s;box-shadow:0 1px 0 var(--linha)}
 .serv:hover{box-shadow:0 40px 60px -36px rgba(60,40,25,.45)}
 .serv .simb{font-size:40px;line-height:1;color:var(--destaque);transform:translateZ(40px)}
@@ -324,7 +325,7 @@ document.title = M.nomeCompleto || M.nome;
 const reduz = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* ---------- conteúdo a partir de marca.js ---------- */
-if (A.DEMO) $('demoBarra').innerHTML = `<div class="demo-barra">Demonstração com uma marca fictícia. Experimenta a <a href="cliente.html">área de cliente</a> e o <a href="admin.html">painel</a>.</div>`;
+if (A.DEMO) $('demoBarra').innerHTML = `<div class="demo-barra">Demonstração: os dados ficam só neste navegador. Experimenta a <a href="cliente.html">área de cliente</a> (como cliente) e o <a href="admin.html">painel</a> (como dono do site).</div>`;
 $('logo').innerHTML = A.logoHtml();
 const H = M.hero;
 $('hEtq').textContent = H.etiqueta; $('hTit').innerHTML = A.enfase(H.titulo); $('hSub').textContent = H.subtitulo;

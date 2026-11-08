@@ -15,6 +15,7 @@
 <script src="core.js"></script>
 <style>
 body{background:var(--fundo2)}
+#logo img,#logo2 img{height:42px;width:auto}
 .entrar{min-height:100vh;display:grid;place-items:center;padding:24px}
 .entrar[hidden],.painel[hidden],[hidden]{display:none!important}
 .entrar form{width:min(380px,100%);background:var(--branco);border-radius:16px;padding:34px;display:grid;gap:14px}
@@ -87,6 +88,7 @@ body{background:var(--fundo2)}
   <form id="fEntrar">
     <div id="logo"></div>
     <h1>Painel</h1>
+    <p class="sem" id="eDemo" hidden style="font-size:15px;color:var(--suave)">Demonstração: aqui vês o site como o dono, com os pedidos de orçamento e as áreas dos clientes. Carrega em Entrar.</p>
     <div class="campo"><label for="eEmail">Email</label><input class="inp" id="eEmail" type="email" autocomplete="username"></div>
     <div class="campo"><label for="ePass">Palavra-passe</label><input class="inp" id="ePass" type="password" autocomplete="current-password"></div>
     <p class="erro" id="eErro" role="alert"></p>
@@ -119,7 +121,7 @@ let PROJ = {}, PED = {}, modo = 'proj', sel = null, abaP = 'mensagens';
 /* ---------- entrar ---------- */
 (async () => {
   await A.iniciar(true);
-  if (A.DEMO) { $('eEmail').value = 'demo@exemplo.pt'; $('ePass').value = 'demonstracao'; }
+  if (A.DEMO) { $('eEmail').value = 'demo@exemplo.pt'; $('ePass').value = 'demonstracao'; $('eDemo').hidden = false; }
   A.auth.onAuthStateChanged(async u => {
     if (!u) { $('entrar').hidden = false; $('painel').hidden = true; return; }
     const s = await A.db.ref('admins/' + u.uid).once('value').catch(() => null);
@@ -154,7 +156,7 @@ function desenharLista() {
   }
 }
 $('lista').addEventListener('click', e => { const b = e.target.closest('.li'); if (!b) return; sel = b.dataset.k; abaP = 'mensagens'; $('painel').classList.add('aberto'); desenharLista(); modo === 'proj' ? desenharProjeto(true) : desenharPedido(); });
-function vazio() { $('painel').classList.remove('aberto'); $('dentro').innerHTML = `<div class="vazio"><h2>${modo === 'proj' ? 'Escolhe um projeto' : 'Escolhe um pedido'}</h2><p>${modo === 'proj' ? 'As mensagens, notas e ficheiros dos clientes aparecem aqui.' : 'Os pedidos de orçamento do site aparecem aqui.'}</p></div>`; }
+function vazio() { $('painel').classList.remove('aberto'); $('dentro').innerHTML = `<div class="vazio"><h2>${modo === 'proj' ? 'Escolhe um projeto' : 'Escolhe um pedido'}</h2><p>${modo === 'proj' ? 'As mensagens, notas e ficheiros dos clientes aparecem aqui.' + (A.DEMO ? ' Experimenta abrir “Ana & Pedro”.' : '') : 'Os pedidos de orçamento do site aparecem aqui.'}</p></div>`; }
 const voltar = `<button class="btn btn-linha btn-pq voltar" onclick="sel=null;desenharLista();vazio()">← Voltar</button>`;
 
 /* ---------- pedidos ---------- */

@@ -236,7 +236,7 @@ $('logo').innerHTML = A.logoHtml();
 $('lFoto').style.backgroundImage = `url("${M.hero.imagens.principal}")`; $('lFrase').innerHTML = A.enfase(M.hero.titulo);
 const C = M.contactos;
 $('lAjuda').innerHTML = `Não tens código? ${C.email ? `Pede-o por <a href="mailto:${esc(C.email)}">email</a>` : ''}${C.telefone ? ` ou <a href="https://wa.me/${A.telInt(C.telefone)}" target="_blank" rel="noopener">WhatsApp</a>` : ''}.`;
-if (A.DEMO) { $('demoBarra').innerHTML = `<div class="demo-barra">Demonstração: usa o código <b>DEMOANAPEDRO</b>. Abre o <a href="admin.html" target="_blank">painel</a> noutra aba para responder.</div>`; $('codigo').value = 'DEMOANAPEDRO'; }
+if (A.DEMO) { $('demoBarra').innerHTML = `<div class="demo-barra">Estás a ver como cliente (código <b>DEMOANAPEDRO</b>). Para ver o outro lado, abre o <a href="admin.html" target="_blank">painel</a> noutra aba e responde.</div>`; $('codigo').value = 'DEMOANAPEDRO'; }
 const aviso = t => { $('aviso').textContent = t; $('aviso').classList.add('on'); clearTimeout(aviso.t); aviso.t = setTimeout(() => $('aviso').classList.remove('on'), 3200); };
 const MAXB = (M.ficheiroMaxMB || 3) * 1048576;
 $('fLim').textContent = `Imagens, PDF ou Word, até ${M.ficheiroMaxMB || 3} MB cada. Maiores: por WeTransfer, nos links.`;

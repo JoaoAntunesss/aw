@@ -1,0 +1,17 @@
+{
+  "name": "Inês Digital Studio",
+  "short_name": "Inês Digital",
+  "description": "Social Media & Creative Studio",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#F6F1EA",
+  "theme_color": "#F6F1EA",
+  "icons": [
+    {
+      "src": "img/logo.png",
+      "sizes": "768x768",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
