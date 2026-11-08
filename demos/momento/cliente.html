@@ -27,8 +27,8 @@ body{background:var(--fundo2)}
 .cod{font-size:22px;letter-spacing:.2em;text-transform:uppercase;text-align:center;font-family:var(--f-texto)}
 .cod::placeholder{letter-spacing:.02em;text-transform:none;font-size:17px}
 .cod.email{font-size:17px;letter-spacing:0;text-transform:none}
-.demo-ent{display:grid;gap:8px;border-top:1px solid var(--linha);padding-top:16px;margin-top:4px}.demo-ent span{font-size:13px;color:var(--suave);text-align:center}
-.dados{background:var(--branco);border:1px solid var(--linha);border-radius:10px;padding:12px 14px;font-size:14px;line-height:1.7}.dados b{font-weight:600;user-select:all}
+.demo-ent{display:grid;gap:8px}.demo-ent span{font-size:13px;color:var(--suave);text-align:center}
+.dados{background:var(--branco);border:1px solid var(--linha);border-left:3px solid var(--destaque);border-radius:10px;padding:14px 16px;font-size:14px;line-height:1.6;display:grid;gap:10px}.dados b{font-weight:600}.dados code{font:600 14px var(--f-texto);background:var(--fundo2);padding:1px 6px;border-radius:4px;user-select:all}
 .ajuda{font-size:14px;color:var(--suave)}
 .ajuda a{text-decoration:underline}
 
@@ -141,11 +141,11 @@ dialog .rod{display:flex;justify-content:space-between;align-items:center;gap:14
       <span class="etq">Área de cliente</span>
       <h1>Bem-vindos.</h1>
       <p class="s" id="lTxt"></p>
+      <div class="demo-ent" id="lDemo" hidden><div class="dados" id="lDados"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><button type="button" class="btn btn-linha btn-pq" id="dCli">Entrar como cliente</button><button type="button" class="btn btn-linha btn-pq" id="dDono"></button></div></div>
       <input class="inp cod" id="codigo" autocomplete="username" autocapitalize="off" spellcheck="false" maxlength="120" placeholder="Código ou email" aria-label="Código de acesso ou email">
       <input class="inp" id="lPass" type="password" autocomplete="current-password" placeholder="Palavra-passe" aria-label="Palavra-passe" hidden>
       <p class="erro" id="lErro" role="alert"></p>
       <button class="btn btn-escuro" type="submit">Entrar <span class="seta">→</span></button>
-      <div class="demo-ent" id="lDemo" hidden><span>Demonstração: experimenta os dois lados</span><div class="dados" id="lDados"></div><button type="button" class="btn btn-linha" id="dCli">Entrar como cliente</button><button type="button" class="btn btn-linha" id="dDono"></button></div>
       <p class="ajuda" id="lAjuda"></p>
     </form>
   </div>
@@ -245,7 +245,7 @@ $('lAjuda').innerHTML = `Não tens código? ${C.email ? `Pede-o por <a href="mai
 const DONO = M.donoNome || 'dono do site', DEMO_EMAIL = 'demo@' + (M.dominio || 'exemplo.pt');
 $('lTxt').textContent = `Clientes: escrevam o código que receberam por email ou WhatsApp. ${M.donoNome ? M.donoNome + ': entra' : 'Dono do site: entra'} com o teu email para abrir o painel.`;
 if (A.DEMO) { $('demoBarra').innerHTML = `<div class="demo-barra">Demonstração: os dados ficam só neste navegador.</div>`; $('lDemo').hidden = false; $('dDono').textContent = 'Entrar como ' + DONO;
-  $('lDados').innerHTML = `Como cliente: código <b>DEMOANAPEDRO</b><br>Como ${esc(DONO)}: email <b>${esc(DEMO_EMAIL)}</b> e palavra-passe <b>demo123</b>`; }
+  $('lDados').innerHTML = `<p><b>Para entrares como cliente</b><br>Escreve o código <code>DEMOANAPEDRO</code> e carrega em Entrar.</p><p><b>Para entrares como ${esc(DONO)}</b> (o painel)<br>Escreve o email <code>${esc(DEMO_EMAIL)}</code>, a palavra-passe <code>demo123</code> e carrega em Entrar.</p>`; }
 $('codigo').addEventListener('input', () => { const em = $('codigo').value.includes('@'); $('codigo').classList.toggle('email', em); $('lPass').hidden = !em; });
 async function entrarDono(email, pass) {
   if (A.DEMO && (email.toLowerCase() !== DEMO_EMAIL || pass !== 'demo123')) { $('lErro').textContent = `Na demonstração usa ${DEMO_EMAIL} e demo123.`; return; }

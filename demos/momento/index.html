@@ -127,6 +127,7 @@ section.bloco{padding:120px 0}
 .feats li{display:grid;grid-template-columns:44px 1fr;gap:2px 14px;padding:16px 0;border-top:1px solid rgba(255,255,255,.12)}
 .feats .ic{grid-row:span 2;width:40px;height:40px;border-radius:50%;border:1px solid rgba(216,191,152,.5);display:grid;place-items:center;color:#d8bf98}
 .feats b{font-weight:500}.feats span{color:#bfb1a0;font-size:15px}
+.ac-demo{margin-top:22px;border:1px solid rgba(216,191,152,.4);border-radius:12px;padding:16px 18px;display:grid;gap:4px;font-size:15px;color:#cdbfae}.ac-demo b{color:var(--fundo);font-weight:500}.ac-demo i{font-style:normal;color:#d8bf98;font-weight:600;user-select:all}
 .ac .btn-linha{border-color:rgba(255,255,255,.35);color:var(--fundo)}.ac .btn-linha:hover{border-color:var(--fundo)}
 .mock-palco{perspective:1600px;display:grid;place-items:center}
 .mock{width:min(560px,100%);background:var(--fundo);color:var(--texto);border-radius:14px;padding:22px;box-shadow:0 60px 100px -40px rgba(0,0,0,.7);transform:rotateY(-28deg) rotateX(10deg) translateY(40px);opacity:.35;transition:transform 1.6s var(--ease),opacity 1s ease}
@@ -325,7 +326,11 @@ document.title = M.nomeCompleto || M.nome;
 const reduz = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* ---------- conteúdo a partir de marca.js ---------- */
-if (A.DEMO) $('demoBarra').innerHTML = `<div class="demo-barra">Demonstração: os dados ficam só neste navegador. Na <a href="cliente.html">área de cliente</a> podes entrar como cliente ou como ${A.esc(M.donoNome || 'dono do site')}.</div>`;
+const DEMO_EMAIL = 'demo@' + (M.dominio || 'exemplo.pt'), DONO = M.donoNome || 'dono do site';
+if (A.DEMO) {
+  $('demoBarra').innerHTML = `<div class="demo-barra">Demonstração. Na <a href="cliente.html">área de cliente</a>: como cliente, código <b>DEMOANAPEDRO</b> · como ${esc(DONO)}, email <b>${esc(DEMO_EMAIL)}</b> e palavra-passe <b>demo123</b></div>`;
+  document.querySelector('#area-cliente a[href="cliente.html"]').insertAdjacentHTML('afterend', `<div class="ac-demo"><b>Experimenta os dois lados</b><span>Como cliente: código <i>DEMOANAPEDRO</i></span><span>Como ${esc(DONO)}: email <i>${esc(DEMO_EMAIL)}</i> e palavra-passe <i>demo123</i></span></div>`);
+}
 $('logo').innerHTML = A.logoHtml();
 const H = M.hero;
 $('hEtq').textContent = H.etiqueta; $('hTit').innerHTML = A.enfase(H.titulo); $('hSub').textContent = H.subtitulo;
