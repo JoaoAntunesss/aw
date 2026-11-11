@@ -18,3 +18,12 @@ Quando respondes a um pedido de suporte, envias uma contraproposta, ou aceitas/r
 4. `cd functions && npm install && cd .. && firebase deploy --only functions`
 5. Responde a um pedido de suporte de teste feito com um email teu e vê se chega.
 Se um dia tiveres domínio próprio, troca para um email com esse domínio (muda MAIL_USER e usa o serviço SMTP desse email).
+
+## Pagamentos dentro do site (Stripe)
+O cliente paga a montagem e a mensalidade numa janela do próprio site, com o valor exato que puseste no orçamento.
+
+1. No Stripe: Programadores → Chaves de API. Copia a "Chave secreta" (começa por `sk_test_` em teste, `sk_live_` a sério).
+2. `firebase functions:secrets:set STRIPE_SECRET` e cola a chave secreta. Nunca a ponhas no site nem no GitHub.
+3. `cd functions && npm install && cd .. && firebase deploy --only functions`
+4. A chave pública (`pk_test_…` / `pk_live_…`) vai em `STRIPE_PK` no index.html (essa pode estar no site).
+5. Para passar de teste para real: troca as duas chaves (secreta e pública) pelas `live` e volta a fazer o deploy.

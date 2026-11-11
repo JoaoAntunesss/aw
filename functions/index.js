@@ -68,3 +68,78 @@ exports.respostaOrcamento = onDocumentUpdated({ ...mailOpts, document: "pedidos/
   if (d.estado === "aceite") return enviarEmail(d.email, "AW: aceitei a tua proposta", [ola, `Aceitei a tua proposta para ${nome}. Entro em contacto contigo para combinarmos os próximos passos.`], "Ver na minha conta");
   if (d.estado === "recusado") return enviarEmail(d.email, "AW: sobre a tua proposta", [ola, `Obrigado pelo interesse. Desta vez não consegui avançar com a proposta para ${nome}. Se quiseres, podes enviar outra com valores diferentes.`], "Ver na minha conta");
 });
+
+
+/* ---- Pagamentos dentro do site (Stripe Embedded Checkout) ----
+   O valor vem sempre do pedido guardado no Firestore (o cliente não o consegue mudar).
+   Configuração em functions/LEIA-ME.md, secção "Pagamentos". */
+const { onCall, HttpsError } = require("firebase-functions/v2/https");
+const admin = require("firebase-admin");
+if (!admin.apps.length) admin.initializeApp();
+const STRIPE_SECRET = defineSecret("STRIPE_SECRET");
+const payOpts = { secrets: [STRIPE_SECRET], region: "europe-west1", maxInstances: 5 };
+const stripeDe = () => require("stripe")(STRIPE_SECRET.value());
+
+async function pedidoDoCliente(req, pedidoId) {
+  if (!req.auth) throw new HttpsError("unauthenticated", "Entra na tua conta para pagar.");
+  if (typeof pedidoId !== "string" || !pedidoId || pedidoId.length > 200) throw new HttpsError("invalid-argument", "Pedido inválido.");
+  const ref = admin.firestore().collection("pedidos").doc(pedidoId);
+  const snap = await ref.get();
+  if (!snap.exists) throw new HttpsError("not-found", "Pedido não encontrado.");
+  const p = snap.data();
+  if (p.uid !== req.auth.uid) throw new HttpsError("permission-denied", "Este pedido não é teu.");
+  return { ref, p };
+}
+const valorDe = (p, tipo) => {
+  const o = p.orcamento || {}, r = p.respostas || {};
+  return Number(tipo === "mensal" ? (o.mensal ?? r.budgetMensal) : (o.valor ?? r.budgetMontagem)) || 0;
+};
+
+exports.pagamentoIniciar = onCall(payOpts, async (req) => {
+  const { pedidoId, tipo } = req.data || {};
+  if (tipo !== "montagem" && tipo !== "mensal") throw new HttpsError("invalid-argument", "Tipo de pagamento inválido.");
+  const { p } = await pedidoDoCliente(req, pedidoId);
+  if (p.estado !== "aceite") throw new HttpsError("failed-precondition", "O orçamento ainda não foi aceite.");
+  const g = p.pagamento || {};
+  if (tipo === "montagem" && g.montagemPaga) throw new HttpsError("failed-precondition", "A montagem já está paga.");
+  if (tipo === "mensal" && g.mensalAtiva) throw new HttpsError("failed-precondition", "A mensalidade já está ativa.");
+  const valor = valorDe(p, tipo);
+  if (!(valor >= 1 && valor <= 20000)) throw new HttpsError("failed-precondition", "Este pedido ainda não tem valor definido.");
+  const negocio = cortar((p.respostas || {}).negocio, 60);
+  const mensal = tipo === "mensal";
+  const ses = await stripeDe().checkout.sessions.create({
+    ui_mode: "embedded",
+    redirect_on_completion: "never",
+    mode: mensal ? "subscription" : "payment",
+    locale: "pt",
+    customer_email: p.email || undefined,
+    client_reference_id: pedidoId,
+    metadata: { pedidoId, tipo },
+    ...(mensal ? { subscription_data: { metadata: { pedidoId } } } : { payment_intent_data: { metadata: { pedidoId, tipo } } }),
+    line_items: [{
+      quantity: 1,
+      price_data: {
+        currency: "eur",
+        unit_amount: Math.round(valor * 100),
+        ...(mensal ? { recurring: { interval: "month" } } : {}),
+        product_data: { name: mensal ? `Manutenção do site${negocio ? ": " + negocio : ""}` : `Montagem do site${negocio ? ": " + negocio : ""}` }
+      }
+    }]
+  });
+  return { clientSecret: ses.client_secret, sessionId: ses.id };
+});
+
+exports.pagamentoConfirmar = onCall(payOpts, async (req) => {
+  const { sessionId } = req.data || {};
+  if (typeof sessionId !== "string" || !/^cs_[A-Za-z0-9_]+$/.test(sessionId)) throw new HttpsError("invalid-argument", "Sessão inválida.");
+  const ses = await stripeDe().checkout.sessions.retrieve(sessionId);
+  const { pedidoId, tipo } = ses.metadata || {};
+  const { ref } = await pedidoDoCliente(req, pedidoId);
+  const pago = ses.status === "complete" && (ses.payment_status === "paid" || ses.payment_status === "no_payment_required");
+  if (!pago) return { ok: false };
+  const patch = { atualizadoEm: admin.firestore.FieldValue.serverTimestamp() };
+  if (tipo === "mensal") { patch["pagamento.mensalAtiva"] = true; patch["pagamento.stripeSubscricao"] = String(ses.subscription || ""); }
+  else { patch["pagamento.montagemPaga"] = true; patch["pagamento.stripePagamento"] = String(ses.payment_intent || ""); }
+  await ref.update(patch);
+  return { ok: true };
+});
