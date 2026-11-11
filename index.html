@@ -666,6 +666,7 @@ form h3:first-of-type{border-top:0;padding-top:0}
 .e-recusado{background:var(--red-bg);color:var(--red)}
 .orc{background:var(--surface);border-radius:16px;padding:1.1rem 1.2rem;margin:.6rem 0 1rem;max-width:620px;box-shadow:var(--shadow)}
 .orc h4{margin:0 0 .6rem}
+.pag-valor{margin:.7rem 0 .2rem;padding:.6rem .8rem;border-radius:10px;background:var(--bg,rgba(0,0,0,.04))}
 .orc dl{display:grid;grid-template-columns:auto 1fr;gap:.25rem 1.2rem;margin:0 0 .8rem}
 .orc dt{color:var(--muted)}
 .orc dd{margin:0;font-weight:600;font-variant-numeric:tabular-nums}
@@ -1644,15 +1645,30 @@ function answersHTML(p){
 }
 /* pagamento: links do Stripe (ou outro) criados por mim para cada cliente */
 const pagUrl=u=>typeof u==="string"&&/^https:\/\/[^\s"'<>]+$/.test(u.trim())?u.trim():"";
-function pagHTML(p){
+/* Links gerais do Stripe. Montagem: o cliente paga o valor combinado (o Stripe só aceita entre 150 € e 500 €).
+   Mensalidade: um link por valor (subscrições têm preço fixo). Um link escrito à mão no pedido tem prioridade. */
+const STRIPE={
+  montagem:"https://buy.stripe.com/test_28EaEP4cP3cz2G8aPT93y02", montMin:150, montMax:500,
+  mensal:{20:"https://buy.stripe.com/test_cNidR16kXdRd3Kc8HL93y01"}
+};
+const pagLink=(u,p)=>{ if(!u) return ""; try{ const x=new URL(u); x.searchParams.set("client_reference_id",p.id); if(p.email) x.searchParams.set("prefilled_email",p.email); return x.toString(); }catch(e){ return u; } };
+function pagLinks(p){
   const g=p.pagamento||{}, o=p.orcamento||{}, r=p.respostas||{};
-  const mont=o.valor??r.budgetMontagem, mens=o.mensal??r.budgetMensal;
-  const lm=pagUrl(g.montagem), ln=pagUrl(g.mensal);
+  const mont=Number(o.valor??r.budgetMontagem)||0, mens=Number(o.mensal??r.budgetMensal)||0;
+  const geralM=!pagUrl(g.montagem)&&mont>=STRIPE.montMin&&mont<=STRIPE.montMax;
+  return { mont, mens, geralM,
+    lm:pagLink(pagUrl(g.montagem)||(geralM?STRIPE.montagem:""),p),
+    ln:pagLink(pagUrl(g.mensal)||STRIPE.mensal[mens]||"",p) };
+}
+function pagHTML(p){
+  const g=p.pagamento||{};
+  const {mont,mens,geralM,lm,ln}=pagLinks(p);
   if(p.estado!=="aceite"||(!lm&&!ln&&!g.montagemPaga&&!g.mensalAtiva)) return "";
   const row=(ok,okTxt,link,btn)=>ok?`<p class="ok">${okTxt}</p>`:link?`<a class="btn solid small" href="${esc(link)}" target="_blank" rel="noopener">${btn}</a>`:"";
   return `<div class="orc pag"><h4>Pagamento</h4>
     <div class="ctas">${row(g.montagemPaga,"Montagem paga. Obrigado!",lm,`Pagar a montagem (${eur(mont)})`)}
     ${row(g.mensalAtiva,"Mensalidade ativa: é cobrada automaticamente todos os meses.",ln,`Ativar a manutenção (${eur(mens)} por mês)`)}</div>
+    ${geralM&&!g.montagemPaga?`<p class="pag-valor">Na página do Stripe, escreve <b>${eur(mont)}</b> no valor a pagar.</p>`:""}
     <p class="muted">O pagamento abre numa página segura do Stripe (cartão ou MB Way). Recebes o recibo por email. Se preferires transferência, fala comigo.</p>
   </div>`;
 }
@@ -1720,8 +1736,9 @@ function renderAdmin(all){
         <label class="f"><span>Manutenção por mês (€)</span><input type="number" name="mensal" min="0" step="1" value="${esc(o.mensal??"")}"></label>
         <label class="f full"><span>Prazo</span><input type="text" name="prazo" placeholder="Por exemplo: 2 semanas depois de recebermos os textos…" value="${esc(o.prazo??"")}"></label>
         <label class="f full"><span>Mensagem para o cliente</span><textarea name="mensagem">${esc(o.mensagem??"")}</textarea></label>
-        <label class="f"><span>Link de pagamento da montagem (Stripe)</span><input type="url" name="pagMontagem" placeholder="https://buy.stripe.com/…" value="${esc((p.pagamento||{}).montagem??"")}"></label>
-        <label class="f"><span>Link da mensalidade (Stripe)</span><input type="url" name="pagMensal" placeholder="https://buy.stripe.com/…" value="${esc((p.pagamento||{}).mensal??"")}"></label>
+        <p class="muted full">Pagamentos: se deixares os links vazios, o cliente recebe o link geral do Stripe para o valor da montagem (${STRIPE.montMin} € a ${STRIPE.montMax} €) e o da mensalidade, se houver link para esse valor (${Object.keys(STRIPE.mensal).map(v=>v+" €").join(", ")}).</p>
+        <label class="f"><span>Link de pagamento da montagem (Stripe)</span><input type="url" name="pagMontagem" placeholder="https://buy.stripe.com/… (opcional)" value="${esc((p.pagamento||{}).montagem??"")}"></label>
+        <label class="f"><span>Link da mensalidade (Stripe)</span><input type="url" name="pagMensal" placeholder="https://buy.stripe.com/… (opcional)" value="${esc((p.pagamento||{}).mensal??"")}"></label>
         <label class="f"><span><input type="checkbox" name="montagemPaga"${(p.pagamento||{}).montagemPaga?" checked":""}> Montagem paga</span></label>
         <label class="f"><span><input type="checkbox" name="mensalAtiva"${(p.pagamento||{}).mensalAtiva?" checked":""}> Mensalidade ativa</span></label>
         <p class="err full" role="alert"></p>
@@ -1735,7 +1752,11 @@ function renderAdmin(all){
     e.preventDefault(); const er=f.querySelector(".err"); er.textContent="";
     const d=Object.fromEntries(new FormData(f)), num=v=>v===""?null:Number(v);
     let patch;
-    if(e.submitter?.value==="aceitar"){ patch={estado:"aceite"}; }
+    if(e.submitter?.value==="aceitar"){
+      patch={estado:"aceite"};
+      const p0=all.find(x=>x.id===f.dataset.id)||{}, o0=p0.orcamento||{};
+      if(d.valor!==""||d.mensal!=="") patch.orcamento={...o0,valor:d.valor===""?(o0.valor??null):num(d.valor),mensal:d.mensal===""?(o0.mensal??null):num(d.mensal)};
+    }
     else if(e.submitter?.value==="enviar"){
       if(d.valor===""){ er.textContent="Para a contraproposta, indica pelo menos o valor da montagem."; return; }
       patch={estado:"orcamento-enviado",orcamento:{valor:num(d.valor),mensal:num(d.mensal),prazo:d.prazo.trim(),mensagem:d.mensagem.trim(),enviadoEm:Date.now()}};
