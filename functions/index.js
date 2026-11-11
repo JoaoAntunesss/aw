@@ -78,6 +78,7 @@ const admin = require("firebase-admin");
 if (!admin.apps.length) admin.initializeApp();
 const STRIPE_SECRET = defineSecret("STRIPE_SECRET");
 const payOpts = { secrets: [STRIPE_SECRET], region: "europe-west1", maxInstances: 5 };
+const confOpts = { secrets: [STRIPE_SECRET, TG_TOKEN, TG_CHAT], region: "europe-west1", maxInstances: 5 };
 const stripeDe = () => require("stripe")(STRIPE_SECRET.value());
 
 async function pedidoDoCliente(req, pedidoId) {
@@ -129,17 +130,23 @@ exports.pagamentoIniciar = onCall(payOpts, async (req) => {
   return { clientSecret: ses.client_secret, sessionId: ses.id };
 });
 
-exports.pagamentoConfirmar = onCall(payOpts, async (req) => {
+exports.pagamentoConfirmar = onCall(confOpts, async (req) => {
   const { sessionId } = req.data || {};
   if (typeof sessionId !== "string" || !/^cs_[A-Za-z0-9_]+$/.test(sessionId)) throw new HttpsError("invalid-argument", "Sessão inválida.");
   const ses = await stripeDe().checkout.sessions.retrieve(sessionId);
   const { pedidoId, tipo } = ses.metadata || {};
-  const { ref } = await pedidoDoCliente(req, pedidoId);
+  const { ref, p } = await pedidoDoCliente(req, pedidoId);
   const pago = ses.status === "complete" && (ses.payment_status === "paid" || ses.payment_status === "no_payment_required");
   if (!pago) return { ok: false };
   const patch = { atualizadoEm: admin.firestore.FieldValue.serverTimestamp() };
   if (tipo === "mensal") { patch["pagamento.mensalAtiva"] = true; patch["pagamento.stripeSubscricao"] = String(ses.subscription || ""); }
   else { patch["pagamento.montagemPaga"] = true; patch["pagamento.stripePagamento"] = String(ses.payment_intent || ""); }
+  const g = p.pagamento || {}, jaEstava = tipo === "mensal" ? g.mensalAtiva : g.montagemPaga;
   await ref.update(patch);
+  if (!jaEstava) {
+    const valor = (ses.amount_total || 0) / 100;
+    try { await avisar(`AW: pagamento recebido 💶\n${cortar((p.respostas || {}).negocio, 60)} (${cortar(p.nome, 40)})\n${tipo === "mensal" ? "Mensalidade ativada" : "Montagem paga"}: ${valor.toFixed(2)} €${tipo === "mensal" ? "/mês" : ""}\nhttps://joaoantunesss.github.io/aw/#gestao`); }
+    catch (e) { console.error("aviso de pagamento falhou", e); }
+  }
   return { ok: true };
 });
