@@ -561,7 +561,7 @@ nav a[aria-current]{color:var(--ink)}
 .f{display:grid;gap:.35rem;margin:0 0 1.15rem;border:0;padding:0;min-width:0}
 .f > span,.f > legend{font-weight:600;padding:0;margin-bottom:.15rem}
 .f small{color:var(--muted)}
-input[type=text],input[type=email],input[type=password],input[type=tel],input[type=number],select,textarea{
+input[type=text],input[type=email],input[type=password],input[type=tel],input[type=number],input[type=url],select,textarea{
   font:inherit;width:100%;padding:.72rem .9rem;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink)}
 textarea{min-height:110px;resize:vertical}
 input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
@@ -1033,6 +1033,7 @@ details summary{cursor:pointer;color:var(--brand);font-weight:600;min-height:32p
         <details><summary>O que é um “modelo”?</summary><p>É um site já pronto para um tipo de negócio (restaurante, salão, fotografia e eventos, babysitter ou explicações). Eu adapto-o às tuas cores, fotos, preços e serviços, e fica com o teu nome.</p></details>
         <details><summary>O que preciso de te dar?</summary><p>Fotografias, textos, preços e horários. Se ainda não tiveres tudo, começo com o que existe e acrescentamos depois.</p></details>
         <details><summary>O site é meu?</summary><p>Sim. O endereço (domínio) fica registado em teu nome e, se um dia quiseres sair, entrego-te o projeto.</p></details>
+        <details><summary>Como pago o site e a manutenção?</summary><p>Depois de aceitarmos o valor, aparecem na tua área de cliente os botões para pagar a montagem e ativar a manutenção, numa página segura do Stripe, com cartão ou MB Way. A manutenção é cobrada automaticamente todos os meses e recebes sempre o recibo por email. Também podes pagar por transferência.</p></details>
         <details><summary>Posso cancelar a manutenção?</summary><p>Podes, quando quiseres.</p></details>
       </div>
     </div>
@@ -1641,6 +1642,20 @@ function answersHTML(p){
   const rows=qs.filter(q=>p.respostas?.[q.id]).map(q=>`<dt>${q.label}</dt><dd>${esc([].concat(p.respostas[q.id]).join(", "))}</dd>`).join("");
   return `<dl class="answers">${rows}</dl>`;
 }
+/* pagamento: links do Stripe (ou outro) criados por mim para cada cliente */
+const pagUrl=u=>typeof u==="string"&&/^https:\/\/[^\s"'<>]+$/.test(u.trim())?u.trim():"";
+function pagHTML(p){
+  const g=p.pagamento||{}, o=p.orcamento||{}, r=p.respostas||{};
+  const mont=o.valor??r.budgetMontagem, mens=o.mensal??r.budgetMensal;
+  const lm=pagUrl(g.montagem), ln=pagUrl(g.mensal);
+  if(p.estado!=="aceite"||(!lm&&!ln&&!g.montagemPaga&&!g.mensalAtiva)) return "";
+  const row=(ok,okTxt,link,btn)=>ok?`<p class="ok">${okTxt}</p>`:link?`<a class="btn solid small" href="${esc(link)}" target="_blank" rel="noopener">${btn}</a>`:"";
+  return `<div class="orc pag"><h4>Pagamento</h4>
+    <div class="ctas">${row(g.montagemPaga,"Montagem paga. Obrigado!",lm,`Pagar a montagem (${eur(mont)})`)}
+    ${row(g.mensalAtiva,"Mensalidade ativa: é cobrada automaticamente todos os meses.",ln,`Ativar a manutenção (${eur(mens)} por mês)`)}</div>
+    <p class="muted">O pagamento abre numa página segura do Stripe (cartão ou MB Way). Recebes o recibo por email. Se preferires transferência, fala comigo.</p>
+  </div>`;
+}
 function orcHTML(p,canAnswer){
   const o=p.orcamento; if(!o) return "";
   return `<div class="orc"><h4>Contraproposta</h4><dl>
@@ -1663,6 +1678,7 @@ function renderMine(list){
       ${p.estado==="aceite"&&!p.orcamento?`<p class="ok">Aceitei a tua proposta. Vou entrar em contacto para começar.</p>`:""}
       ${p.estado==="recusado"&&!p.orcamento?`<p class="muted">Desta vez não consegui aceitar a proposta. Podes fazer uma nova com outro valor ou falar comigo.</p>`:""}
       ${orcHTML(p,true)}
+      ${pagHTML(p)}
       <details><summary>Ver as minhas respostas</summary>${answersHTML(p)}</details>
     </article>`).join(""):`<p class="empty">Ainda não fizeste nenhum pedido. Escolhe um modelo e conta-me como é o teu negócio.</p>`);
   $("newReq").addEventListener("click",()=>{ pendingTpl=PANELS[current].t; renderApp(); });
@@ -1704,6 +1720,10 @@ function renderAdmin(all){
         <label class="f"><span>Manutenção por mês (€)</span><input type="number" name="mensal" min="0" step="1" value="${esc(o.mensal??"")}"></label>
         <label class="f full"><span>Prazo</span><input type="text" name="prazo" placeholder="Por exemplo: 2 semanas depois de recebermos os textos…" value="${esc(o.prazo??"")}"></label>
         <label class="f full"><span>Mensagem para o cliente</span><textarea name="mensagem">${esc(o.mensagem??"")}</textarea></label>
+        <label class="f"><span>Link de pagamento da montagem (Stripe)</span><input type="url" name="pagMontagem" placeholder="https://buy.stripe.com/…" value="${esc((p.pagamento||{}).montagem??"")}"></label>
+        <label class="f"><span>Link da mensalidade (Stripe)</span><input type="url" name="pagMensal" placeholder="https://buy.stripe.com/…" value="${esc((p.pagamento||{}).mensal??"")}"></label>
+        <label class="f"><span><input type="checkbox" name="montagemPaga"${(p.pagamento||{}).montagemPaga?" checked":""}> Montagem paga</span></label>
+        <label class="f"><span><input type="checkbox" name="mensalAtiva"${(p.pagamento||{}).mensalAtiva?" checked":""}> Mensalidade ativa</span></label>
         <p class="err full" role="alert"></p>
         <div class="ctas full"><button class="btn solid small" type="submit" value="aceitar">Aceitar proposta do cliente</button><button class="btn small" type="submit" value="enviar">Enviar contraproposta</button><button class="btn small" type="submit" value="guardar">Guardar estado</button>${p.estado==="aceite"?`<button class="btn small" type="button" data-cli="${p.id}">Criar ficha de cliente</button>`:""}</div>
       </form></article>`;}).join(""):`<p class="empty">Não há pedidos ${adminFilter==="todos"?"":"neste estado "}por agora.</p>`}`;
@@ -1720,6 +1740,8 @@ function renderAdmin(all){
       if(d.valor===""){ er.textContent="Para a contraproposta, indica pelo menos o valor da montagem."; return; }
       patch={estado:"orcamento-enviado",orcamento:{valor:num(d.valor),mensal:num(d.mensal),prazo:d.prazo.trim(),mensagem:d.mensagem.trim(),enviadoEm:Date.now()}};
     } else patch={estado:d.estado};
+    for(const k of ["pagMontagem","pagMensal"]) if(d[k]&&!pagUrl(d[k])){ er.textContent="O link de pagamento tem de começar por https://"; return; }
+    patch.pagamento={montagem:pagUrl(d.pagMontagem||""),mensal:pagUrl(d.pagMensal||""),montagemPaga:!!d.montagemPaga,mensalAtiva:!!d.mensalAtiva};
     f.querySelectorAll("button").forEach(b=>b.disabled=true);
     try{ await store.updatePedido(f.dataset.id,patch); renderApp(); }catch(ex){ er.textContent=errMsg(ex); f.querySelectorAll("button").forEach(b=>b.disabled=false); }
   }));
