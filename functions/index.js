@@ -134,23 +134,94 @@ exports.pagamentoIniciar = onCall(payOpts, async (req) => {
   return { clientSecret: ses.client_secret, sessionId: ses.id };
 });
 
+/* Marca o pedido como pago (uma só vez) e avisa-me. Usado pelo site e pelo webhook. */
+async function marcarPago(pedidoId, tipo, ses) {
+  const ref = admin.firestore().collection("pedidos").doc(pedidoId);
+  const mudou = await admin.firestore().runTransaction(async (t) => {
+    const snap = await t.get(ref); if (!snap.exists) return null;
+    const p = snap.data(), g = p.pagamento || {};
+    if (tipo === "mensal" ? g.mensalAtiva : g.montagemPaga) return null;
+    const patch = { atualizadoEm: admin.firestore.FieldValue.serverTimestamp() };
+    if (tipo === "mensal") Object.assign(patch, { "pagamento.mensalAtiva": true, "pagamento.mensalCancelada": false, "pagamento.mensalFim": null, "pagamento.stripeSubscricao": String(ses.subscription || ""), "pagamento.stripeCliente": String(ses.customer || "") });
+    else Object.assign(patch, { "pagamento.montagemPaga": true, "pagamento.stripePagamento": String(ses.payment_intent || "") });
+    t.update(ref, patch); return p;
+  });
+  if (mudou) {
+    const valor = (ses.amount_total || 0) / 100;
+    try { await avisar(`AW: pagamento recebido 💶\n${cortar((mudou.respostas || {}).negocio, 60)} (${cortar(mudou.nome, 40)})\n${tipo === "mensal" ? "Mensalidade ativada" : "Montagem paga"}: ${valor.toFixed(2)} €${tipo === "mensal" ? "/mês" : ""}\nhttps://joaoantunesss.github.io/aw/#gestao`); }
+    catch (e) { console.error("aviso de pagamento falhou", e); }
+  }
+}
+const pago = (ses) => ses.status === "complete" && (ses.payment_status === "paid" || ses.payment_status === "no_payment_required");
+const dataPT = (unix) => new Date(unix * 1000).toLocaleDateString("pt-PT", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Lisbon" });
+
 exports.pagamentoConfirmar = onCall(confOpts, async (req) => {
   const { sessionId } = req.data || {};
   if (typeof sessionId !== "string" || !/^cs_[A-Za-z0-9_]+$/.test(sessionId)) throw new HttpsError("invalid-argument", "Sessão inválida.");
   const ses = await stripeDe().checkout.sessions.retrieve(sessionId);
   const { pedidoId, tipo } = ses.metadata || {};
-  const { ref, p } = await pedidoDoCliente(req, pedidoId);
-  const pago = ses.status === "complete" && (ses.payment_status === "paid" || ses.payment_status === "no_payment_required");
-  if (!pago) return { ok: false };
-  const patch = { atualizadoEm: admin.firestore.FieldValue.serverTimestamp() };
-  if (tipo === "mensal") { patch["pagamento.mensalAtiva"] = true; patch["pagamento.stripeSubscricao"] = String(ses.subscription || ""); }
-  else { patch["pagamento.montagemPaga"] = true; patch["pagamento.stripePagamento"] = String(ses.payment_intent || ""); }
-  const g = p.pagamento || {}, jaEstava = tipo === "mensal" ? g.mensalAtiva : g.montagemPaga;
-  await ref.update(patch);
-  if (!jaEstava) {
-    const valor = (ses.amount_total || 0) / 100;
-    try { await avisar(`AW: pagamento recebido 💶\n${cortar((p.respostas || {}).negocio, 60)} (${cortar(p.nome, 40)})\n${tipo === "mensal" ? "Mensalidade ativada" : "Montagem paga"}: ${valor.toFixed(2)} €${tipo === "mensal" ? "/mês" : ""}\nhttps://joaoantunesss.github.io/aw/#gestao`); }
-    catch (e) { console.error("aviso de pagamento falhou", e); }
-  }
+  await pedidoDoCliente(req, pedidoId);
+  if (!pago(ses)) return { ok: false };
+  await marcarPago(pedidoId, tipo === "mensal" ? "mensal" : "montagem", ses);
   return { ok: true };
+});
+
+/* O cliente cancela a manutenção na conta dele. Fica ativa até ao fim do mês já pago e não volta a ser cobrada. */
+exports.cancelarManutencao = onCall(confOpts, async (req) => {
+  const { pedidoId } = req.data || {};
+  const { ref, p } = await pedidoDoCliente(req, pedidoId);
+  const g = p.pagamento || {};
+  if (!g.mensalAtiva || !g.stripeSubscricao) throw new HttpsError("failed-precondition", "Não há nenhuma manutenção ativa neste pedido.");
+  if (g.mensalCancelada) return { ok: true, fim: g.mensalFim || null };
+  const sub = await stripeDe().subscriptions.update(g.stripeSubscricao, { cancel_at_period_end: true });
+  const fim = sub.cancel_at || sub.current_period_end || (sub.items?.data?.[0]?.current_period_end) || null;
+  await ref.update({ "pagamento.mensalCancelada": true, "pagamento.mensalFim": fim ? fim * 1000 : null, atualizadoEm: admin.firestore.FieldValue.serverTimestamp() });
+  try { await avisar(`AW: manutenção cancelada ⚠️\n${cortar((p.respostas || {}).negocio, 60)} (${cortar(p.nome, 40)})\nFica ativa até ${fim ? dataPT(fim) : "ao fim do período pago"} e não volta a ser cobrada.\nhttps://joaoantunesss.github.io/aw/#gestao`); } catch (e) { console.error(e); }
+  return { ok: true, fim: fim ? fim * 1000 : null };
+});
+
+/* Webhook do Stripe: garante que tudo fica certo mesmo que o cliente feche a janela,
+   e avisa-me quando uma mensalidade acaba ou falha. */
+const STRIPE_WEBHOOK_SECRET = defineSecret("STRIPE_WEBHOOK_SECRET");
+const { onRequest } = require("firebase-functions/v2/https");
+async function pedidoDaSubscricao(sub) {
+  const id = sub.metadata?.pedidoId;
+  if (id) { const r = admin.firestore().collection("pedidos").doc(id); const s = await r.get(); if (s.exists) return { ref: r, p: s.data() }; }
+  const q = await admin.firestore().collection("pedidos").where("pagamento.stripeSubscricao", "==", sub.id).limit(1).get();
+  return q.empty ? null : { ref: q.docs[0].ref, p: q.docs[0].data() };
+}
+exports.stripeWebhook = onRequest({ secrets: [STRIPE_SECRET, STRIPE_WEBHOOK_SECRET, TG_TOKEN, TG_CHAT, MAIL_USER, MAIL_PASS], region: "europe-west1", maxInstances: 5 }, async (req, res) => {
+  let ev;
+  try { ev = stripeDe().webhooks.constructEvent(req.rawBody, req.headers["stripe-signature"], STRIPE_WEBHOOK_SECRET.value()); }
+  catch (e) { console.error("assinatura inválida", e.message); res.status(400).send("assinatura inválida"); return; }
+  try {
+    const o = ev.data.object;
+    if (ev.type === "checkout.session.completed" || ev.type === "checkout.session.async_payment_succeeded") {
+      const { pedidoId, tipo } = o.metadata || {};
+      if (pedidoId && pago(o)) await marcarPago(pedidoId, tipo === "mensal" ? "mensal" : "montagem", o);
+    } else if (ev.type === "customer.subscription.updated") {
+      const f = await pedidoDaSubscricao(o); if (f) {
+        const g = f.p.pagamento || {}, cancelada = !!(o.cancel_at_period_end || o.cancel_at);
+        if (cancelada && !g.mensalCancelada) {
+          const fim = o.cancel_at || o.current_period_end || o.items?.data?.[0]?.current_period_end;
+          await f.ref.update({ "pagamento.mensalCancelada": true, "pagamento.mensalFim": fim ? fim * 1000 : null });
+          await avisar(`AW: manutenção cancelada ⚠️\n${cortar((f.p.respostas || {}).negocio, 60)} (${cortar(f.p.nome, 40)})\nFica ativa até ${fim ? dataPT(fim) : "ao fim do período pago"}.`);
+        } else if (!cancelada && g.mensalCancelada) {
+          await f.ref.update({ "pagamento.mensalCancelada": false, "pagamento.mensalFim": null });
+          await avisar(`AW: manutenção retomada ✅\n${cortar((f.p.respostas || {}).negocio, 60)} (${cortar(f.p.nome, 40)})`);
+        }
+      }
+    } else if (ev.type === "customer.subscription.deleted") {
+      const f = await pedidoDaSubscricao(o); if (f) {
+        await f.ref.update({ "pagamento.mensalAtiva": false, "pagamento.mensalCancelada": true, "pagamento.mensalFim": Date.now(), atualizadoEm: admin.firestore.FieldValue.serverTimestamp() });
+        await avisar(`AW: manutenção terminou ❌\n${cortar((f.p.respostas || {}).negocio, 60)} (${cortar(f.p.nome, 40)})\nJá não é cobrada. Decide se desligas o site ou falas com o cliente.`);
+        await enviarEmail(f.p.email, "AW: a tua manutenção terminou", [`Olá ${cortar(f.p.nome, 40)},`, `A manutenção do site ${cortar((f.p.respostas || {}).negocio, 60)} terminou e já não vais ser cobrado.`, "Se quiseres voltar a ativá-la, fala comigo."], "Ver na minha conta");
+      }
+    } else if (ev.type === "invoice.payment_failed") {
+      const subId = typeof o.subscription === "string" ? o.subscription : o.parent?.subscription_details?.subscription;
+      const f = subId ? await pedidoDaSubscricao({ id: subId, metadata: o.subscription_details?.metadata || o.parent?.subscription_details?.metadata || {} }) : null;
+      await avisar(`AW: mensalidade falhou ⚠️\n${f ? cortar((f.p.respostas || {}).negocio, 60) + " (" + cortar(f.p.nome, 40) + ")" : (o.customer_email || "cliente")}\n${((o.amount_due || 0) / 100).toFixed(2)} € não foram cobrados. O Stripe volta a tentar nos próximos dias.`);
+    }
+  } catch (e) { console.error("webhook", ev.type, e); res.status(500).send("erro"); return; }
+  res.json({ recebido: true });
 });

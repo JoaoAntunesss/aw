@@ -27,3 +27,12 @@ O cliente paga a montagem e a mensalidade numa janela do próprio site, com o va
 3. `cd functions && npm install && cd .. && firebase deploy --only functions`
 4. A chave pública (`pk_test_…` / `pk_live_…`) vai em `STRIPE_PK` no index.html (essa pode estar no site).
 5. Para passar de teste para real: troca as duas chaves (secreta e pública) pelas `live` e volta a fazer o deploy.
+
+### Webhook do Stripe (confirmações automáticas e cancelamentos)
+Garante que o pedido fica pago mesmo que o cliente feche a janela, e avisa-te no Telegram quando uma manutenção é cancelada, termina ou falha.
+1. No Stripe: Programadores → Webhooks → Adicionar destino. URL: `https://europe-west1-aw-sites-e31c3.cloudfunctions.net/stripeWebhook`
+   Eventos: `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_failed`.
+2. Abre o destino criado e copia o "Segredo de assinatura" (começa por `whsec_`).
+3. `firebase functions:secrets:set STRIPE_WEBHOOK_SECRET` e cola-o.
+4. `firebase deploy --only functions`
+Em modo real repete os passos 1 a 4 no modo real (o webhook e o segredo são diferentes).

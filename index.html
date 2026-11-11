@@ -1482,6 +1482,7 @@ async function firebaseStore(cfg){
     async allPedidos(){ return (await F.getDocs(F.collection(db,"pedidos"))).docs.map(norm).sort(byDate); },
     async updatePedido(id,patch){ await F.updateDoc(F.doc(db,"pedidos",id),{...patch,atualizadoEm:F.serverTimestamp()}); },
     async pagIniciar(pedidoId,tipo){ const Fn=await import(base+"firebase-functions.js"); const fn=Fn.httpsCallable(Fn.getFunctions(app,"europe-west1"),"pagamentoIniciar"); return (await fn({pedidoId,tipo})).data; },
+    async cancelarManut(pedidoId){ const Fn=await import(base+"firebase-functions.js"); const fn=Fn.httpsCallable(Fn.getFunctions(app,"europe-west1"),"cancelarManutencao"); return (await fn({pedidoId})).data; },
     async pagConfirmar(sessionId){ const Fn=await import(base+"firebase-functions.js"); const fn=Fn.httpsCallable(Fn.getFunctions(app,"europe-west1"),"pagamentoConfirmar"); return (await fn({sessionId})).data; },
     async createSuporte(d){ await F.addDoc(F.collection(db,"suporte"),{...d,estado:"aberto",criadoEm:F.serverTimestamp(),atualizadoEm:F.serverTimestamp()}); avisarEmail("AW: novo pedido de suporte",`${d.site}: ${d.tipo}\n${d.nome||""} · ${d.telefone||d.email||""}\n${d.descricao}\nhttps://joaoantunesss.github.io/aw/#gestao`); },
     async mySuporte(){ const q=F.query(F.collection(db,"suporte"),F.where("uid","==",auth.currentUser.uid)); return (await F.getDocs(q)).docs.map(norm).sort(byDate); },
@@ -1681,11 +1682,15 @@ function pagHTML(p){
   const row=(ok,okTxt,link,btn,tipo,val)=>ok?`<p class="ok">${okTxt}</p>`
     :inSite&&val>0?`<button class="btn solid small" type="button" data-pag="${tipo}" data-id="${esc(p.id)}" data-link="${esc(link)}">${btn}</button>`
     :link?`<a class="btn solid small" href="${esc(link)}" target="_blank" rel="noopener">${btn}</a>`:"";
+  const ctas=`${row(g.montagemPaga,"Montagem paga. Obrigado!",lm,`Pagar a montagem (${eur(mont)})`,"montagem",mont)}
+    ${g.mensalAtiva&&g.mensalCancelada?`<p class="muted">Manutenção cancelada: fica ativa até ${g.mensalFim?fmtDate(g.mensalFim):"ao fim do mês já pago"} e não voltas a ser cobrado.</p>`
+      :g.mensalAtiva?`<p class="ok">Manutenção ativa: é cobrada automaticamente todos os meses.</p>${inSite&&g.stripeSubscricao?`<button class="btn small" type="button" data-cancel="${esc(p.id)}">Cancelar a manutenção</button>`:""}`
+      :!g.mensalAtiva&&g.mensalCancelada&&g.mensalFim?`<p class="muted">A manutenção terminou a ${fmtDate(g.mensalFim)}.</p>${row(false,"",ln,`Voltar a ativar a manutenção (${eur(mens)} por mês)`,"mensal",mens)}`
+      :row(false,"",ln,`Ativar a manutenção (${eur(mens)} por mês)`,"mensal",mens)}`;
   return `<div class="orc pag"><h4>Pagamento</h4>
-    <div class="ctas">${row(g.montagemPaga,"Montagem paga. Obrigado!",lm,`Pagar a montagem (${eur(mont)})`,"montagem",mont)}
-    ${row(g.mensalAtiva,"Mensalidade ativa: é cobrada automaticamente todos os meses.",ln,`Ativar a manutenção (${eur(mens)} por mês)`,"mensal",mens)}</div>
+    <div class="ctas">${ctas}</div>
     ${geralM&&!g.montagemPaga&&!inSite?`<p class="pag-valor">Na página do Stripe, escreve <b>${eur(mont)}</b> no valor a pagar.</p>`:""}
-    <p class="muted">${inSite?"Pagas aqui mesmo, num formulário seguro do Stripe (cartão, MB WAY e outros).":"O pagamento abre numa página segura do Stripe (cartão ou MB WAY)."} Recebes o recibo por email. Se preferires transferência, fala comigo.</p>
+    ${/data-pag|class="btn solid/.test(ctas)?`<p class="muted">${inSite?"Pagas aqui mesmo, num formulário seguro do Stripe (cartão, MB WAY e outros).":"O pagamento abre numa página segura do Stripe (cartão ou MB WAY)."} Recebes o recibo por email. Se preferires transferência, fala comigo.</p>`:""}
   </div>`;
 }
 /* Pagamento dentro do site: o servidor (functions) cria a sessão com o valor do orçamento e o Stripe desenha o formulário aqui. */
@@ -1737,6 +1742,12 @@ function renderMine(list){
       <details><summary>Ver as minhas respostas</summary>${answersHTML(p)}</details>
     </article>`).join(""):`<p class="empty">Ainda não fizeste nenhum pedido. Escolhe um modelo e conta-me como é o teu negócio.</p>`);
   $("newReq").addEventListener("click",()=>{ pendingTpl=PANELS[current].t; renderApp(); });
+  a.querySelectorAll("[data-cancel]").forEach(b=>b.addEventListener("click",async()=>{
+    if(!confirm("Cancelar a manutenção? Fica ativa até ao fim do mês que já pagaste e depois deixa de ser cobrada.")) return;
+    b.disabled=true; b.textContent="A cancelar…";
+    try{ await store.cancelarManut(b.dataset.cancel); renderApp(); }
+    catch(e){ b.disabled=false; b.textContent="Cancelar a manutenção"; alert("Não foi possível cancelar agora: "+(e?.message||e)+". Fala comigo e eu trato disso."); }
+  }));
   a.querySelectorAll("[data-pag]").forEach(b=>b.addEventListener("click",()=>abrirPagamento(b.dataset.id,b.dataset.pag,b.dataset.link,b.textContent)));
   const md=document.createElement("section"); md.className="mydata";
   md.innerHTML=`<h3>Os teus dados</h3><p>Podes descarregar uma cópia de tudo o que tenho sobre ti, ou pedir que apague a tua conta e os teus dados. Consulta a <a href="privacidade.html" target="_blank" rel="noopener">política de privacidade</a>.</p><div class="ctas"><button class="btn small" type="button" id="dlData">Descarregar os meus dados</button><button class="btn small" type="button" id="delData">Pedir o apagamento dos meus dados</button></div><p class="ok" id="mydataMsg" role="status"></p>`;
@@ -1780,7 +1791,7 @@ function renderAdmin(all){
         <label class="f"><span>Link de pagamento da montagem (Stripe)</span><input type="url" name="pagMontagem" placeholder="https://buy.stripe.com/… (opcional)" value="${esc((p.pagamento||{}).montagem??"")}"></label>
         <label class="f"><span>Link da mensalidade (Stripe)</span><input type="url" name="pagMensal" placeholder="https://buy.stripe.com/… (opcional)" value="${esc((p.pagamento||{}).mensal??"")}"></label>
         <label class="f"><span><input type="checkbox" name="montagemPaga"${(p.pagamento||{}).montagemPaga?" checked":""}> Montagem paga</span></label>
-        <label class="f"><span><input type="checkbox" name="mensalAtiva"${(p.pagamento||{}).mensalAtiva?" checked":""}> Mensalidade ativa</span></label>
+        <label class="f"><span><input type="checkbox" name="mensalAtiva"${(p.pagamento||{}).mensalAtiva?" checked":""}> Mensalidade ativa${(p.pagamento||{}).mensalCancelada?` <b class="err">(cancelada${(p.pagamento||{}).mensalFim?", até "+fmtDate((p.pagamento||{}).mensalFim):""})</b>`:""}</span></label>
         <p class="err full" role="alert"></p>
         <div class="ctas full"><button class="btn solid small" type="submit" value="aceitar">Aceitar proposta do cliente</button><button class="btn small" type="submit" value="enviar">Enviar contraproposta</button><button class="btn small" type="submit" value="guardar">Guardar estado</button>${p.estado==="aceite"?`<button class="btn small" type="button" data-cli="${p.id}">Criar ficha de cliente</button>`:""}</div>
       </form></article>`;}).join(""):`<p class="empty">Não há pedidos ${adminFilter==="todos"?"":"neste estado "}por agora.</p>`}`;
@@ -1802,7 +1813,8 @@ function renderAdmin(all){
       patch={estado:"orcamento-enviado",orcamento:{valor:num(d.valor),mensal:num(d.mensal),prazo:d.prazo.trim(),mensagem:d.mensagem.trim(),enviadoEm:Date.now()}};
     } else patch={estado:d.estado};
     for(const k of ["pagMontagem","pagMensal"]) if(d[k]&&!pagUrl(d[k])){ er.textContent="O link de pagamento tem de começar por https://"; return; }
-    patch.pagamento={montagem:pagUrl(d.pagMontagem||""),mensal:pagUrl(d.pagMensal||""),montagemPaga:!!d.montagemPaga,mensalAtiva:!!d.mensalAtiva};
+    { const g0=(all.find(x=>x.id===f.dataset.id)||{}).pagamento||{};
+      patch.pagamento={...g0,montagem:pagUrl(d.pagMontagem||""),mensal:pagUrl(d.pagMensal||""),montagemPaga:!!d.montagemPaga,mensalAtiva:!!d.mensalAtiva}; }
     f.querySelectorAll("button").forEach(b=>b.disabled=true);
     try{ await store.updatePedido(f.dataset.id,patch); renderApp(); }catch(ex){ er.textContent=errMsg(ex); f.querySelectorAll("button").forEach(b=>b.disabled=false); }
   }));
