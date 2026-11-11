@@ -65,7 +65,11 @@ exports.respostaOrcamento = onDocumentUpdated({ ...mailOpts, document: "pedidos/
   }
   // aceite ou recusado por mim (se vinha de uma contraproposta, foi o cliente que decidiu e não envio nada)
   if (a.estado === "orcamento-enviado") return;
-  if (d.estado === "aceite") return enviarEmail(d.email, "AW: aceitei a tua proposta", [ola, `Aceitei a tua proposta para ${nome}. Entro em contacto contigo para combinarmos os próximos passos.`], "Ver na minha conta");
+  if (d.estado === "aceite") {
+    const mont = o.valor ?? r.budgetMontagem, mens = o.mensal ?? r.budgetMensal;
+    const valores = `Montagem: ${mont ?? "a definir"} €${mens && Number(mens) > 0 ? `\nManutenção: ${mens} € por mês` : ""}`;
+    return enviarEmail(d.email, "AW: aceitei a tua proposta", [ola, `Aceitei a tua proposta para ${nome}.`, valores, "Na tua conta já tens o botão para pagar, de forma segura (cartão ou MB WAY). Assim que pagares, começo o teu site e entro em contacto contigo."], "Pagar na minha conta");
+  }
   if (d.estado === "recusado") return enviarEmail(d.email, "AW: sobre a tua proposta", [ola, `Obrigado pelo interesse. Desta vez não consegui avançar com a proposta para ${nome}. Se quiseres, podes enviar outra com valores diferentes.`], "Ver na minha conta");
 });
 
