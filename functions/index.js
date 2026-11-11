@@ -134,6 +134,26 @@ exports.pagamentoIniciar = onCall(payOpts, async (req) => {
   return { clientSecret: ses.client_secret, sessionId: ses.id };
 });
 
+/* Movimentos que aparecem no painel ("Últimos movimentos"). */
+async function evento(tipo, texto, pedidoId) {
+  try { await admin.firestore().collection("eventos").add({ tipo, texto: cortar(texto, 300), pedidoId: pedidoId || "", criadoEm: admin.firestore.FieldValue.serverTimestamp() }); }
+  catch (e) { console.error("evento", e); }
+}
+/* Ficha de cliente ligada ao pedido: criada quando paga a montagem, atualizada pela mensalidade. */
+async function fichaCliente(pedidoId, p, extra) {
+  const col = admin.firestore().collection("clientes");
+  const q = await col.where("pedidoId", "==", pedidoId).limit(1).get();
+  const now = admin.firestore.FieldValue.serverTimestamp();
+  if (q.empty) {
+    const o = p.orcamento || {}, r = p.respostas || {};
+    await col.add({ nome: cortar(r.negocio || p.nome, 120), contacto: cortar(p.nome, 120), email: cortar(p.email, 200), telefone: cortar(p.telefone, 40),
+      site: cortar(r.negocio, 120), url: p.siteUrl || "", template: p.template || "", plano: "", montagem: Number(o.valor ?? r.budgetMontagem) || 0,
+      mensal: 0, inicio: new Date().toISOString().slice(0, 10), renovacao: "", estado: "ativo", notas: "Criada automaticamente quando pagou.", montagemPaga: false,
+      pedidoId, criadoEm: now, atualizadoEm: now, ...extra });
+  } else await q.docs[0].ref.update({ ...extra, atualizadoEm: now });
+}
+const fimPeriodo = (sub) => sub?.current_period_end || sub?.items?.data?.[0]?.current_period_end || null;
+
 /* Marca o pedido como pago (uma só vez) e avisa-me. Usado pelo site e pelo webhook. */
 async function marcarPago(pedidoId, tipo, ses) {
   const ref = admin.firestore().collection("pedidos").doc(pedidoId);
@@ -142,12 +162,21 @@ async function marcarPago(pedidoId, tipo, ses) {
     const p = snap.data(), g = p.pagamento || {};
     if (tipo === "mensal" ? g.mensalAtiva : g.montagemPaga) return null;
     const patch = { atualizadoEm: admin.firestore.FieldValue.serverTimestamp() };
-    if (tipo === "mensal") Object.assign(patch, { "pagamento.mensalAtiva": true, "pagamento.mensalCancelada": false, "pagamento.mensalFim": null, "pagamento.stripeSubscricao": String(ses.subscription || ""), "pagamento.stripeCliente": String(ses.customer || "") });
+    if (tipo === "mensal") Object.assign(patch, { "pagamento.mensalAtiva": true, "pagamento.mensalCancelada": false, "pagamento.mensalFalhou": false, "pagamento.mensalFim": null, "pagamento.stripeSubscricao": String(ses.subscription || ""), "pagamento.stripeCliente": String(ses.customer || "") });
     else Object.assign(patch, { "pagamento.montagemPaga": true, "pagamento.stripePagamento": String(ses.payment_intent || "") });
     t.update(ref, patch); return p;
   });
   if (mudou) {
     const valor = (ses.amount_total || 0) / 100;
+    const negocio = cortar((mudou.respostas || {}).negocio || mudou.nome, 60);
+    await evento(tipo, `${negocio}: ${tipo === "mensal" ? "mensalidade ativada" : "montagem paga"}, ${valor.toFixed(2)} €${tipo === "mensal" ? "/mês" : ""}`, pedidoId);
+    try {
+      if (tipo === "mensal") {
+        let prox = null; try { const sub = await stripeDe().subscriptions.retrieve(String(ses.subscription)); prox = fimPeriodo(sub); } catch (e) { console.error(e); }
+        if (prox) await ref.update({ "pagamento.mensalProxima": prox * 1000 });
+        await fichaCliente(pedidoId, mudou, { mensal: valor, estado: "ativo" });
+      } else await fichaCliente(pedidoId, mudou, { montagemPaga: true });
+    } catch (e) { console.error("ficha de cliente", e); }
     try { await avisar(`AW: pagamento recebido 💶\n${cortar((mudou.respostas || {}).negocio, 60)} (${cortar(mudou.nome, 40)})\n${tipo === "mensal" ? "Mensalidade ativada" : "Montagem paga"}: ${valor.toFixed(2)} €${tipo === "mensal" ? "/mês" : ""}\nhttps://joaoantunesss.github.io/aw/#gestao`); }
     catch (e) { console.error("aviso de pagamento falhou", e); }
   }
@@ -176,6 +205,7 @@ exports.cancelarManutencao = onCall(confOpts, async (req) => {
   const sub = await stripeDe().subscriptions.update(g.stripeSubscricao, { cancel_at_period_end: true });
   const fim = sub.cancel_at || sub.current_period_end || (sub.items?.data?.[0]?.current_period_end) || null;
   await ref.update({ "pagamento.mensalCancelada": true, "pagamento.mensalFim": fim ? fim * 1000 : null, atualizadoEm: admin.firestore.FieldValue.serverTimestamp() });
+  await evento("cancelada", `${cortar((p.respostas || {}).negocio || p.nome, 60)}: manutenção cancelada, ativa até ${fim ? dataPT(fim) : "ao fim do período pago"}`, pedidoId);
   try { await avisar(`AW: manutenção cancelada ⚠️\n${cortar((p.respostas || {}).negocio, 60)} (${cortar(p.nome, 40)})\nFica ativa até ${fim ? dataPT(fim) : "ao fim do período pago"} e não volta a ser cobrada.\nhttps://joaoantunesss.github.io/aw/#gestao`); } catch (e) { console.error(e); }
   return { ok: true, fim: fim ? fim * 1000 : null };
 });
@@ -205,23 +235,52 @@ exports.stripeWebhook = onRequest({ secrets: [STRIPE_SECRET, STRIPE_WEBHOOK_SECR
         if (cancelada && !g.mensalCancelada) {
           const fim = o.cancel_at || o.current_period_end || o.items?.data?.[0]?.current_period_end;
           await f.ref.update({ "pagamento.mensalCancelada": true, "pagamento.mensalFim": fim ? fim * 1000 : null });
+          await evento("cancelada", `${cortar((f.p.respostas || {}).negocio || f.p.nome, 60)}: manutenção cancelada, ativa até ${fim ? dataPT(fim) : "ao fim do período pago"}`, f.ref.id);
           await avisar(`AW: manutenção cancelada ⚠️\n${cortar((f.p.respostas || {}).negocio, 60)} (${cortar(f.p.nome, 40)})\nFica ativa até ${fim ? dataPT(fim) : "ao fim do período pago"}.`);
         } else if (!cancelada && g.mensalCancelada) {
           await f.ref.update({ "pagamento.mensalCancelada": false, "pagamento.mensalFim": null });
+          await evento("retomada", `${cortar((f.p.respostas || {}).negocio || f.p.nome, 60)}: manutenção retomada`, f.ref.id);
           await avisar(`AW: manutenção retomada ✅\n${cortar((f.p.respostas || {}).negocio, 60)} (${cortar(f.p.nome, 40)})`);
         }
       }
     } else if (ev.type === "customer.subscription.deleted") {
       const f = await pedidoDaSubscricao(o); if (f) {
         await f.ref.update({ "pagamento.mensalAtiva": false, "pagamento.mensalCancelada": true, "pagamento.mensalFim": Date.now(), atualizadoEm: admin.firestore.FieldValue.serverTimestamp() });
+        await evento("terminou", `${cortar((f.p.respostas || {}).negocio || f.p.nome, 60)}: manutenção terminou`, f.ref.id);
+        try { await fichaCliente(f.ref.id, f.p, { estado: "terminado" }); } catch (e) { console.error(e); }
         await avisar(`AW: manutenção terminou ❌\n${cortar((f.p.respostas || {}).negocio, 60)} (${cortar(f.p.nome, 40)})\nJá não é cobrada. Decide se desligas o site ou falas com o cliente.`);
         await enviarEmail(f.p.email, "AW: a tua manutenção terminou", [`Olá ${cortar(f.p.nome, 40)},`, `A manutenção do site ${cortar((f.p.respostas || {}).negocio, 60)} terminou e já não vais ser cobrado.`, "Se quiseres voltar a ativá-la, fala comigo."], "Ver na minha conta");
       }
     } else if (ev.type === "invoice.payment_failed") {
       const subId = typeof o.subscription === "string" ? o.subscription : o.parent?.subscription_details?.subscription;
       const f = subId ? await pedidoDaSubscricao({ id: subId, metadata: o.subscription_details?.metadata || o.parent?.subscription_details?.metadata || {} }) : null;
+      if (f) await f.ref.update({ "pagamento.mensalFalhou": true });
+      await evento("falhou", `${f ? cortar((f.p.respostas || {}).negocio || f.p.nome, 60) : (o.customer_email || "cliente")}: mensalidade de ${((o.amount_due || 0) / 100).toFixed(2)} € falhou`, f?.ref.id);
       await avisar(`AW: mensalidade falhou ⚠️\n${f ? cortar((f.p.respostas || {}).negocio, 60) + " (" + cortar(f.p.nome, 40) + ")" : (o.customer_email || "cliente")}\n${((o.amount_due || 0) / 100).toFixed(2)} € não foram cobrados. O Stripe volta a tentar nos próximos dias.`);
+    } else if (ev.type === "invoice.paid") {
+      const subId = typeof o.subscription === "string" ? o.subscription : o.parent?.subscription_details?.subscription;
+      const f = subId ? await pedidoDaSubscricao({ id: subId, metadata: o.subscription_details?.metadata || o.parent?.subscription_details?.metadata || {} }) : null;
+      const fim = o.lines?.data?.[0]?.period?.end;
+      if (f) await f.ref.update({ "pagamento.mensalFalhou": false, ...(fim ? { "pagamento.mensalProxima": fim * 1000 } : {}) });
     }
   } catch (e) { console.error("webhook", ev.type, e); res.status(500).send("erro"); return; }
   res.json({ recebido: true });
+});
+
+
+/* Todos os dias de manhã: avisa-me dos domínios que renovam nos próximos 30 dias (uma vez por data). */
+const { onSchedule } = require("firebase-functions/v2/scheduler");
+exports.avisoDominios = onSchedule({ schedule: "every day 09:00", timeZone: "Europe/Lisbon", region: "europe-west1", secrets: [TG_TOKEN, TG_CHAT] }, async () => {
+  const q = await admin.firestore().collection("pedidos").where("estado", "==", "aceite").get();
+  const hoje = Date.now();
+  for (const d of q.docs) {
+    const p = d.data(), dm = p.dominio || {};
+    if (!dm.renovacao || dm.avisado === dm.renovacao) continue;
+    const dias = Math.ceil((new Date(dm.renovacao).getTime() - hoje) / 864e5);
+    if (dias > 30) continue;
+    const nome = dm.nome || (p.dominioCliente || {}).nome || "domínio";
+    await avisar(`AW: domínio a renovar 🌐\n${nome} (${cortar((p.respostas || {}).negocio || p.nome, 60)})\n${dias < 0 ? `Já passou a data (${dm.renovacao})!` : `Renova em ${dias} dia(s), a ${dm.renovacao}.`} Confirma com o cliente que está pago, senão o site deixa de abrir.`);
+    await evento("dominio", `${nome}: renovação ${dias < 0 ? "atrasada" : `em ${dias} dia(s)`}`, d.id);
+    await d.ref.update({ "dominio.avisado": dm.renovacao });
+  }
 });

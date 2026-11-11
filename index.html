@@ -2,7 +2,7 @@
 <html lang="pt-PT">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; img-src 'self' data: https://*.stripe.com; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://js.stripe.com https://*.js.stripe.com https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://www.google.com; connect-src 'self' https://europe-west1-aw-sites-e31c3.cloudfunctions.net https://api.stripe.com https://checkout.stripe.com https://*.googleapis.com https://*.firebaseapp.com https://api.emailjs.com https://cloudflareinsights.com https://static.cloudflareinsights.com https://www.google.com; frame-src https://www.google.com https://js.stripe.com https://*.js.stripe.com https://hooks.stripe.com https://checkout.stripe.com; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; img-src 'self' data: https://*.stripe.com; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://js.stripe.com https://*.js.stripe.com https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://www.google.com; connect-src 'self' https://dns.google https://europe-west1-aw-sites-e31c3.cloudfunctions.net https://api.stripe.com https://checkout.stripe.com https://*.googleapis.com https://*.firebaseapp.com https://api.emailjs.com https://cloudflareinsights.com https://static.cloudflareinsights.com https://www.google.com; frame-src https://www.google.com https://js.stripe.com https://*.js.stripe.com https://hooks.stripe.com https://checkout.stripe.com; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>AW, sites cuidados, rápidos e acessíveis</title>
@@ -670,6 +670,41 @@ form h3:first-of-type{border-top:0;padding-top:0}
 .orc{background:var(--surface);border-radius:16px;padding:1.1rem 1.2rem;margin:.6rem 0 1rem;max-width:620px;box-shadow:var(--shadow)}
 .orc h4{margin:0 0 .6rem}
 .pag .ctas{margin-bottom:.7rem}
+.proj{display:grid;gap:1rem;margin:.6rem 0 1rem;max-width:720px}
+.proj>section{background:var(--surface);border-radius:16px;padding:1.1rem 1.2rem;box-shadow:var(--shadow)}
+.proj h4{margin:0 0 .7rem}
+.fases{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem;counter-reset:f}
+.fases li{position:relative;padding:.55rem .6rem .5rem;border-radius:10px;background:var(--sunk);color:var(--muted);font-size:.86rem;line-height:1.3}
+.fases li b{display:block;font-size:.72rem;opacity:.7;font-weight:600}
+.fases li.feito{background:color-mix(in srgb,var(--brand) 14%,var(--surface));color:var(--ink)}
+.fases li.agora{background:var(--ink);color:var(--surface)}
+@media (max-width:560px){.fases{grid-template-columns:1fr 1fr}}
+.chk{list-style:none;margin:0;padding:0;display:grid;gap:.55rem}
+.chk li{display:grid;grid-template-columns:auto 1fr;gap:.2rem .7rem;align-items:start;padding:.65rem .75rem;border:1px solid var(--line);border-radius:12px}
+.chk li.feito{border-color:color-mix(in srgb,#3f8f64 45%,var(--line))}
+.chk input[type=checkbox]{width:1.15rem;height:1.15rem;margin-top:.15rem}
+.chk small{grid-column:2;color:var(--muted)}
+.chk .files{grid-column:2;display:flex;flex-wrap:wrap;gap:.35rem .8rem;font-size:.86rem}
+.chk .up{grid-column:2;display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
+.dns{width:100%;border-collapse:collapse;font-size:.88rem;margin:.4rem 0}
+.dns th,.dns td{text-align:left;padding:.45rem .5rem;border-bottom:1px solid var(--line);vertical-align:middle;word-break:break-all}
+.dns code{font-size:.85rem}
+.dns td:nth-child(-n+2),.dns th{white-space:nowrap;word-break:normal}
+.lista td{white-space:normal!important;padding:.25rem}.lista input{width:100%;min-width:7rem;padding:.4rem .5rem;font-size:.9rem}
+.chk textarea{width:100%}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.dom-opc{display:flex;flex-wrap:wrap;gap:.4rem 1rem;margin:.2rem 0 .7rem}
+.dom-opc label{display:flex;gap:.4rem;align-items:center;font-weight:500}
+.guia{margin:.5rem 0;padding-left:1.2rem}.guia li{margin:.3rem 0}
+.hoje{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.6rem;margin:0 0 1.2rem}
+.hoje button{all:unset;cursor:pointer;display:flex;gap:.7rem;align-items:center;padding:.8rem .9rem;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.hoje button:hover,.hoje button:focus-visible{border-color:var(--ink)}
+.hoje button:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.hoje b{font-size:1.5rem;line-height:1;min-width:1.6ch}
+.hoje .zero{opacity:.45}
+.hoje-ok{margin:0 0 1.2rem;padding:.8rem 1rem;border-radius:14px;background:var(--sunk)}
+.mov{list-style:none;margin:0;padding:0}.mov li{display:flex;gap:.6rem;justify-content:space-between;padding:.45rem 0;border-bottom:1px solid var(--line);font-size:.92rem}.mov time{color:var(--muted);white-space:nowrap}
+.projForm{margin-top:.8rem;padding-top:.8rem;border-top:1px dashed var(--line)}
 .pag-valor{margin:.7rem 0 .2rem;padding:.6rem .8rem;border-radius:10px;background:var(--bg,rgba(0,0,0,.04))}
 .orc dl{display:grid;grid-template-columns:auto 1fr;gap:.25rem 1.2rem;margin:0 0 .8rem}
 .orc dt{color:var(--muted)}
@@ -1447,6 +1482,8 @@ function demoStore(){
     async myPedidos(){ const u=cur(); return mem.pedidos.filter(p=>p.uid===u?.uid).sort(byDate); },
     async allPedidos(){ return [...mem.pedidos].sort(byDate); },
     async updatePedido(id,patch){ const p=mem.pedidos.find(x=>x.id===id); if(p){Object.assign(p,patch,{atualizadoEm:Date.now()}); save();} },
+    async upload(){ throw new Error("No modo demonstração não dá para enviar ficheiros."); },
+    async ficheiroUrl(){ return "#"; }, async eventos(){ return []; },
     async createSuporte(d){ mem.suporte=mem.suporte||[]; mem.suporte.push({...d,id:"s"+Date.now(),estado:"aberto",criadoEm:Date.now(),atualizadoEm:Date.now()}); save(); },
     async mySuporte(){ const u=cur(); return (mem.suporte||[]).filter(p=>p.uid===u?.uid).sort(byDate); },
     async allSuporte(){ return [...(mem.suporte||[])].sort(byDate); },
@@ -1482,6 +1519,13 @@ async function firebaseStore(cfg){
     async allPedidos(){ return (await F.getDocs(F.collection(db,"pedidos"))).docs.map(norm).sort(byDate); },
     async updatePedido(id,patch){ await F.updateDoc(F.doc(db,"pedidos",id),{...patch,atualizadoEm:F.serverTimestamp()}); },
     async pagIniciar(pedidoId,tipo){ const Fn=await import(base+"firebase-functions.js"); const fn=Fn.httpsCallable(Fn.getFunctions(app,"europe-west1"),"pagamentoIniciar"); return (await fn({pedidoId,tipo})).data; },
+    async upload(pedidoId,item,file){ const S=await import(base+"firebase-storage.js"); const st=S.getStorage(app);
+      const nome=file.name.replace(/[^\w.\-]+/g,"_").slice(-80), path=`uploads/${auth.currentUser.uid}/${pedidoId}/${Date.now()}-${nome}`;
+      await S.uploadBytes(S.ref(st,path),file,{contentType:file.type||"application/octet-stream"});
+      const f={item,nome:file.name.slice(0,120),path,tamanho:file.size,em:Date.now()};
+      await F.updateDoc(F.doc(db,"pedidos",pedidoId),{ficheiros:F.arrayUnion(f),atualizadoEm:F.serverTimestamp()}); return f; },
+    async ficheiroUrl(path){ const S=await import(base+"firebase-storage.js"); return S.getDownloadURL(S.ref(S.getStorage(app),path)); },
+    async eventos(){ try{ const q=F.query(F.collection(db,"eventos"),F.orderBy("criadoEm","desc"),F.limit(15)); return (await F.getDocs(q)).docs.map(norm); }catch(e){ return []; } },
     async cancelarManut(pedidoId){ const Fn=await import(base+"firebase-functions.js"); const fn=Fn.httpsCallable(Fn.getFunctions(app,"europe-west1"),"cancelarManutencao"); return (await fn({pedidoId})).data; },
     async pagConfirmar(sessionId){ const Fn=await import(base+"firebase-functions.js"); const fn=Fn.httpsCallable(Fn.getFunctions(app,"europe-west1"),"pagamentoConfirmar"); return (await fn({sessionId})).data; },
     async createSuporte(d){ await F.addDoc(F.collection(db,"suporte"),{...d,estado:"aberto",criadoEm:F.serverTimestamp(),atualizadoEm:F.serverTimestamp()}); avisarEmail("AW: novo pedido de suporte",`${d.site}: ${d.tipo}\n${d.nome||""} · ${d.telefone||d.email||""}\n${d.descricao}\nhttps://joaoantunesss.github.io/aw/#gestao`); },
@@ -1499,6 +1543,35 @@ async function firebaseStore(cfg){
 let gtab="resumo", supSite="todos", cliQ="", cliDraft=null, fichaId=null;
 const CLI_ESTADOS={"ativo":"Ativo","pausado":"Pausado","terminado":"Terminado"}, PLANOS=["Essencial","Cuidado","Completo","Sem manutenção"];
 const ESTADOS={"recebido":"Recebido","em-analise":"Em análise","orcamento-enviado":"Contraproposta","aceite":"Aceite","recusado":"Recusado"};
+const FASES=[["conteudos","À espera dos teus conteúdos"],["a-fazer","A fazer o teu site"],["revisao","Em revisão contigo"],["publicado","Publicado"]];
+const C_LOGO={k:"logotipo",t:"Logótipo",tipo:"ficheiros",h:"Em boa qualidade (PNG ou SVG). Se ainda não tens, diz-me na nota."};
+const C_HORAS={k:"horarios",t:"Horário",tipo:"lista",h:"Um dia por linha. Se fechas, escreve «Fechado».",cols:["Dia","Abre","Fecha"],ex:["Segunda","09:00","19:00"]};
+const C_CONT={k:"contactos",t:"Contactos",tipo:"campos",h:"Aparecem no site e no Google.",campos:["Morada","Telefone","Email","Instagram","Facebook"]};
+const C_SOBRE={k:"sobre",t:"Quem és",tipo:"texto",h:"Um ou dois parágrafos sobre ti e o teu trabalho. Eu ajusto o texto se for preciso."};
+const CONTEUDO={
+  restaurante:[C_LOGO,{k:"fotos",t:"Fotografias",tipo:"ficheiros",h:"Dos pratos, do espaço e da equipa. Fotos do telemóvel servem, com boa luz."},
+    {k:"cardapio",t:"Cardápio",tipo:"lista",h:"Um prato por linha. Alergénios separados por vírgulas (glúten, lactose, ovo…).",cols:["Prato","Categoria","Preço (€)","Descrição","Alergénios"],ex:["Bacalhau à Lagareiro","Peixe","14,50","Com batata a murro","Peixe"]},
+    C_HORAS,C_CONT],
+  studio:[C_LOGO,{k:"fotos",t:"Fotografias",tipo:"ficheiros",h:"Do espaço, da equipa e de trabalhos feitos."},
+    {k:"servicos",t:"Serviços e preços",tipo:"lista",h:"Um serviço por linha. A duração serve para as marcações online.",cols:["Serviço","Categoria","Duração (min)","Preço (€)"],ex:["Corte e brushing","Cabelo","45","35"]},
+    {k:"equipa",t:"Equipa",tipo:"lista",h:"Quem faz marcações e o quê.",cols:["Nome","O que faz"],ex:["Ana","Cabelo e coloração"]},C_HORAS,C_CONT],
+  momento:[C_LOGO,{k:"portefolio",t:"Portefólio",tipo:"ficheiros",h:"As tuas melhores fotografias (ou um link para uma pasta)."},
+    {k:"pacotes",t:"Pacotes e preços",tipo:"lista",h:"Se preferires não mostrar preços, escreve «sob consulta».",cols:["Pacote","Preço (€)","O que inclui"],ex:["Casamento completo","1200","Preparativos, cerimónia e festa"]},C_SOBRE,C_CONT],
+  ninho:[{k:"foto",t:"A tua fotografia",tipo:"ficheiros",h:"Uma foto tua, simpática e com boa luz. Dá confiança às famílias."},
+    {k:"tarifas",t:"Serviços e preços",tipo:"lista",h:"Um serviço por linha.",cols:["Serviço","Preço","Notas"],ex:["Noites","10 €/hora","Depois das 22h"]},
+    {k:"certificados",t:"Formação e certificados",tipo:"ficheiros",h:"Primeiros socorros, cursos, registo criminal (opcional)."},C_SOBRE,C_CONT],
+  quadro:[C_LOGO,{k:"disciplinas",t:"Disciplinas e preços",tipo:"lista",h:"Uma linha por disciplina e nível.",cols:["Disciplina","Nível","Formato","Preço (€)"],ex:["Matemática","Secundário","Individual, 60 min","20"]},
+    {k:"turmas",t:"Turmas e horários",tipo:"lista",h:"As turmas que já tens, para criar as salas.",cols:["Turma","Dia e hora","Onde (presencial ou online)"],ex:["Mat 12.º A","Terça 18:00","Online"]},C_SOBRE,C_CONT]
+};
+const itensDe=p=>CONTEUDO[p.template]||[C_LOGO,{k:"fotos",t:"Fotografias",tipo:"ficheiros",h:"Do espaço, da equipa e dos trabalhos."},C_SOBRE,C_CONT];
+const itemFeito=(p,it)=>{ const c=(p.conteudo||{})[it.k]||{}, ck=(p.checklist||{})[it.k]||{};
+  if(it.tipo==="ficheiros") return (p.ficheiros||[]).some(f=>f.item===it.k)||!!(c.nota||ck.nota)||!!ck.ok;
+  if(it.tipo==="lista") return (c.linhas||[]).some(l=>Object.values(l).some(v=>String(v).trim()));
+  if(it.tipo==="campos") return Object.values(c.campos||{}).some(v=>String(v).trim());
+  return String(c.texto||"").trim().length>=20; };
+const conteudoCompleto=p=>itensDe(p).every(it=>itemFeito(p,it));
+const DOM_EST={"por-escolher":"Por escolher","comprado":"Comprado, falta ligar","dns":"Registos DNS por configurar","ligado":"Ligado (https a ativar)","https":"Ligado com https"};
+const DOM_OK=d=>d&&(d.estado==="ligado"||d.estado==="https");
 let stab="meus", store=null, user=null, admin=false, pendingTpl=null, tab="meus", authMode="criar", adminFilter="todos";
 const eur=n=>(n===undefined||n===null||n==="")?"A definir":new Intl.NumberFormat("pt-PT",{style:"currency",currency:"EUR"}).format(n);
 const fmtDate=ms=>new Date(ms).toLocaleDateString("pt-PT",{day:"numeric",month:"long",year:"numeric"});
@@ -1716,6 +1789,89 @@ async function abrirPagamento(id,tipo,link,titulo){
   }
 }
 $("pagDlg").addEventListener("close",()=>{ if(pagCheckout){ try{pagCheckout.destroy();}catch(e){} pagCheckout=null; } });
+/* ---- Projeto: fases, o meu site, o que preciso de ti, domínio ---- */
+const faseIdx=p=>Math.max(0,FASES.findIndex(f=>f[0]===(p.fase||"conteudos")));
+function fasesHTML(p){ const i=faseIdx(p); return `<ol class="fases">${FASES.map((f,k)=>`<li class="${k<i?"feito":k===i?"agora":""}"${k===i?' aria-current="step"':""}><b>${k<i?"Feito":k===i?"Agora":"Depois"}</b>${f[1]}</li>`).join("")}</ol>`; }
+const fmtTam=n=>n>1048576?(n/1048576).toFixed(1)+" MB":Math.max(1,Math.round(n/1024))+" KB";
+function filesHTML(p,item){ const fs=(p.ficheiros||[]).filter(f=>f.item===item); return fs.length?`<span class="files">${fs.map(f=>`<a href="#" data-file="${esc(f.path)}">${esc(f.nome)}</a> <span class="muted">${fmtTam(f.tamanho||0)}</span>`).join("")}</span>`:""; }
+function registosHTML(txt,copy){
+  const linhas=String(txt||"").split("\n").map(l=>l.trim()).filter(Boolean).map(l=>l.split(/\s+/)).filter(x=>x.length>=3);
+  if(!linhas.length) return "";
+  return `<table class="dns"><thead><tr><th>Tipo</th><th>Nome</th><th>Valor</th>${copy?"<th></th>":""}</tr></thead><tbody>${linhas.map(([t,n,...v])=>`<tr><td>${esc(t)}</td><td><code>${esc(n)}</code></td><td><code>${esc(v.join(" "))}</code></td>${copy?`<td><button class="btn small" type="button" data-copy="${esc(v.join(" "))}">Copiar</button></td>`:""}</tr>`).join("")}</tbody></table>`;
+}
+function itemHTML(p,it,edit){
+  const c=(p.conteudo||{})[it.k]||{}, ok=itemFeito(p,it), id=esc(p.id), cols=it.cols||[];
+  let corpo="";
+  if(it.tipo==="ficheiros") corpo=`${filesHTML(p,it.k)}${edit?`<span class="up"><label class="btn small" style="cursor:pointer">Enviar ficheiros<input type="file" multiple hidden data-up="${it.k}" data-id="${id}"></label><input type="text" data-nota="${it.k}" data-id="${id}" placeholder="Ou um link (Google Drive, WeTransfer…)" value="${esc(c.nota||(p.checklist||{})[it.k]?.nota||"")}" style="flex:1;min-width:12rem"></span>`:(c.nota?`<small>${esc(c.nota)}</small>`:"")}`;
+  else if(it.tipo==="lista"){ const linhas=(c.linhas&&c.linhas.length)?c.linhas:(edit?[{}]:[]);
+    corpo=linhas.length?`<div style="grid-column:2;overflow-x:auto"><table class="dns lista" data-lista="${it.k}" data-id="${id}"><thead><tr>${cols.map(h=>`<th>${esc(h)}</th>`).join("")}${edit?"<th></th>":""}</tr></thead><tbody>${linhas.map(l=>`<tr>${cols.map((h,ci)=>edit?`<td><input type="text" data-c="${ci}" value="${esc(l["c"+ci]||"")}" placeholder="${esc((it.ex||[])[ci]||"")}" aria-label="${esc(h)}"></td>`:`<td>${esc(l["c"+ci]||"")}</td>`).join("")}${edit?`<td><button class="btn small" type="button" data-rmlinha aria-label="Apagar linha">✕</button></td>`:""}</tr>`).join("")}</tbody></table></div>
+      ${edit?`<span class="up"><button class="btn small" type="button" data-addlinha="${it.k}" data-id="${id}">Mais uma linha</button><button class="btn solid small" type="button" data-savelista="${it.k}" data-id="${id}">Guardar</button></span>`:`<span class="up"><button class="btn small" type="button" data-csv="${it.k}" data-id="${id}">Copiar para Excel</button></span>`}`:`<small>Ainda nada.</small>`; }
+  else if(it.tipo==="campos") corpo=`<div style="grid-column:2;display:grid;gap:.4rem">${it.campos.map((f,ci)=>edit?`<label class="f" style="margin:0"><span>${esc(f)}</span><input type="text" data-campo="${it.k}" data-id="${id}" data-f="${esc(f)}" value="${esc((c.campos||{})[f]||"")}"></label>`:((c.campos||{})[f]?`<span><b>${esc(f)}:</b> ${esc(c.campos[f])}</span>`:"")).join("")}</div>`;
+  else corpo=edit?`<textarea data-texto="${it.k}" data-id="${id}" rows="4" style="grid-column:2">${esc(c.texto||"")}</textarea>`:`<p class="pre" style="grid-column:2;margin:0">${esc(c.texto||"")||'<span class="muted">Ainda nada.</span>'}</p>`;
+  return `<li class="${ok?"feito":""}"><span aria-hidden="true">${ok?"✅":"⬜"}</span><b>${it.t}${ok?' <span class="sr-only">(feito)</span>':""}</b>${edit?`<small>${esc(it.h)}</small>`:""}${corpo}</li>`;
+}
+function projetoHTML(p){
+  if(p.estado!=="aceite") return "";
+  const g=p.pagamento||{}, d=p.dominio||{}, dc=p.dominioCliente||{};
+  const site=p.siteUrl?`<p><a class="btn solid small" href="${esc(p.siteUrl)}" target="_blank" rel="noopener">Abrir o meu site</a> <span class="muted">${esc(p.siteUrl.replace(/^https?:\/\//,""))}</span></p>`:`<p class="muted">O endereço do teu site aparece aqui quando estiver publicado.</p>`;
+  const manut=g.mensalAtiva?(g.mensalCancelada?`Manutenção cancelada, ativa até ${g.mensalFim?fmtDate(g.mensalFim):"ao fim do mês pago"}.`:`Manutenção ativa${g.mensalProxima?`, próxima cobrança a ${fmtDate(g.mensalProxima)}`:""}.`)+(g.mensalFalhou?` <b class="err">O último pagamento falhou: confirma o teu cartão.</b>`:""):"Manutenção ainda não ativada.";
+  const itens=itensDe(p), feitos=itens.filter(it=>itemFeito(p,it)).length;
+  const opc=dc.opcao||"";
+  return `<div class="proj">
+    <section><h4>O meu site</h4>${fasesHTML(p)}<div style="margin-top:.8rem">${site}<p class="muted">${manut}</p></div></section>
+    <section><h4>O que preciso de ti <span class="muted" style="font-weight:500">${feitos} de ${itens.length}</span></h4>
+      <p class="muted">Para o teu site ${esc(tplOf(p.template).nome)}. Vai preenchendo; fica guardado e eu vejo logo no meu painel.</p>
+      <ul class="chk">${itens.map(it=>itemHTML(p,it,true)).join("")}</ul>
+      <p class="muted" data-upmsg="${esc(p.id)}" role="status"></p></section>
+    <section><h4>O teu domínio ${d.estado?`<span class="estado">${esc(DOM_EST[d.estado]||d.estado)}</span>`:""}</h4>
+      <p class="muted">O domínio é o endereço do teu site (por exemplo, <code>onomedoteunegocio.pt</code>). Fica sempre em teu nome.</p>
+      <div class="dom-opc" role="radiogroup" aria-label="O teu domínio">
+        <label><input type="radio" name="dopc-${p.id}" value="tenho"${opc==="tenho"?" checked":""} data-dopc="${esc(p.id)}"> Já tenho</label>
+        <label><input type="radio" name="dopc-${p.id}" value="comprar"${opc==="comprar"?" checked":""} data-dopc="${esc(p.id)}"> Quero comprar</label>
+        <label><input type="radio" name="dopc-${p.id}" value="gratis"${opc==="gratis"?" checked":""} data-dopc="${esc(p.id)}"> Por agora uso o endereço grátis</label></div>
+      ${opc==="comprar"?`<ol class="guia"><li>Entra em <a href="https://www.dominios.pt" target="_blank" rel="noopener">dominios.pt</a> e pesquisa o nome que queres (por exemplo, <code>salaoana.pt</code>).</li><li>Se estiver livre, regista-o <b>em nome do teu negócio</b>, com o teu NIF. Escolhe só o domínio: não precisas de alojamento nem de email.</li><li>Quando estiver comprado, escreve-o aqui em baixo. Eu digo-te o que pôr na zona DNS, ou tratas comigo por telefone.</li></ol>`:""}
+      ${opc==="gratis"?`<p>Sem problema: o site fica num endereço grátis meu e mais tarde ligamos um domínio teu, sem mudar nada no site.</p>`:""}
+      ${opc==="tenho"||opc==="comprar"?`<div class="up" style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center"><input type="text" data-dnome="${esc(p.id)}" placeholder="onomedoteunegocio.pt" value="${esc(dc.nome||"")}" style="flex:1;min-width:12rem" autocomplete="off" spellcheck="false"><button class="btn small" type="button" data-dsave="${esc(p.id)}">Guardar</button></div>`:""}
+      ${d.registos&&(dc.nome||d.nome)?`<p style="margin-top:.8rem"><b>Põe estes registos na zona DNS do teu domínio</b> (em dominios.pt: o teu domínio → Gestão de DNS):</p>${registosHTML(d.registos,true)}<p><button class="btn small" type="button" data-dcheck="${esc(p.id)}" data-dom="${esc(dc.nome||d.nome)}">Verificar se já está ligado</button> <span data-dres="${esc(p.id)}" role="status"></span></p><p class="muted">Depois de mudares, pode demorar umas horas a funcionar.</p>`
+        :dc.nome?`<p class="muted" style="margin-top:.6rem">Obrigado. Estou a preparar os dados para ligares o domínio, que aparecem aqui.</p>`:""}
+      ${d.renovacao?`<p class="muted">Renovação do domínio: ${fmtDate(new Date(d.renovacao).getTime())}. Aviso-te antes.</p>`:""}
+    </section></div>`;
+}
+const normDom=v=>String(v||"").trim().toLowerCase().replace(/^https?:\/\//,"").replace(/^www\./,"").replace(/\/.*$/,"");
+async function verificarDominio(dom,registos){
+  const want=String(registos||"").split("\n").map(l=>l.trim().split(/\s+/)).filter(x=>x[0]&&/^A$/i.test(x[0])).map(x=>x.slice(2).join(" "));
+  const r=await fetch(`https://dns.google/resolve?name=${encodeURIComponent(dom)}&type=A`).then(r=>r.json());
+  const got=(r.Answer||[]).filter(a=>a.type===1).map(a=>a.data);
+  if(!got.length) return {ok:false,txt:"Ainda não encontro o domínio a apontar para lado nenhum."};
+  if(want.length&&!want.some(w=>got.includes(w))) return {ok:false,txt:`Ainda aponta para ${got.join(", ")}. Confirma o registo A, ou espera umas horas.`};
+  return {ok:true,txt:"Está ligado! ✅"};
+}
+function bindProjeto(a,list){
+  const byId=id=>list.find(x=>x.id===id);
+  const salvar=async(id,patch,msg)=>{ const m=a.querySelector(`[data-upmsg="${id}"]`); try{ await store.updatePedido(id,patch); if(m&&msg) m.textContent=msg; }catch(e){ if(m) m.textContent=errMsg(e); else alert(errMsg(e)); } };
+  const setC=async(id,k,val,msg)=>{ const p=byId(id), c={...(p.conteudo||{})}; c[k]={...(c[k]||{}),...val}; p.conteudo=c; await salvar(id,{conteudo:c},msg); };
+  a.querySelectorAll("[data-nota]").forEach(i=>i.addEventListener("change",()=>setC(i.dataset.id,i.dataset.nota,{nota:i.value.trim().slice(0,500)},"Guardado.")));
+  a.querySelectorAll("[data-texto]").forEach(t=>t.addEventListener("change",()=>setC(t.dataset.id,t.dataset.texto,{texto:t.value.trim().slice(0,4000)},"Texto guardado.")));
+  a.querySelectorAll("[data-campo]").forEach(i=>i.addEventListener("change",()=>{ const p=byId(i.dataset.id), c0=((p.conteudo||{})[i.dataset.campo]||{}).campos||{}; setC(i.dataset.id,i.dataset.campo,{campos:{...c0,[i.dataset.f]:i.value.trim().slice(0,300)}},"Guardado."); }));
+  const linhasDe=tb=>[...tb.querySelectorAll("tbody tr")].map(tr=>Object.fromEntries([...tr.querySelectorAll("input[data-c]")].map(x=>["c"+x.dataset.c,x.value.trim().slice(0,300)]))).filter(l=>Object.values(l).some(Boolean)).slice(0,150);
+  a.querySelectorAll("[data-addlinha]").forEach(b=>b.addEventListener("click",()=>{ const tb=a.querySelector(`table[data-lista="${b.dataset.addlinha}"][data-id="${b.dataset.id}"] tbody`), tr=tb.lastElementChild.cloneNode(true); tr.querySelectorAll("input").forEach(x=>x.value=""); tb.appendChild(tr); tr.querySelector("input").focus(); }));
+  a.addEventListener("click",e=>{ const b=e.target.closest("[data-rmlinha]"); if(!b) return; const tb=b.closest("tbody"); if(tb.children.length>1) b.closest("tr").remove(); else b.closest("tr").querySelectorAll("input").forEach(x=>x.value=""); });
+  a.querySelectorAll("[data-savelista]").forEach(b=>b.addEventListener("click",async()=>{ const tb=a.querySelector(`table[data-lista="${b.dataset.savelista}"][data-id="${b.dataset.id}"]`); b.disabled=true; await setC(b.dataset.id,b.dataset.savelista,{linhas:linhasDe(tb)},"Lista guardada."); b.disabled=false; b.textContent="Guardado ✓"; setTimeout(()=>b.textContent="Guardar",1500); }));
+  a.querySelectorAll("[data-up]").forEach(inp=>inp.addEventListener("change",async()=>{
+    const p=byId(inp.dataset.id), m=a.querySelector(`[data-upmsg="${p.id}"]`), files=[...inp.files];
+    for(const [i,f] of files.entries()){ if(f.size>25*1048576){ m.textContent=`${f.name} tem mais de 25 MB. Envia-o por link na nota.`; continue; }
+      m.textContent=`A enviar ${i+1} de ${files.length}: ${f.name}…`;
+      try{ await store.upload(p.id,inp.dataset.up,f); }catch(e){ m.textContent=errMsg(e); return; } }
+    m.textContent="Ficheiros enviados. Obrigado!"; renderApp(); }));
+  a.querySelectorAll("[data-file]").forEach(l=>l.addEventListener("click",async e=>{ e.preventDefault(); try{ window.open(await store.ficheiroUrl(l.dataset.file),"_blank","noopener"); }catch(x){ alert(errMsg(x)); } }));
+  a.querySelectorAll("[data-dopc]").forEach(r=>r.addEventListener("change",async()=>{ const p=byId(r.dataset.dopc); await salvar(p.id,{dominioCliente:{...(p.dominioCliente||{}),opcao:r.value}}); renderApp(); }));
+  a.querySelectorAll("[data-dsave]").forEach(b=>b.addEventListener("click",async()=>{ const p=byId(b.dataset.dsave), v=normDom(a.querySelector(`[data-dnome="${p.id}"]`).value);
+    if(v&&!/^[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(v)){ alert("Escreve só o domínio, por exemplo onomedoteunegocio.pt"); return; }
+    b.disabled=true; await salvar(p.id,{dominioCliente:{...(p.dominioCliente||{}),nome:v}}); renderApp(); }));
+  a.querySelectorAll("[data-copy]").forEach(b=>b.addEventListener("click",async()=>{ try{ await navigator.clipboard.writeText(b.dataset.copy); b.textContent="Copiado"; setTimeout(()=>b.textContent="Copiar",1500); }catch(e){} }));
+  a.querySelectorAll("[data-dcheck]").forEach(b=>b.addEventListener("click",async()=>{ const p=byId(b.dataset.dcheck), out=a.querySelector(`[data-dres="${p.id}"]`); out.textContent="A verificar…";
+    try{ const r=await verificarDominio(b.dataset.dom,(p.dominio||{}).registos); out.textContent=r.txt; out.className=r.ok?"ok":"muted"; }catch(e){ out.textContent="Não consegui verificar agora. Tenta daqui a pouco."; } }));
+}
 function orcHTML(p,canAnswer){
   const o=p.orcamento; if(!o) return "";
   return `<div class="orc"><h4>Contraproposta</h4><dl>
@@ -1739,6 +1895,7 @@ function renderMine(list){
       ${p.estado==="recusado"&&!p.orcamento?`<p class="muted">Desta vez não consegui aceitar a proposta. Podes fazer uma nova com outro valor ou falar comigo.</p>`:""}
       ${orcHTML(p,true)}
       ${pagHTML(p)}
+      ${projetoHTML(p)}
       <details><summary>Ver as minhas respostas</summary>${answersHTML(p)}</details>
     </article>`).join(""):`<p class="empty">Ainda não fizeste nenhum pedido. Escolhe um modelo e conta-me como é o teu negócio.</p>`);
   $("newReq").addEventListener("click",()=>{ pendingTpl=PANELS[current].t; renderApp(); });
@@ -1749,6 +1906,7 @@ function renderMine(list){
     catch(e){ b.disabled=false; b.textContent="Cancelar a manutenção"; alert("Não foi possível cancelar agora: "+(e?.message||e)+". Fala comigo e eu trato disso."); }
   }));
   a.querySelectorAll("[data-pag]").forEach(b=>b.addEventListener("click",()=>abrirPagamento(b.dataset.id,b.dataset.pag,b.dataset.link,b.textContent)));
+  bindProjeto(a,list);
   const md=document.createElement("section"); md.className="mydata";
   md.innerHTML=`<h3>Os teus dados</h3><p>Podes descarregar uma cópia de tudo o que tenho sobre ti, ou pedir que apague a tua conta e os teus dados. Consulta a <a href="privacidade.html" target="_blank" rel="noopener">política de privacidade</a>.</p><div class="ctas"><button class="btn small" type="button" id="dlData">Descarregar os meus dados</button><button class="btn small" type="button" id="delData">Pedir o apagamento dos meus dados</button></div><p class="ok" id="mydataMsg" role="status"></p>`;
   a.appendChild(md);
@@ -1768,6 +1926,22 @@ function renderMine(list){
     const id=b.dataset.acc||b.dataset.rec; b.disabled=true;
     try{ await store.updatePedido(id,{estado:b.dataset.acc?"aceite":"recusado"}); renderApp(); }catch(ex){ alert(errMsg(ex)); b.disabled=false; }
   }));
+}
+function adminProjHTML(p){
+  const d=p.dominio||{}, dc=p.dominioCliente||{};
+  const opcTxt={tenho:"Já tem domínio",comprar:"Vai comprar domínio",gratis:"Endereço grátis por agora"}[dc.opcao]||"Ainda não escolheu";
+  return `<form class="orcForm projForm" data-proj="${p.id}">
+    <h4 class="full" style="margin:0">Projeto</h4>
+    <div class="full"><div class="list-head" style="margin:0"><b>O que o cliente já enviou (${itensDe(p).filter(it=>itemFeito(p,it)).length} de ${itensDe(p).length})</b><button class="btn small" type="button" data-json="${p.id}">Descarregar tudo (JSON)</button></div><ul class="chk" style="margin-top:.4rem">${itensDe(p).map(it=>itemHTML(p,it,false)).join("")}</ul></div>
+    <label class="f"><span>Fase</span><select name="fase">${FASES.map(([k,l])=>`<option value="${k}"${(p.fase||"conteudos")===k?" selected":""}>${l}</option>`).join("")}</select></label>
+    <label class="f"><span>Endereço do site publicado</span><input type="url" name="siteUrl" placeholder="https://" value="${esc(p.siteUrl||"")}"></label>
+    <p class="full" style="margin:.3rem 0 0"><b>Domínio:</b> ${opcTxt}${dc.nome?`: <code>${esc(dc.nome)}</code>`:""}</p>
+    <label class="f"><span>Estado do domínio</span><select name="domEstado">${Object.entries(DOM_EST).map(([k,l])=>`<option value="${k}"${(d.estado||"por-escolher")===k?" selected":""}>${l}</option>`).join("")}</select></label>
+    <label class="f"><span>Renovação do domínio</span><input type="date" name="domRenovacao" value="${esc(d.renovacao||"")}"></label>
+    <label class="f full"><span>Registos DNS para o cliente (um por linha: TIPO NOME VALOR)</span><textarea name="domRegistos" placeholder="A @ 199.36.158.100&#10;TXT @ hosting-site=…&#10;CNAME www onomedoteunegocio.pt">${esc(d.registos||"")}</textarea></label>
+    <p class="err full" role="alert"></p>
+    <div class="ctas full"><button class="btn solid small" type="submit">Guardar projeto</button></div>
+  </form>`;
 }
 function renderAdmin(all){
   const a=$("listArea");
@@ -1794,8 +1968,25 @@ function renderAdmin(all){
         <label class="f"><span><input type="checkbox" name="mensalAtiva"${(p.pagamento||{}).mensalAtiva?" checked":""}> Mensalidade ativa${(p.pagamento||{}).mensalCancelada?` <b class="err">(cancelada${(p.pagamento||{}).mensalFim?", até "+fmtDate((p.pagamento||{}).mensalFim):""})</b>`:""}</span></label>
         <p class="err full" role="alert"></p>
         <div class="ctas full"><button class="btn solid small" type="submit" value="aceitar">Aceitar proposta do cliente</button><button class="btn small" type="submit" value="enviar">Enviar contraproposta</button><button class="btn small" type="submit" value="guardar">Guardar estado</button>${p.estado==="aceite"?`<button class="btn small" type="button" data-cli="${p.id}">Criar ficha de cliente</button>`:""}</div>
-      </form></article>`;}).join(""):`<p class="empty">Não há pedidos ${adminFilter==="todos"?"":"neste estado "}por agora.</p>`}`;
+      </form>${p.estado==="aceite"?adminProjHTML(p):""}</article>`;}).join(""):`<p class="empty">Não há pedidos ${adminFilter==="todos"?"":"neste estado "}por agora.</p>`}`;
   $("filt").addEventListener("change",e=>{adminFilter=e.target.value;renderAdmin(all);});
+  a.querySelectorAll("[data-file]").forEach(l=>l.addEventListener("click",async e=>{ e.preventDefault(); try{ window.open(await store.ficheiroUrl(l.dataset.file),"_blank","noopener"); }catch(x){ alert(errMsg(x)); } }));
+  a.querySelectorAll("[data-csv]").forEach(b=>b.addEventListener("click",async()=>{ const p=all.find(x=>x.id===b.dataset.id), it=itensDe(p).find(x=>x.k===b.dataset.csv), c=(p.conteudo||{})[it.k]||{};
+    const tsv=[it.cols.join("\t"),...(c.linhas||[]).map(l=>it.cols.map((_,i)=>String(l["c"+i]||"").replace(/\s+/g," ")).join("\t"))].join("\n");
+    try{ await navigator.clipboard.writeText(tsv); b.textContent="Copiado ✓"; setTimeout(()=>b.textContent="Copiar para Excel",1500); }catch(e){ alert(tsv); } }));
+  a.querySelectorAll("[data-json]").forEach(b=>b.addEventListener("click",()=>{ const p=all.find(x=>x.id===b.dataset.json);
+    const out={negocio:p.respostas?.negocio||"",modelo:p.template,respostas:p.respostas||{},conteudo:Object.fromEntries(itensDe(p).map(it=>{ const c=(p.conteudo||{})[it.k]||{};
+      return [it.k, it.tipo==="lista"?(c.linhas||[]).map(l=>Object.fromEntries(it.cols.map((h,i)=>[h,l["c"+i]||""]))):it.tipo==="campos"?(c.campos||{}):it.tipo==="texto"?(c.texto||""):{nota:c.nota||"",ficheiros:(p.ficheiros||[]).filter(f=>f.item===it.k).map(f=>f.nome)}]; })),dominio:p.dominioCliente||{}};
+    const url=URL.createObjectURL(new Blob([JSON.stringify(out,null,2)],{type:"application/json"})); const l=document.createElement("a"); l.href=url; l.download=`conteudo-${(p.respostas?.negocio||"cliente").toLowerCase().replace(/[^a-z0-9]+/g,"-")}.json`; document.body.appendChild(l); l.click(); l.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000); }));
+  a.querySelectorAll("form[data-proj]").forEach(f=>f.addEventListener("submit",async e=>{
+    e.preventDefault(); const er=f.querySelector(".err"); er.textContent=""; const d=Object.fromEntries(new FormData(f));
+    if(d.siteUrl&&!pagUrl(d.siteUrl)){ er.textContent="O endereço do site tem de começar por https://"; return; }
+    const p0=all.find(x=>x.id===f.dataset.proj)||{}, dm0=p0.dominio||{};
+    const patch={fase:d.fase,siteUrl:pagUrl(d.siteUrl||""),dominio:{...dm0,estado:d.domEstado,renovacao:d.domRenovacao||"",registos:d.domRegistos.trim().slice(0,2000),nome:(p0.dominioCliente||{}).nome||dm0.nome||""}};
+    if(dm0.renovacao!==patch.dominio.renovacao) patch.dominio.avisado="";
+    const b=f.querySelector("button"); b.disabled=true;
+    try{ await store.updatePedido(f.dataset.proj,patch); renderApp(); }catch(ex){ er.textContent=errMsg(ex); b.disabled=false; }
+  }));
   a.querySelectorAll("[data-cli]").forEach(b=>b.addEventListener("click",()=>{ const p=all.find(x=>x.id===b.dataset.cli), o=p.orcamento||{}, r=p.respostas||{};
     cliDraft={nome:r.negocio||"",contacto:p.nome||"",email:p.email||"",telefone:p.telefone||"",template:p.template,montagem:o.valor??r.budgetMontagem??"",mensal:o.mensal??r.budgetMensal??"",estado:"ativo",pedidoId:p.id};
     gtab="clientes"; renderApp(); }));
@@ -1983,7 +2174,18 @@ function renderResumo(P,S,C){
   const pct=meta?Math.min(100,Math.round(M.mrr/meta*100)):0;
   const ordem=[...C].sort((x,y)=>M.saude(y).n-M.saude(x).n||(Number(y.mensal)||0)-(Number(x.mensal)||0));
   const estF=Object.entries(ESTADOS).map(([k,l])=>[l,P.filter(p=>p.estado===k).length]);
-  a.innerHTML=`<div class="cc-top"><p class="cc-brief">${briefing(M,P,S,C)}</p>
+  const A=P.filter(p=>p.estado==="aceite"), dDias=d=>d?Math.ceil((new Date(d)-agora)/DIA):null;
+  const hoje=[
+    {n:P.filter(p=>p.estado==="recebido").length,t:"orçamentos por responder",g:"pedidos",f:"recebido"},
+    {n:A.filter(p=>!(p.pagamento||{}).montagemPaga).length,t:"aceites à espera de pagamento",g:"pedidos",f:"aceite"},
+    {n:A.filter(p=>(p.pagamento||{}).montagemPaga&&(p.fase||"conteudos")==="conteudos"&&!conteudoCompleto(p)).length,t:"à espera de conteúdos do cliente",g:"pedidos",f:"aceite"},
+    {n:A.filter(p=>(p.pagamento||{}).montagemPaga&&(p.dominioCliente||{}).opcao!=="gratis"&&!DOM_OK(p.dominio)).length,t:"domínios por ligar",g:"pedidos",f:"aceite"},
+    {n:A.filter(p=>{const x=dDias((p.dominio||{}).renovacao);return x!==null&&x<=30;}).length,t:"domínios a renovar em 30 dias",g:"pedidos",f:"aceite"},
+    {n:A.filter(p=>{const g=p.pagamento||{};return g.mensalFalhou||(g.mensalAtiva&&g.mensalCancelada);}).length,t:"manutenções canceladas ou com falha",g:"pedidos",f:"aceite"},
+    {n:S.filter(x=>x.estado==="aberto").length,t:"pedidos de suporte por abrir",g:"suporte"}];
+  const hojeN=hoje.reduce((t,x)=>t+x.n,0);
+  const hojeHTML=hojeN?`<div class="hoje" aria-label="Hoje">${hoje.map((x,i)=>`<button type="button" data-hoje="${i}" class="${x.n?"":"zero"}"><b>${x.n}</b><span>${x.t}</span></button>`).join("")}</div>`:`<p class="hoje-ok">Hoje está tudo em dia: nada por responder, cobrar, ligar ou renovar.</p>`;
+  a.innerHTML=`${hojeHTML}<div class="cc-top"><p class="cc-brief">${briefing(M,P,S,C)}</p>
     <div class="cc-act"><label class="f" style="margin:0"><span class="muted" style="font-weight:500">Ir para cliente</span><input id="ccGo" list="ccList" placeholder="Escreve o nome" autocomplete="off"><datalist id="ccList">${C.map(c=>`<option value="${esc(c.nome)}">`).join("")}</datalist></label>
     <button class="btn small" type="button" id="ccRel">Relatório (PDF)</button></div></div>
     <div class="kpis cc-k">${kpi(eurS(M.mrr),"Receita mensal recorrente",`${eurS(M.mrr*12)} por ano`)}${kpi(eurS(M.faturado),"Faturado desde o início","montagens pagas e mensalidades")}${kpi(eurS(M.porCobrar),"Por cobrar","montagens em aberto",M.porCobrar>0)}${kpi(M.ativos.length,"Clientes ativos",`${C.length} registados`)}${kpi(eurS(M.arpa),"Receita por cliente","por mês")}${kpi(eurS(M.ltv),"Valor de um cliente","estimado a 24 meses")}${kpi(M.conv===null?"–":M.conv+"%","Orçamentos aceites",`${M.aceites} de ${P.length}`)}${kpi(fDur(M.tResp),"Tempo até responder","orçamentos")}${kpi(fDur(M.tRes),"Tempo a resolver","suporte")}${kpi(M.churn+"%","Clientes perdidos",`${M.terminados} terminados`,M.churn>0)}</div>
@@ -1998,9 +2200,12 @@ function renderResumo(P,S,C){
       <section class="cc-card"><div class="cc-h"><h3>Próximas renovações</h3><span class="muted">60 dias</span></div>${renov.length?`<ul class="tl">${renov.map(c=>{const d=Math.ceil((new Date(c.renovacao)-agora)/DIA);return `<li><button type="button" class="lnk" data-f="${c.id}">${esc(c.nome)}</button> ${d<0?`atrasada ${-d} dias`:d===0?"hoje":`em ${d} dias`}, ${c.mensal?eurS(c.mensal):"sem valor"}</li>`;}).join("")}</ul>`:`<p class="muted">Nenhuma nos próximos 60 dias.</p>`}</section>
       <section class="cc-card"><div class="cc-h"><h3>Problemas mais comuns no suporte</h3></div>${hbar(M.porTipo)}<p class="muted">Se o mesmo tipo aparece muito, vale a pena corrigi-lo nos modelos.</p></section>
       <section class="cc-card cc-wide"><div class="cc-h"><h3>Precisa de atenção</h3></div>${al.length?`<ul class="alerts">${al.map((x,i)=>`<li><button type="button" data-al="${i}">${x.t}</button></li>`).join("")}</ul>`:`<p class="empty">Tudo em dia. Não há nada parado nem em atraso.</p>`}</section>
+      <section class="cc-card cc-wide"><div class="cc-h"><h3>Últimos movimentos</h3><span class="muted">pagamentos, cancelamentos e falhas</span></div><div id="movs"><p class="muted">A carregar…</p></div></section>
       <div class="cc-wide bgrid">${barras("Orçamentos por mês",P)}${barras("Pedidos de suporte por mês",S)}</div>
     </div>`;
   const ir=id=>{fichaId=id;gtab="ficha";renderApp();window.scrollTo(0,0);};
+  a.querySelectorAll("[data-hoje]").forEach(b=>b.addEventListener("click",()=>{const x=hoje[+b.dataset.hoje]; gtab=x.g; if(x.f) adminFilter=x.f; renderApp(); window.scrollTo(0,0);}));
+  store.eventos().then(ev=>{ const el=$("movs"); if(!el) return; el.innerHTML=ev.length?`<ul class="mov">${ev.map(x=>`<li><span>${esc(x.texto)}</span><time>${fmtDate(x.criadoEm)}</time></li>`).join("")}</ul>`:`<p class="muted">Ainda não há movimentos. Aparecem aqui os pagamentos, cancelamentos e falhas.</p>`; });
   a.querySelectorAll("[data-al]").forEach(b=>b.addEventListener("click",()=>{const x=al[+b.dataset.al];if(x.f)ir(x.f);else{gtab=x.g;renderApp();window.scrollTo(0,0);}}));
   a.querySelectorAll("[data-f]").forEach(b=>b.addEventListener("click",()=>ir(b.dataset.f)));
   $("ccGo").addEventListener("change",e=>{const c=C.find(x=>x.nome.toLowerCase()===e.target.value.trim().toLowerCase());if(c) ir(c.id);});

@@ -34,9 +34,17 @@ service cloud.firestore {
         && txt(request.resource.data.template, 40)
         && request.resource.data.criadoEm is timestamp;
       allow read: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin());
-      allow update: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['estado','atualizadoEm'])
-        && request.resource.data.estado in ['aceite','recusado']);
+      allow update: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid && (
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['estado','atualizadoEm'])
+          && request.resource.data.estado in ['aceite','recusado'])
+        // depois de aceite, o cliente preenche o que falta: checklist, ficheiros e o domínio
+        || (resource.data.estado == 'aceite'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['checklist','conteudo','ficheiros','dominioCliente','atualizadoEm'])
+          && (!('checklist' in request.resource.data) || request.resource.data.checklist is map)
+          && (!('conteudo' in request.resource.data) || request.resource.data.conteudo is map)
+          && (!('ficheiros' in request.resource.data) || (request.resource.data.ficheiros is list && request.resource.data.ficheiros.size() <= 60))
+          && (!('dominioCliente' in request.resource.data) || request.resource.data.dominioCliente is map))
+      ));
     }
 
     match /suporte/{id} {
@@ -52,6 +60,12 @@ service cloud.firestore {
         && request.resource.data.criadoEm is timestamp;
       allow read: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin());
       allow update: if isAdmin();
+    }
+
+    // avisos de pagamentos, cancelamentos e falhas (escritos pelo servidor)
+    match /eventos/{id} {
+      allow read: if isAdmin();
+      allow write: if false;
     }
 
     // fichas dos teus clientes: só tu

@@ -1,0 +1,13 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Ficheiros que o cliente envia para o site (logótipo, fotos, textos). Só ele e o admin os veem.
+    match /uploads/{uid}/{pedido}/{ficheiro} {
+      allow read: if request.auth != null && (request.auth.uid == uid
+        || firestore.exists(/databases/(default)/documents/admins/$(request.auth.uid)));
+      allow create: if request.auth != null && request.auth.uid == uid
+        && request.resource.size < 25 * 1024 * 1024;
+      allow delete: if request.auth != null && request.auth.uid == uid;
+    }
+  }
+}
