@@ -31,7 +31,7 @@ O cliente paga a montagem e a mensalidade numa janela do próprio site, com o va
 ### Webhook do Stripe (confirmações automáticas e cancelamentos)
 Garante que o pedido fica pago mesmo que o cliente feche a janela, e avisa-te no Telegram quando uma manutenção é cancelada, termina ou falha.
 1. No Stripe: Programadores → Webhooks → Adicionar destino. URL: `https://europe-west1-aw-sites-e31c3.cloudfunctions.net/stripeWebhook`
-   Eventos: `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_failed`.
+   Eventos: `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_failed`, `invoice.paid`.
 2. Abre o destino criado e copia o "Segredo de assinatura" (começa por `whsec_`).
 3. `firebase functions:secrets:set STRIPE_WEBHOOK_SECRET` e cola-o.
 4. `firebase deploy --only functions`
