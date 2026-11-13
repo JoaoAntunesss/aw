@@ -342,8 +342,13 @@ exports.lerLink = onRequest({ region: "europe-west1", maxInstances: 3, memory: "
       const nome = (/(?:property|name)\s*=\s*["']([^"']+)["']/i.exec(tag) || [])[1];
       if (nome && nome.toLowerCase() === k) { const c = (/content\s*=\s*["']([^"']*)["']/i.exec(tag) || [])[1]; if (c) return ent(c.trim()); } } return ""; };
     let nome = meta("og:site_name") || meta("og:title") || ent(((/<title[^>]*>([^<]*)/i.exec(html) || [])[1] || "").trim());
-    nome = nome.split(/\s+[|·•–—-]\s+|\s+\(@|\s*:\s+/)[0].replace(/\s+on Instagram$|\s+no Instagram$/i, "").trim().slice(0, 60);
-    if (/^(instagram|facebook|google maps|log ?in|entrar)$/i.test(nome)) nome = "";
+    const inteiro = nome;
+    nome = nome.split(/\s+[|–—-]\s+|\s+\(@/)[0].replace(/\s+(on|no) Instagram.*$/i, "").trim();
+    if (nome.length < 4) nome = inteiro.split(/\s+[|–—]\s+/)[0].trim();
+    nome = nome.slice(0, 60);
+    if (/^(instagram|facebook|google maps|google|log ?in|entrar|iniciar sessão)$/i.test(nome)) nome = "";
+    /* sem nome, é uma página de entrada ou genérica (Instagram, Maps sem sessão): não serve para nada */
+    if (!nome) { res.set("Cache-Control", "public, max-age=600"); return res.json({ nome: "", imagem: "", cor: "", site: alvo.hostname.replace(/^www\./, "") }); }
     let imagem = meta("og:image:secure_url") || meta("og:image") || meta("twitter:image");
     try { imagem = imagem ? new URL(imagem, alvo).href : ""; } catch (e) { imagem = ""; }
     if (!/^https:/.test(imagem)) imagem = "";
@@ -362,6 +367,12 @@ exports.lerLink = onRequest({ region: "europe-west1", maxInstances: 3, memory: "
     }
     let cor = meta("theme-color");
     if (!/^#[0-9a-f]{6}$/i.test(cor)) cor = /^#[0-9a-f]{3}$/i.test(cor) ? "#" + cor.slice(1).split("").map(c => c + c).join("") : "";
+    /* só uma cor com cor: branco, preto e cinzentos não dizem nada da marca */
+    if (cor) {
+      const n = parseInt(cor.slice(1), 16), r = (n >> 16) / 255, g = ((n >> 8) & 255) / 255, b = (n & 255) / 255;
+      const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, s = mx === mn ? 0 : (mx - mn) / (1 - Math.abs(2 * l - 1));
+      if (s < 0.25 || l > 0.9 || l < 0.1) cor = "";
+    }
     res.set("Cache-Control", "public, max-age=3600");
     return res.json({ nome, imagem, cor, site: alvo.hostname.replace(/^www\./, "") });
   } catch (e) {
