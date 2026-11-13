@@ -341,7 +341,9 @@ exports.lerLink = onRequest({ region: "europe-west1", maxInstances: 3, memory: "
     const meta = k => { for (const m of html.matchAll(/<meta\b[^>]*>/gi)) { const tag = m[0];
       const nome = (/(?:property|name)\s*=\s*["']([^"']+)["']/i.exec(tag) || [])[1];
       if (nome && nome.toLowerCase() === k) { const c = (/content\s*=\s*["']([^"']*)["']/i.exec(tag) || [])[1]; if (c) return ent(c.trim()); } } return ""; };
-    let nome = meta("og:site_name") || meta("og:title") || ent(((/<title[^>]*>([^<]*)/i.exec(html) || [])[1] || "").trim());
+    const titulo = meta("og:title") || ent(((/<title[^>]*>([^<]*)/i.exec(html) || [])[1] || "").trim());
+    let nome = meta("og:site_name");
+    if (nome.length < 4) nome = titulo || nome;
     const inteiro = nome;
     nome = nome.split(/\s+[|–—-]\s+|\s+\(@/)[0].replace(/\s+(on|no) Instagram.*$/i, "").trim();
     if (nome.length < 4) nome = inteiro.split(/\s+[|–—]\s+/)[0].trim();
