@@ -2,7 +2,7 @@
 <html lang="pt-PT">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; img-src 'self' data: https://*.stripe.com; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://js.stripe.com https://*.js.stripe.com https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://www.google.com; connect-src 'self' https://dns.google https://europe-west1-aw-sites-e31c3.cloudfunctions.net https://api.stripe.com https://checkout.stripe.com https://*.googleapis.com https://*.firebaseapp.com https://api.emailjs.com https://cloudflareinsights.com https://static.cloudflareinsights.com https://www.google.com; frame-src https://www.google.com https://js.stripe.com https://*.js.stripe.com https://hooks.stripe.com https://checkout.stripe.com; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; img-src 'self' data: blob: https://*.stripe.com; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://js.stripe.com https://*.js.stripe.com https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://www.google.com; connect-src 'self' https://dns.google https://europe-west1-aw-sites-e31c3.cloudfunctions.net https://api.stripe.com https://checkout.stripe.com https://*.googleapis.com https://*.firebaseapp.com https://api.emailjs.com https://cloudflareinsights.com https://static.cloudflareinsights.com https://www.google.com; frame-src https://www.google.com https://js.stripe.com https://*.js.stripe.com https://hooks.stripe.com https://checkout.stripe.com; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>AW, sites cuidados, rápidos e acessíveis</title>
@@ -723,6 +723,163 @@ details summary{cursor:pointer;color:var(--brand);font-weight:600;min-height:32p
 .empty{padding:2rem 0;color:var(--muted)}
 
 </style>
+<style>
+@font-face{font-family:"Cormorant Garamond";font-style:normal;font-weight:500;font-display:swap;src:url(demos/momento/fonts/cormorant-garamond-latin-500-normal.woff2) format("woff2")}
+@font-face{font-family:"Cormorant Garamond";font-style:italic;font-weight:500;font-display:swap;src:url(demos/momento/fonts/cormorant-garamond-latin-500-italic.woff2) format("woff2")}
+@font-face{font-family:"DM Sans";font-style:normal;font-weight:400;font-display:swap;src:url(demos/momento/fonts/dm-sans-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:"DM Sans";font-style:normal;font-weight:500 600;font-display:swap;src:url(demos/momento/fonts/dm-sans-latin-600-normal.woff2) format("woff2")}
+/* ---------- hero ao vivo: o visitante monta o site dele (nome, tipo, cor, fotos, frase ou link) ---------- */
+.hero{padding-block:clamp(2rem,5vw,4rem) clamp(3rem,6vw,5rem)}
+.hero-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(2rem,4.5vw,4.5rem);align-items:center;width:100%}
+.hero-copy{min-width:0;position:relative;z-index:2}
+.hero-copy .proof-card{display:flex;gap:.85rem;align-items:center;max-width:400px;margin-top:2.2rem;padding:.6rem .9rem .6rem .6rem;border-radius:12px;background:var(--surface);border:1px solid var(--line);text-decoration:none;color:var(--muted);font-size:.86rem;line-height:1.35}
+.proof-card img{width:96px;height:58px;object-fit:cover;object-position:left top;border-radius:6px;flex:none;border:1px solid var(--line)}
+.proof-card strong{display:flex;align-items:center;gap:.45rem;color:var(--ink);font-weight:600;font-size:.92rem}
+.proof-card strong i{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px var(--green-bg);flex:none}
+@media (hover:hover){.proof-card:hover{border-color:var(--ink)}}
+@media (max-width:900px){.hero-grid{grid-template-columns:1fr}}
+
+.builder{min-width:0;position:relative;z-index:2}
+.bl-stage{perspective:1600px}
+.bl-win{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:0 1px 2px rgba(11,18,32,.05),0 30px 60px -22px rgba(11,18,32,.3);overflow:hidden;
+  transform:rotateY(-9deg) rotateX(5deg);transform-origin:60% 50%;transition:transform .7s cubic-bezier(.2,.7,.15,1)}
+.builder:hover .bl-win,.builder:focus-within .bl-win{transform:none}
+.bl-bar{display:flex;align-items:center;gap:.75rem;padding:.55rem .8rem;background:var(--sunk);border-bottom:1px solid var(--line)}
+.bl-dots{display:flex;gap:6px;flex:none}.bl-dots i{width:10px;height:10px;border-radius:50%;background:var(--line)}
+.bl-url{flex:1;min-width:0;display:flex;align-items:center;gap:.4rem;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:.25rem .65rem;font-size:.84rem;color:var(--muted);white-space:nowrap}
+.bl-url svg{flex:none;width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2}
+.bl-url span{min-width:0;overflow:hidden;text-overflow:ellipsis}.bl-url b{color:var(--ink);font-weight:600}
+.bl-vp{position:relative;aspect-ratio:16/10;max-width:100%;overflow:hidden;background:#fff}
+.ms{position:absolute;left:0;top:0;width:1000px;height:625px;transform-origin:0 0;overflow:hidden;perspective:900px}
+@keyframes bl-place{
+  0%{opacity:0;transform:translate3d(0,-26px,120px) rotateX(-10deg);outline:1.5px dashed #2547F5;outline-offset:4px}
+  70%{outline-color:rgba(37,71,245,.5)}
+  100%{opacity:1;transform:none;outline-color:transparent;outline-offset:4px}}
+.bl-vp.build [data-l]{animation:bl-place .66s cubic-bezier(.2,.75,.2,1) both;animation-delay:calc(var(--d,0)*75ms)}
+@media (prefers-reduced-motion:reduce){.bl-vp.build [data-l]{animation:none}.bl-win{transform:none}}
+
+/* comandos */
+.bl-dock{display:grid;gap:.8rem;margin-top:1.1rem}
+.bl-dock>label,.bl-lbl{font-size:.92rem;font-weight:600;color:var(--ink)}
+.bl-in{width:100%;min-width:0;min-height:46px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:1rem;padding:0 .9rem}
+.bl-in::placeholder{color:var(--muted)}
+.bl-chips{display:flex;flex-wrap:wrap;gap:.45rem;margin:0;padding:0;list-style:none}
+.bl-chips button,.bl-tool{min-height:38px;padding:0 .95rem;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);font:inherit;font-size:.93rem;font-weight:500;cursor:pointer;transition:background-color .18s,color .18s,border-color .18s}
+@media (hover:hover){.bl-chips button:hover,.bl-tool:hover{border-color:var(--ink);color:var(--ink)}}
+.bl-chips button[aria-pressed="true"],.bl-tool[aria-expanded="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.bl-row{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .9rem}
+.bl-sw{display:flex;align-items:center;gap:.4rem}
+.bl-sw button,.bl-sw label{width:30px;height:30px;border-radius:50%;border:2px solid var(--surface);box-shadow:0 0 0 1px var(--line);background:var(--c);cursor:pointer;padding:0;position:relative}
+.bl-sw button[aria-pressed="true"]{box-shadow:0 0 0 2px var(--ink)}
+.bl-sw label{background:conic-gradient(#e94b4b,#f2c14e,#5bc57a,#3fa7d6,#7a5cf0,#e94b4b);display:grid;place-items:center}
+.bl-sw label input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.bl-tool{display:inline-flex;align-items:center;gap:.45rem;color:var(--ink)}
+.bl-tool svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.bl-more{display:grid;gap:.6rem;padding:.9rem;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.bl-pair{display:flex;gap:.5rem}.bl-pair .bl-in{flex:1}
+.bl-note{font-size:.88rem;color:var(--muted);margin:0}
+.bl-note.err{color:var(--red)}
+.bl-thumbs{display:flex;gap:.35rem}.bl-thumbs img{width:34px;height:34px;object-fit:cover;border-radius:7px;border:1px solid var(--line)}
+
+/* ---------- os cinco mini-sites (cores fixas: são os sites dos clientes) ---------- */
+.ms *{box-sizing:border-box}
+.m-nav{position:absolute;left:0;right:0;top:0;height:74px;display:flex;align-items:center;justify-content:space-between;padding:0 44px;z-index:2}
+.m-links{display:flex;gap:26px;font-size:14px}
+.pill{display:inline-flex;align-items:center;justify-content:center;height:40px;padding:0 20px;border-radius:999px;font-size:14px;font-weight:600;white-space:nowrap}
+.nm{max-width:380px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;vertical-align:bottom}
+.ms .acc{background:var(--a);color:var(--ai)}
+.ms .av{border-radius:50%;object-fit:cover;flex:none}
+
+.s-salao{background:linear-gradient(125deg,#2f2230 0%,#5e4459 45%,#9a7a8f 100%);color:#fff;font-family:"DM Sans",system-ui,sans-serif}
+.s-salao.ph{background:linear-gradient(90deg,rgba(22,14,22,.86) 0%,rgba(22,14,22,.55) 55%,rgba(22,14,22,.25) 100%),var(--p0) center/cover}
+.s-salao .blob{position:absolute;right:-60px;top:250px;width:420px;height:260px;border-radius:50%;background:radial-gradient(closest-side,rgba(255,220,235,.35),transparent);transform:rotate(-25deg)}
+.s-salao.ph .blob{display:none}
+.s-salao .brand{display:flex;align-items:center;gap:12px;font-family:"Cormorant Garamond",Georgia,serif;font-size:24px;font-weight:600;line-height:1}
+.s-salao .brand small{display:block;font-family:"DM Sans",system-ui,sans-serif;font-size:9px;letter-spacing:.18em;opacity:.75;margin-top:4px;font-weight:500}
+.s-salao .mk{width:38px;height:38px;border-radius:50%;border:1.5px solid rgba(255,255,255,.8);display:grid;place-items:center;font-size:18px}
+.s-salao .m-links{color:rgba(255,255,255,.85)}
+.s-salao .copy{position:absolute;left:44px;top:150px;width:560px}
+.s-salao .eb{font-size:15px;opacity:.85}
+.s-salao h2{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:84px;line-height:.98;margin:14px 0 22px;letter-spacing:-.01em;color:#fff}
+.s-salao h2.long{font-size:62px}
+.s-salao h2 em{font-style:italic;color:color-mix(in srgb,var(--a) 55%,#fff)}
+.s-salao p{font-size:17px;line-height:1.5;opacity:.88;margin:0 0 30px;max-width:430px;color:#fff}
+.s-salao .b1{height:50px;padding:0 26px}.s-salao .b2{border:1.5px solid rgba(255,255,255,.7);height:50px;padding:0 26px;margin-left:12px}
+.s-salao .c1{position:absolute;right:46px;top:200px;width:250px;padding:16px 18px;border-radius:16px;background:#fff;color:#2b1f2a;display:flex;gap:14px;align-items:center}
+.s-salao .c1 i{width:38px;height:38px;border-radius:10px;background:color-mix(in srgb,var(--a) 18%,#fff);display:grid;place-items:center;font-style:normal;color:var(--a);font-size:18px}
+.s-salao .c1 small{display:flex;align-items:center;gap:6px;font-size:12px;color:#6c5b67}.s-salao .c1 small::before{content:"";width:7px;height:7px;border-radius:50%;background:#2f9e6a}
+.s-salao .c1 b{font-size:17px}
+.s-salao .c2{position:absolute;right:46px;top:300px;width:250px;padding:16px 18px;border-radius:16px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);color:#fff}
+.s-salao .c2 b{font-size:34px;font-weight:600}.s-salao .c2 span{color:#f6d77e;letter-spacing:2px;margin-left:8px}.s-salao .c2 small{display:block;font-size:12px;opacity:.85}
+
+.s-rest{background:#f3ebdf;color:#2a1d15;font-family:"DM Sans",system-ui,sans-serif}
+.s-rest .m-nav{background:#ece2d3;border-bottom:1px solid #dccfbd}
+.s-rest .brand{display:flex;align-items:center;gap:12px;font-family:"Cormorant Garamond",Georgia,serif;font-size:24px;font-weight:600}
+.s-rest .mk{width:36px;height:36px;border-radius:50%;border:1.5px solid #2a1d15;display:grid;place-items:center;font-size:15px}
+.s-rest .head{position:absolute;left:0;right:0;top:120px;text-align:center}
+.s-rest h2{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:62px;margin:0;line-height:1;color:#2a1d15}
+.s-rest h2.long{font-size:46px}
+.s-rest .rule{display:flex;align-items:center;justify-content:center;gap:10px;margin:14px 0}.s-rest .rule i{width:70px;height:1px;background:#c9b9a2}.s-rest .rule b{width:7px;height:7px;background:var(--a);transform:rotate(45deg)}
+.s-rest .head p{margin:0;color:#6d5a4b;font-size:16px}
+.s-rest .k1{position:absolute;left:60px;top:315px;width:420px;height:250px;border-radius:22px;background:#2b1e17;color:#f3ebdf;padding:34px;overflow:hidden}
+.s-rest .k1.ph{background:linear-gradient(0deg,rgba(25,16,10,.9) 10%,rgba(25,16,10,.35) 100%),var(--p0) center/cover}
+.s-rest .k1 small{font-size:12px;letter-spacing:.2em;color:color-mix(in srgb,var(--a) 50%,#f3ebdf)}.s-rest .k1 h3{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:40px;line-height:1.05;margin:12px 0 10px;color:#fff}
+.s-rest .k1 em{font-family:"Cormorant Garamond",Georgia,serif;font-size:20px;color:#e2d4c3}.s-rest .k1 b{display:block;margin-top:22px;font-size:22px;font-weight:600}
+.s-rest .k2{position:absolute;right:60px;top:315px;width:420px;height:250px;border-radius:22px;background:#fffaf2;border:1px solid #e3d6c3;padding:30px 34px}
+.s-rest .k2 h4{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:28px;margin:0 0 14px;color:#2a1d15}
+.s-rest .k2 ul{padding:0;margin:0}.s-rest .k2 li{display:flex;align-items:baseline;gap:8px;font-size:17px;list-style:none;margin:0 0 12px}
+.s-rest .k2 li i{flex:1;border-bottom:1px dotted #bfae97;transform:translateY(-4px)}.s-rest .k2 li span{color:var(--a);font-family:"Cormorant Garamond",Georgia,serif;font-size:19px}
+
+.s-foto{background:#f6f0e8;color:#2d2620;font-family:"DM Sans",system-ui,sans-serif}
+.s-foto .brand{font-family:"Cormorant Garamond",Georgia,serif;font-size:28px;font-weight:500}
+.s-foto .m-links{color:#5a5047}
+.s-foto .copy{position:absolute;left:44px;top:140px;width:480px}
+.s-foto .eb{display:flex;align-items:center;gap:12px;font-size:12px;letter-spacing:.2em;color:var(--a)}.s-foto .eb::before{content:"";width:34px;height:1px;background:var(--a)}
+.s-foto h2{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:62px;line-height:1.04;margin:18px 0 20px;color:#2d2620}
+.s-foto h2.long{font-size:48px}
+.s-foto h2 em{color:var(--a)}
+.s-foto p{font-size:16px;line-height:1.55;color:#5a5047;margin:0 0 28px}
+.s-foto .b1{height:48px;padding:0 24px}.s-foto .b2{color:#2d2620;border:1.5px solid #cbbcad;margin-left:10px;height:48px}
+.pol{position:absolute;background:#fff;padding:10px 10px 26px;box-shadow:0 18px 36px -14px rgba(45,38,32,.45)}
+.pol img{display:block;width:100%;height:100%;object-fit:cover}
+.s-foto .p1{left:560px;top:140px;width:210px;height:170px;transform:rotate(-4deg)}
+.s-foto .p2{left:720px;top:170px;width:220px;height:280px;transform:rotate(3deg)}
+.s-foto .p3{left:585px;top:330px;width:170px;height:220px;transform:rotate(-2deg)}
+
+.s-baby{background:#fbf3f1;color:#1d1b22;font-family:"Schibsted Grotesk",system-ui,sans-serif}
+.s-baby .m-nav{border-bottom:1px solid #efdfdb}
+.s-baby .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:22px;letter-spacing:-.02em}
+.s-baby .copy{position:absolute;left:44px;top:120px;width:450px}
+.s-baby .copy .av{width:84px;height:84px;margin-bottom:14px;border:3px solid #fff;box-shadow:0 8px 20px -8px rgba(0,0,0,.35)}
+.s-baby h2{font-weight:800;font-size:74px;line-height:.95;letter-spacing:-.045em;margin:0 0 18px;color:#1d1b22}
+.s-baby h2.long{font-size:52px}
+.s-baby.ph h2{font-size:62px}.s-baby.ph h2.long{font-size:46px}
+.s-baby p{font-size:16px;line-height:1.5;color:#55505c;margin:0 0 16px}
+.s-baby .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}.s-baby .chips span{background:#f1e2dc;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:500}
+.s-baby .b1{height:48px;padding:0 24px}
+.s-baby .cal{position:absolute;right:44px;top:130px;width:400px;padding:22px;border-radius:20px;background:#fff;border:1px solid #efdfdb}
+.s-baby .cal h4{margin:0 0 14px;font-size:16px;font-weight:700;color:#1d1b22}
+.s-baby .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}
+.s-baby .grid b{font-size:11px;font-weight:600;text-align:center;color:#8a8290}
+.s-baby .grid i{height:40px;border-radius:9px;display:grid;place-items:center;font-style:normal;font-size:13px;font-weight:600;background:#f1ebe8;color:#9a929e}
+.s-baby .grid i.f{background:#f0b27a;color:#3d2410}.s-baby .grid i.m{background:var(--a);color:var(--ai)}
+.s-baby .leg{display:flex;gap:16px;margin-top:14px;font-size:12px;color:#6c6672}.s-baby .leg span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px;background:var(--c)}
+
+.s-expl{background:#eef5f0;color:#0f2f22;font-family:"Schibsted Grotesk",system-ui,sans-serif}
+.s-expl .brand{font-weight:800;font-size:22px;letter-spacing:-.02em}
+.s-expl .acts{display:flex;gap:10px;align-items:center}.s-expl .o{border:1.5px solid #b9cfc2;height:38px}.s-expl .g{height:38px}
+.s-expl .ban{position:absolute;left:0;right:0;top:74px;height:42px;font-weight:600;font-size:15px;display:flex;align-items:center;padding:0 44px}
+.s-expl .copy{position:absolute;left:44px;top:150px;width:520px}
+.s-expl h2{font-weight:800;font-size:66px;line-height:.98;letter-spacing:-.045em;margin:0 0 18px;color:#0d3b26}
+.s-expl h2.long{font-size:50px}
+.s-expl p{font-size:16px;line-height:1.5;color:#3e5a4c;margin:0 0 24px;max-width:430px}
+.s-expl .b1{height:48px;padding:0 22px}.s-expl .b2{border:1.5px solid #b9cfc2;height:48px;margin-left:10px}
+.s-expl .board{position:absolute;right:44px;top:160px;width:350px;height:330px;border-radius:22px;background:#12392a;color:#fff;padding:28px 30px;overflow:hidden}
+.s-expl .board.ph{background:linear-gradient(0deg,rgba(8,30,20,.92) 20%,rgba(8,30,20,.45) 100%),var(--p0) center/cover}
+.s-expl .board small{font-size:14px;color:#a9d7bd}
+.s-expl .board div{font-family:"Cormorant Garamond",Georgia,serif;font-size:44px;font-weight:600;line-height:1.35;margin-top:18px}
+.s-expl .board sup{font-size:.55em}.s-expl .board .gr{color:#6fdc9a}
+</style>
 </head>
 <body>
 <canvas id="fio" aria-hidden="true"></canvas>
@@ -758,31 +915,51 @@ details summary{cursor:pointer;color:var(--brand);font-weight:600;min-height:32p
 
 <main id="topo">
   <section class="hero" id="hero">
-    <div class="hero-track">
-      <div class="hero-stick">
-        <div class="wrap hero-grid">
-          <div class="hero-copy">
-            <h1>O teu site, montado e cuidado.</h1>
-            <div class="hero-sub">
-        <div>
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <h1>O teu site, montado e cuidado.</h1>
+        <div class="hero-sub">
           <p class="lead">Faço sites para restaurantes, salões, fotógrafos, babysitters e explicadores. Escolhes um modelo, dizes quanto queres investir e eu trato de tudo: montar, publicar e manter.</p>
-          <p class="proof"><i aria-hidden="true"></i><a href="https://beautystudio.pt" target="_blank" rel="noopener">O AT Beauty Studio já recebe marcações online com um site feito por mim.</a></p>
-        </div>
-        <div class="ctas">
-          <a class="btn solid" href="#templates">Ver os modelos</a>
-          <a class="btn" href="#conta">Fazer proposta</a>
+          <div class="ctas">
+            <a class="btn solid" href="#templates">Ver os modelos</a>
+            <a class="btn" href="#conta">Fazer proposta</a>
+          </div>
+          <a class="proof-card" href="https://beautystudio.pt" target="_blank" rel="noopener">
+            <img src="img/at-beauty-studio.jpg" alt="" width="96" height="58" loading="lazy">
+            <span><strong><i aria-hidden="true"></i>Já no ar: AT Beauty Studio</strong>Recebe marcações online com um site feito por mim.</span>
+          </a>
         </div>
       </div>
+
+      <div class="builder" id="builder">
+        <div class="bl-stage">
+          <div class="bl-win">
+            <div class="bl-bar" aria-hidden="true">
+              <div class="bl-dots"><i></i><i></i><i></i></div>
+              <div class="bl-url"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg><span>https://<b id="blSlug">studio-aurora</b>.pt</span></div>
+            </div>
+            <div class="bl-vp" id="blVp" role="img" aria-label="Pré-visualização do site"><div class="ms" id="blMs"></div></div>
           </div>
-          <div class="hero-art" id="heroArt" aria-hidden="true">
-            <div class="ha-scene"><div class="ha-stack" id="haStack">
-              <div class="ha-plane"><span>Endereço e alojamento</span></div>
-              <div class="ha-plane"><span>Modelo</span></div>
-              <div class="ha-plane"><span>Textos, fotos e preços</span></div>
-              <div class="ha-plane"><span>Painel de gestão</span></div>
-            </div></div>
-            <div class="ha-gauge"><i id="haGauge"></i></div>
+        </div>
+        <div class="bl-dock">
+          <label for="blName">Experimenta com o teu negócio</label>
+          <input class="bl-in" id="blName" type="text" maxlength="34" autocomplete="organization" placeholder="Nome do teu negócio" spellcheck="false">
+          <ul class="bl-chips" id="blTypes" aria-label="Tipo de negócio"></ul>
+          <div class="bl-row">
+            <div class="bl-sw" id="blSw" role="group" aria-label="Cor principal"></div>
+            <label class="bl-tool" for="blFiles"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-8 8"/></svg>Pôr as tuas fotos</label>
+            <input id="blFiles" type="file" accept="image/*" multiple hidden>
+            <span class="bl-thumbs" id="blThumbs"></span>
+            <button class="bl-tool" type="button" id="blMoreBtn" aria-expanded="false" aria-controls="blMore"><svg viewBox="0 0 24 24"><path d="M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1"/></svg>Link e frase</button>
           </div>
+          <div class="bl-more" id="blMore" hidden>
+            <label class="bl-lbl" for="blLink">Tens site, Facebook ou Google Maps? Cola o link</label>
+            <div class="bl-pair"><input class="bl-in" id="blLink" type="url" inputmode="url" placeholder="https://…" spellcheck="false"><button class="btn small" type="button" id="blLinkGo">Ir buscar</button></div>
+            <p class="bl-note" id="blLinkNote" aria-live="polite">Vou buscar o nome, uma foto e a cor da tua marca.</p>
+            <label class="bl-lbl" for="blHead">A tua frase principal</label>
+            <input class="bl-in" id="blHead" type="text" maxlength="60" placeholder="Por exemplo: A melhor pizza de Matosinhos" spellcheck="true">
+          </div>
+          <p class="bl-note" id="blNote" aria-live="polite">Modelo Studio. Experimenta o teu nome, a tua cor e as tuas fotos.</p>
         </div>
       </div>
     </div>
@@ -2729,6 +2906,241 @@ else try{
     raf=requestAnimationFrame(loop);
   }
   loop();
+})();
+</script>
+<script>
+/* hero ao vivo: o visitante monta o site do negócio dele num dos cinco modelos.
+   Nome, tipo, cor, fotos (ficam só no aparelho dele) e frase; ou um link (site, Facebook, Google Maps) de onde a função
+   lerLink vai buscar o nome, a foto e a cor. Até alguém mexer, mostra os modelos um a um. */
+(() => {
+  const vp = document.getElementById('blVp');
+  if (!vp) return;
+  const ms = document.getElementById('blMs'), input = document.getElementById('blName'), slug = document.getElementById('blSlug'),
+    note = document.getElementById('blNote'), chips = document.getElementById('blTypes'), sw = document.getElementById('blSw'),
+    pick = document.getElementById('blPick'), files = document.getElementById('blFiles'), thumbs = document.getElementById('blThumbs'),
+    more = document.getElementById('blMore'), moreBtn = document.getElementById('blMoreBtn'), head = document.getElementById('blHead'),
+    link = document.getElementById('blLink'), linkGo = document.getElementById('blLinkGo'), linkNote = document.getElementById('blLinkNote');
+  const LER = 'https://europe-west1-aw-sites-e31c3.cloudfunctions.net/lerLink';
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+  const N = '<span class="nm" data-name></span>';
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const DEF_IMG = ['img/hero/mesa.jpg', 'img/hero/fotografa.jpg', 'img/hero/aliancas.jpg'];
+  const st = { t: 'salao', a: '', ph: [], h: '' };
+
+  /* frase principal: a do modelo, ou a do visitante */
+  const H = (def, cls = '') => (st.h ? `<h2 class="${cls} ${st.h.length > 34 ? 'long' : ''}">${esc(st.h)}</h2>` : `<h2 class="${cls}">${def}</h2>`);
+  const T = {
+    salao: {
+      label: 'Salão', model: 'Studio', def: 'Studio Aurora', a: '#C98EA4', sw: ['#C98EA4', '#B9935A', '#7FA88E', '#8E7CC3', '#D96C5F'],
+      html: () => `
+      <div class="blob" data-l style="--d:0"></div>
+      <div class="m-nav" data-l style="--d:1"><div class="brand">${st.ph[1] ? `<img class="av" src="${st.ph[1]}" alt="" width="38" height="38">` : '<span class="mk">✦</span>'}<div>${N}<small>BELEZA &amp; BEM-ESTAR</small></div></div>
+        <div class="m-links"><span>Serviços</span><span>Trabalhos</span><span>Avaliações</span><span>Contactos</span></div><span class="pill" style="background:#fff;color:#2b1f2a">Marcar</span></div>
+      <div class="copy"><div class="eb" data-l style="--d:2">Beleza &amp; Bem-estar</div>
+        <div data-l style="--d:3">${H('A sua beleza<br>começa <em>aqui</em>')}</div>
+        <p data-l style="--d:4">Marque online em segundos e receba a confirmação no WhatsApp.</p>
+        <div data-l style="--d:5"><span class="pill acc b1">Marcar agora</span><span class="pill b2">Ver serviços</span></div></div>
+      <div class="c1" data-l style="--d:6"><i>▦</i><div><small>Próxima vaga</small><b>Amanhã às 09:30</b></div></div>
+      <div class="c2" data-l style="--d:7"><b>4,9</b><span>★★★★★</span><small>120 avaliações no Google (exemplo)</small></div>`,
+      ph: () => (st.ph[0] ? 'ph' : '')
+    },
+    rest: {
+      label: 'Restaurante', model: 'Restaurante', def: 'Brasa & Alecrim', a: '#B5522B', sw: ['#B5522B', '#2F6B4F', '#B8862B', '#8C2F39', '#2B4C7E'],
+      html: () => `
+      <div class="m-nav" data-l style="--d:0"><div class="brand">${st.ph[1] ? `<img class="av" src="${st.ph[1]}" alt="" width="36" height="36">` : '<span class="mk">♨</span>'}${N}</div>
+        <div class="m-links"><span>Hoje</span><span>Cardápio</span><span>Visitar</span></div><span class="pill acc">Ver cardápio</span></div>
+      <div class="head"><div data-l style="--d:1">${H('Hoje na cozinha')}</div><div class="rule" data-l style="--d:2"><i></i><b></b><i></i></div>
+        <p data-l style="--d:3">O prato do dia e as sugestões do chef, sempre atualizados.</p></div>
+      <div class="k1 ${st.ph[0] ? 'ph' : ''}" data-l style="--d:4"><small>PRATO DO DIA</small><h3>Arroz de pato à moda antiga</h3><em>Com chouriço e laranja</em><b>14,50 €</b></div>
+      <div class="k2" data-l style="--d:5"><h4>Sugestões do chef</h4><ul><li>Polvo à galega<i></i><span>11,50 €</span></li><li>Bacalhau à lagareiro<i></i><span>18,50 €</span></li><li>Leite-creme queimado<i></i><span>4,50 €</span></li></ul></div>`
+    },
+    foto: {
+      label: 'Fotografia', model: 'Momento', def: 'Lume', a: '#8A6A4F', sw: ['#8A6A4F', '#2D2620', '#9C5B6B', '#4F6D7A', '#6B7F4F'],
+      html: () => {
+        const p = i => st.ph[i] || DEF_IMG[i];
+        return `
+      <div class="m-nav" data-l style="--d:0"><div class="brand">${N}</div>
+        <div class="m-links"><span>Sobre</span><span>Serviços</span><span>Portfólio</span><span>Contactos</span></div><span class="pill acc">Pedir orçamento</span></div>
+      <div class="copy"><div class="eb" data-l style="--d:1">FOTOGRAFIA, CONTEÚDO E EVENTOS</div>
+        <div data-l style="--d:2">${H('Os teus momentos, contados com <em>cuidado</em>.')}</div>
+        <p data-l style="--d:3">Casamentos, batizados, aniversários e marcas. Do primeiro contacto à entrega das fotografias, tudo num só sítio.</p>
+        <div data-l style="--d:4"><span class="pill acc b1">Pedir orçamento</span><span class="pill b2">Ver trabalhos</span></div></div>
+      <div class="pol p1" data-l style="--d:5"><img src="${p(0)}" alt=""></div>
+      <div class="pol p2" data-l style="--d:6"><img src="${p(1)}" alt=""></div>
+      <div class="pol p3" data-l style="--d:7"><img src="${p(2)}" alt=""></div>`;
+      }
+    },
+    baby: {
+      label: 'Babysitter', model: 'Ninho', def: 'Marta Silva', a: '#4F7F75', sw: ['#4F7F75', '#C2577A', '#3F6FB5', '#B87333', '#6A5ACD'],
+      html: () => {
+        const s = 'oo.ffmf.ffoffm.ofofff.offf..'.split(''), days = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+        let g = days.map(d => `<b>${d}</b>`).join('');
+        s.forEach((c, i) => (g += `<i class="${c === 'f' ? 'f' : c === 'm' ? 'm' : ''}">${((i + 3) % 30) + 1}</i>`));
+        return `
+      <div class="m-nav" data-l style="--d:0"><div class="brand">${st.ph[0] ? `<img class="av" src="${st.ph[0]}" alt="" width="34" height="34">` : ''}${N}</div><span class="pill acc">Entrar</span></div>
+      <div class="copy">${st.ph[0] ? `<img class="av" src="${st.ph[0]}" alt="" data-l style="--d:1">` : ''}<div data-l style="--d:1">${H('Babysitter de confiança')}</div>
+        <p data-l style="--d:2">Noites, fins de semana e saídas da escola. Cuido de crianças desde bebés até aos 12 anos, em tua casa.</p>
+        <div class="chips" data-l style="--d:3"><span>Primeiros socorros pediátricos</span><span>5 anos de experiência</span><span>10,00 € por hora</span></div>
+        <div data-l style="--d:4"><span class="pill acc b1">Pedir babysitting</span></div></div>
+      <div class="cal" data-l style="--d:5"><h4>Disponibilidade nas próximas 4 semanas</h4><div class="grid">${g}</div>
+        <div class="leg"><span style="--c:#f0b27a">Livre</span><span style="--c:#f1ebe8">Ocupado</span><span style="--c:var(--a)">Já marcado</span></div></div>`;
+      },
+      ph: () => (st.ph[0] ? 'ph' : '')
+    },
+    expl: {
+      label: 'Explicações', model: 'Quadro', def: 'Explica+', a: '#2E8B57', sw: ['#2E8B57', '#2547F5', '#C0392B', '#8E44AD', '#D68910'],
+      html: () => `
+      <div class="m-nav" data-l style="--d:0"><div class="brand">${N}</div>
+        <div class="acts"><span style="font-size:14px;color:#3e5a4c;margin-right:8px">Início · Horário</span><span class="pill o">Instalar app</span><span class="pill acc g">Entrar</span></div></div>
+      <div class="ban acc" data-l style="--d:1">Inscrições abertas para a preparação de exames nacionais.</div>
+      <div class="copy"><div data-l style="--d:2">${H('Explicações de Matemática e Físico-Química')}</div>
+        <p data-l style="--d:3">Do 7.º ao 12.º ano, no nosso espaço ou online. Cada turma tem a sua sala, com a aula, as fichas e os avisos no mesmo sítio.</p>
+        <div data-l style="--d:4"><span class="pill acc b1">Criar conta de aluno</span><span class="pill b2">Ver horário</span></div></div>
+      <div class="board ${st.ph[0] ? 'ph' : ''}" data-l style="--d:5"><small>Quinta-feira, Matemática A</small><div>f(x) = 2<sup>x</sup><br>lim f(x) = <span class="gr">+∞</span><br>f′(x) = 2<sup>x</sup> ln 2</div></div>`
+    }
+  };
+  const order = ['salao', 'rest', 'foto', 'baby', 'expl'];
+
+  /* texto legível em cima da cor escolhida */
+  function inkOn(hex) {
+    const m = /^#?([0-9a-f]{6})$/i.exec(hex || '');
+    if (!m) return '#fff';
+    const n = parseInt(m[1], 16), L = c => ((c /= 255) <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+    const l = 0.2126 * L(n >> 16) + 0.7152 * L((n >> 8) & 255) + 0.0722 * L(n & 255);
+    return l > 0.45 ? '#141414' : '#fff';
+  }
+  const nameNow = () => input.value.trim() || T[st.t].def;
+  const toSlug = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/&/g, 'e').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 28) || 'o-teu-negocio';
+  function fillName() {
+    const n = nameNow();
+    ms.querySelectorAll('[data-name]').forEach(e => (e.textContent = n));
+    slug.textContent = toSlug(n);
+    vp.setAttribute('aria-label', `Pré-visualização do site ${n}, modelo ${T[st.t].model}`);
+  }
+  function paint(animate) {
+    const t = T[st.t], a = st.a || t.a;
+    ms.className = 'ms s-' + st.t + ' ' + (t.ph ? t.ph() : '');
+    ms.style.setProperty('--a', a);
+    ms.style.setProperty('--ai', inkOn(a));
+    ms.style.setProperty('--p0', st.ph[0] ? `url("${st.ph[0]}")` : 'none');
+    ms.innerHTML = t.html();
+    fillName();
+    if (animate && !reduce) {
+      vp.classList.remove('build');
+      void vp.offsetWidth;
+      vp.classList.add('build');
+    }
+  }
+  function swatches() {
+    const t = T[st.t], cur = (st.a || t.a).toLowerCase();
+    sw.innerHTML =
+      t.sw.map(c => `<button type="button" style="--c:${c}" data-c="${c}" aria-pressed="${c.toLowerCase() === cur}" aria-label="Cor ${c}"></button>`).join('') +
+      `<label title="Outra cor" aria-label="Escolher outra cor"><input type="color" id="blPick" value="${cur}"></label>`;
+    sw.querySelector('input').addEventListener('input', e => setColor(e.target.value));
+  }
+  function setColor(c) {
+    st.a = c;
+    sw.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.c.toLowerCase() === c.toLowerCase())));
+    ms.style.setProperty('--a', c);
+    ms.style.setProperty('--ai', inkOn(c));
+  }
+  function setType(t, animate) {
+    st.t = t;
+    st.a = '';
+    chips.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.t === t)));
+    input.placeholder = 'Nome do teu negócio, por exemplo ' + T[t].def;
+    note.textContent = `Modelo ${T[t].model}. Experimenta o teu nome, a tua cor e as tuas fotos.`;
+    swatches();
+    paint(animate);
+  }
+
+  chips.innerHTML = order.map(k => `<li><button type="button" data-t="${k}" aria-pressed="false">${esc(T[k].label)}</button></li>`).join('');
+  chips.addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (b) setType(b.dataset.t, true);
+  });
+  sw.addEventListener('click', e => {
+    const b = e.target.closest('button[data-c]');
+    if (b) setColor(b.dataset.c);
+  });
+  input.addEventListener('input', fillName);
+  head.addEventListener('input', () => {
+    st.h = head.value.trim();
+    paint(false);
+  });
+  /* fotos: lidas no próprio aparelho, nada é enviado */
+  files.addEventListener('change', () => {
+    const list = [...files.files].filter(f => f.type.startsWith('image/')).slice(0, 3);
+    if (!list.length) return;
+    st.ph.forEach(u => u.startsWith('blob:') && URL.revokeObjectURL(u));
+    st.ph = list.map(f => URL.createObjectURL(f));
+    thumbs.innerHTML = st.ph.map(u => `<img src="${u}" alt="">`).join('');
+    paint(true);
+  });
+  moreBtn.addEventListener('click', () => {
+    const open = more.hidden;
+    more.hidden = !open;
+    moreBtn.setAttribute('aria-expanded', String(open));
+    if (open) link.focus();
+  });
+  /* link do negócio: a função lerLink devolve nome, foto e cor da página */
+  async function readLink() {
+    let u = link.value.trim();
+    if (!u) return;
+    if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
+    linkGo.disabled = true;
+    linkNote.className = 'bl-note';
+    linkNote.textContent = 'A ler a página…';
+    try {
+      const r = await fetch(LER + '?url=' + encodeURIComponent(u));
+      const j = await r.json();
+      if (!r.ok) throw new Error(j.erro || 'erro');
+      const got = [];
+      if (j.nome) {
+        input.value = j.nome.slice(0, 34);
+        got.push('o nome');
+      }
+      if (j.imagem) {
+        st.ph = [j.imagem, ...st.ph.filter(x => x !== j.imagem)].slice(0, 3);
+        thumbs.innerHTML = st.ph.map(x => `<img src="${esc(x)}" alt="">`).join('');
+        got.push('uma foto');
+      }
+      if (j.cor) {
+        st.a = j.cor;
+        got.push('a cor');
+      }
+      paint(true);
+      if (j.cor) swatches();
+      linkNote.textContent = got.length
+        ? `Fui buscar ${got.join(', ').replace(/, ([^,]*)$/, ' e $1')} a ${j.site || 'essa página'}.`
+        : 'Essa página não mostra nome nem fotos a quem não tem sessão iniciada. Escreve o nome e põe as fotos.';
+    } catch (e) {
+      linkNote.className = 'bl-note err';
+      linkNote.textContent = 'Não consegui abrir esse link. Confirma o endereço, ou escreve o nome e põe as fotos.';
+    } finally {
+      linkGo.disabled = false;
+    }
+  }
+  linkGo.addEventListener('click', readLink);
+  link.addEventListener('keydown', e => e.key === 'Enter' && (e.preventDefault(), readLink()));
+
+  const fit = () => (ms.style.transform = `scale(${vp.clientWidth / 1000})`);
+  new ResizeObserver(fit).observe(vp);
+  fit();
+  /* volta guiada pelos modelos até alguém mexer, só com a pré-visualização à vista */
+  let onScreen = true, touched = false, tour = 0;
+  new IntersectionObserver(es => (onScreen = es[0].isIntersecting)).observe(vp);
+  const stop = () => {
+    touched = true;
+    clearInterval(tour);
+  };
+  ['pointerdown', 'focusin', 'keydown'].forEach(ev => document.getElementById('builder').addEventListener(ev, stop));
+  if (!reduce)
+    tour = setInterval(() => {
+      if (touched || !onScreen || document.hidden) return;
+      setType(order[(order.indexOf(st.t) + 1) % order.length], true);
+    }, 4800);
+  setType('salao', true);
 })();
 </script>
 </body>
