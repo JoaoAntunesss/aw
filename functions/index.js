@@ -230,9 +230,9 @@ exports.stripeWebhook = onRequest({ secrets: [STRIPE_SECRET, STRIPE_WEBHOOK_SECR
       const { pedidoId, tipo } = o.metadata || {};
       if (pedidoId && pago(o)) await marcarPago(pedidoId, tipo === "mensal" ? "mensal" : "montagem", o);
       // AntunesPlayer: liga a subscrição à conta da app e avisa-me
-      else if (o.payment_link === PLAYER_PLINK && pago(o) && o.client_reference_id) {
+      else if (PLAYER_PLINKS.includes(o.payment_link) && pago(o) && o.client_reference_id) {
         await playerLigar(o.client_reference_id, o);
-        try { await avisar(`AntunesPlayer: nova subscrição 💶\n${cortar(o.customer_details?.email || o.customer_email, 80)}\n${((o.amount_total || 0) / 100).toFixed(2)} €/mês`); } catch (e) { console.error(e); }
+        try { await avisar(`AntunesPlayer: nova subscrição 💶\n${cortar(o.customer_details?.email || o.customer_email, 80)}\n${((o.amount_total || 0) / 100).toFixed(2)} €${o.payment_link === PLAYER_PLINK ? "/mês" : "/ano"}`); } catch (e) { console.error(e); }
       }
     } else if (ev.type === "customer.subscription.updated") {
       const f = await pedidoDaSubscricao(o); if (f) {
@@ -393,6 +393,8 @@ exports.lerLink = onRequest({ region: "europe-west1", maxInstances: 3, memory: "
    abaixo ligam a subscrição a essa conta (coleção "player", só as funções lhe mexem). */
 const PLAYER_LINK = "https://buy.stripe.com/4gM9AL24H00n6Wo6zD93y00";
 const PLAYER_PLINK = "plink_1UbTfy1B8fzyW0R2yD8oLWon";
+const PLAYER_LINK_ANO = "https://buy.stripe.com/cNidR16kXdRd3Kc8HL93y01"; // 10 €/ano
+const PLAYER_PLINKS = [PLAYER_PLINK, "plink_1UbUFu1B8fzyW0R28tt3Ei5C"];
 const PLAYER_TESTE = 24 * 3600e3;
 const PLAYER_APARELHOS = 3, PLAYER_AO_MESMO_TEMPO = 2, PLAYER_A_VER = 150e3; // aparelhos por conta; a ver em simultâneo; "a ver" = sinal há menos de 2,5 min
 const devId = (x) => (/^[a-z0-9]{4,24}$/i.test(String(x || "")) ? String(x) : "");
@@ -420,13 +422,15 @@ async function playerLigar(uid, ses) {
 }
 // procura no Stripe um pagamento desta conta pelo link (quando a pessoa diz que já pagou)
 async function playerProcurar(uid) {
-  let ini;
-  for (let p = 0; p < 5; p++) {
-    const l = await stripeDe().checkout.sessions.list({ payment_link: PLAYER_PLINK, limit: 100, ...(ini ? { starting_after: ini } : {}) });
-    const s = l.data.find(x => x.client_reference_id === uid && x.status === "complete" && x.subscription);
-    if (s) return s;
-    if (!l.has_more) return null;
-    ini = l.data[l.data.length - 1].id;
+  for (const plink of PLAYER_PLINKS) {
+    let ini;
+    for (let p = 0; p < 5; p++) {
+      const l = await stripeDe().checkout.sessions.list({ payment_link: plink, limit: 100, ...(ini ? { starting_after: ini } : {}) });
+      const s = l.data.find(x => x.client_reference_id === uid && x.status === "complete" && x.subscription);
+      if (s) return s;
+      if (!l.has_more) break;
+      ini = l.data[l.data.length - 1].id;
+    }
   }
   return null;
 }
@@ -475,9 +479,10 @@ exports.playerEstado = onRequest({ region: "europe-west1", maxInstances: 10, sec
   } catch (e) { console.error("playerEstado", e); }
   if (d.sub && subAtiva(d, now)) { res.json({ estado: "pago", ate: d.ate, cancelada: !!d.cancelada }); return; }
   const fimTeste = d.inicio + PLAYER_TESTE;
-  const link = `${PLAYER_LINK}?client_reference_id=${encodeURIComponent(uid)}${email ? "&prefilled_email=" + encodeURIComponent(email) : ""}&locale=pt`;
-  if (now < fimTeste) { res.json({ estado: "teste", fimTeste, link }); return; }
-  res.json({ estado: "pagar", link });
+  const qs = `?client_reference_id=${encodeURIComponent(uid)}${email ? "&prefilled_email=" + encodeURIComponent(email) : ""}&locale=pt`;
+  const link = PLAYER_LINK + qs, linkAno = PLAYER_LINK_ANO + qs;
+  if (now < fimTeste) { res.json({ estado: "teste", fimTeste, link, linkAno }); return; }
+  res.json({ estado: "pagar", link, linkAno });
 });
 // tira um aparelho da conta (para dar lugar a outro)
 exports.playerTirar = onRequest({ region: "europe-west1", maxInstances: 5, cors: true }, async (req, res) => {

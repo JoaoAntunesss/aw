@@ -2351,7 +2351,7 @@ async function renderPlayer(area){
   catch(e){ area.innerHTML=`<p class="err">${esc(errMsg(e))}. Confirma que as regras do Firestore estão publicadas (ficheiro firestore.rules).</p>`; return; }
   const now=Date.now(), pagos=(A||[]).filter(a=>a.sub&&["active","trialing","past_due"].includes(a.subEstado)&&(a.ate||0)>now);
   const teste=(A||[]).filter(a=>!a.sub&&now-(a.inicio||0)<864e5);
-  area.innerHTML=`<div class="kpis">${[[pagos.length,"A pagar"],[eur(pagos.length).replace(",00",""),"Por mês"],[teste.length,"No dia grátis"],[(A||[]).length,"Contas"]].map(([n,l])=>`<div class="kpi"><b>${n}</b><span>${l}</span></div>`).join("")}</div>
+  area.innerHTML=`<div class="kpis">${[[pagos.length,"A pagar"],[teste.length,"No dia grátis"],[(A||[]).length,"Contas"]].map(([n,l])=>`<div class="kpi"><b>${n}</b><span>${l}</span></div>`).join("")}</div>
     <h3>Usam sem pagar</h3><p class="muted">Emails Gmail da conta com que a pessoa entra na app. A tua conta nunca paga.</p>
     <form id="pgAdd" class="tools" style="gap:.5rem"><label class="f" style="margin:0;flex:1;min-width:14rem"><span class="sr-only">Email</span><input type="email" id="pgEmail" required placeholder="nome@gmail.com" autocomplete="off"></label><button class="btn solid small" type="submit">Adicionar</button></form>
     <ul class="pg-list">${G.length?G.map(e=>`<li><span>${esc(e)}</span><button class="btn small" type="button" data-pgdel="${esc(e)}">Tirar</button></li>`).join(""):`<li class="muted">Ainda ninguém.</li>`}</ul>
