@@ -284,3 +284,87 @@ exports.avisoDominios = onSchedule({ schedule: "every day 09:00", timeZone: "Eur
     await d.ref.update({ "dominio.avisado": dm.renovacao });
   }
 });
+
+/* lerLink: para o construtor do primeiro ecrã do site. Recebe o link do negócio do visitante (site, Facebook, Google
+   Maps…) e devolve o nome, uma imagem e a cor da marca que a própria página anuncia (Open Graph e theme-color).
+   Só aceita endereços públicos (nada da rede interna), segue no máximo 4 redireções, desiste ao fim de 7 s e lê no
+   máximo 1,5 MB. Não guarda nada. */
+const dnsP = require("node:dns").promises;
+const net = require("node:net");
+function ipPrivado(ip) {
+  if (net.isIPv6(ip)) {
+    const v = ip.toLowerCase();
+    if (v.startsWith("::ffff:")) return ipPrivado(v.slice(7));
+    return v === "::1" || v === "::" || v.startsWith("fc") || v.startsWith("fd") || v.startsWith("fe80");
+  }
+  const [a, b] = ip.split(".").map(Number);
+  return a === 10 || a === 127 || a === 0 || (a === 169 && b === 254) || (a === 172 && b >= 16 && b <= 31) ||
+    (a === 192 && b === 168) || (a === 100 && b >= 64 && b <= 127) || a >= 224;
+}
+async function urlPublico(u) {
+  let x;
+  try { x = new URL(u); } catch (e) { return null; }
+  if (!/^https?:$/.test(x.protocol) || (x.port && !["80", "443"].includes(x.port)) || x.username || x.password) return null;
+  const host = x.hostname.replace(/^\[|\]$/g, "");
+  const ips = net.isIP(host) ? [host] : (await dnsP.lookup(host, { all: true }).catch(() => [])).map(r => r.address);
+  if (!ips.length || ips.some(ipPrivado)) return null;
+  return x;
+}
+const ORIGENS = ["https://joaoantunesss.github.io", "http://localhost:8912", "http://localhost:8080"];
+exports.lerLink = onRequest({ region: "europe-west1", maxInstances: 3, memory: "256MiB", timeoutSeconds: 15 }, async (req, res) => {
+  const o = req.get("origin") || "";
+  res.set("Access-Control-Allow-Origin", ORIGENS.includes(o) ? o : ORIGENS[0]);
+  res.set("Vary", "Origin");
+  if (req.method === "OPTIONS") { res.set("Access-Control-Allow-Methods", "GET"); return res.status(204).send(""); }
+  const pedido = String(req.query.url || "").slice(0, 600);
+  let alvo = await urlPublico(pedido);
+  if (!alvo) return res.status(400).json({ erro: "link inválido" });
+  const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 7000);
+  try {
+    let r;
+    for (let i = 0; i < 5; i++) {
+      r = await fetch(alvo, { redirect: "manual", signal: ctl.signal, headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; facebookexternalhit/1.1; +https://joaoantunesss.github.io/aw/)",
+        "Accept": "text/html,application/xhtml+xml", "Accept-Language": "pt-PT,pt;q=0.9,en;q=0.6" } });
+      if (r.status < 300 || r.status >= 400) break;
+      const prox = r.headers.get("location");
+      alvo = prox ? await urlPublico(new URL(prox, alvo).href) : null;
+      if (!alvo || i === 4) return res.status(400).json({ erro: "redireções a mais" });
+    }
+    if (!r.ok || !/html/i.test(r.headers.get("content-type") || "")) return res.status(422).json({ erro: "não é uma página" });
+    let html = "", lido = 0;
+    const leitor = r.body.getReader(), dec = new TextDecoder();
+    while (lido < 1.5e6) { const { done, value } = await leitor.read(); if (done) break; lido += value.length; html += dec.decode(value, { stream: true }); if (/<\/head>/i.test(html)) break; }
+    leitor.cancel().catch(() => {});
+    const ent = s => s.replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#0?39;|&apos;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+      .replace(/&#(\d+);/g, (m, n) => String.fromCodePoint(+n)).replace(/&#x([0-9a-f]+);/gi, (m, n) => String.fromCodePoint(parseInt(n, 16)));
+    const meta = k => { for (const m of html.matchAll(/<meta\b[^>]*>/gi)) { const tag = m[0];
+      const nome = (/(?:property|name)\s*=\s*["']([^"']+)["']/i.exec(tag) || [])[1];
+      if (nome && nome.toLowerCase() === k) { const c = (/content\s*=\s*["']([^"']*)["']/i.exec(tag) || [])[1]; if (c) return ent(c.trim()); } } return ""; };
+    let nome = meta("og:site_name") || meta("og:title") || ent(((/<title[^>]*>([^<]*)/i.exec(html) || [])[1] || "").trim());
+    nome = nome.split(/\s+[|·•–—-]\s+|\s+\(@|\s*:\s+/)[0].replace(/\s+on Instagram$|\s+no Instagram$/i, "").trim().slice(0, 60);
+    if (/^(instagram|facebook|google maps|log ?in|entrar)$/i.test(nome)) nome = "";
+    let imagem = meta("og:image:secure_url") || meta("og:image") || meta("twitter:image");
+    try { imagem = imagem ? new URL(imagem, alvo).href : ""; } catch (e) { imagem = ""; }
+    if (!/^https:/.test(imagem)) imagem = "";
+    /* a imagem vai embutida na resposta (data:), para o site não ter de aceitar imagens de qualquer domínio */
+    if (imagem) {
+      try {
+        const iu = await urlPublico(imagem);
+        const ir = iu ? await fetch(iu, { signal: ctl.signal, headers: { "User-Agent": "Mozilla/5.0 (compatible; facebookexternalhit/1.1)" } }) : null;
+        const tipo = ir && (ir.headers.get("content-type") || "").split(";")[0];
+        const tam = ir ? +(ir.headers.get("content-length") || 0) : 0;
+        if (ir && ir.ok && /^image\/(jpeg|png|webp|gif)$/.test(tipo) && tam < 1.2e6) {
+          const buf = Buffer.from(await ir.arrayBuffer());
+          imagem = buf.length < 1.2e6 ? `data:${tipo};base64,${buf.toString("base64")}` : "";
+        } else imagem = "";
+      } catch (e) { imagem = ""; }
+    }
+    let cor = meta("theme-color");
+    if (!/^#[0-9a-f]{6}$/i.test(cor)) cor = /^#[0-9a-f]{3}$/i.test(cor) ? "#" + cor.slice(1).split("").map(c => c + c).join("") : "";
+    res.set("Cache-Control", "public, max-age=3600");
+    return res.json({ nome, imagem, cor, site: alvo.hostname.replace(/^www\./, "") });
+  } catch (e) {
+    return res.status(502).json({ erro: "não consegui abrir" });
+  } finally { clearTimeout(t); }
+});
