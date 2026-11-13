@@ -394,7 +394,9 @@ exports.lerLink = onRequest({ region: "europe-west1", maxInstances: 3, memory: "
 const PLAYER_LINK = "https://buy.stripe.com/4gM9AL24H00n6Wo6zD93y00";
 const PLAYER_PLINK = "plink_1UbTfy1B8fzyW0R2yD8oLWon";
 const PLAYER_TESTE = 24 * 3600e3;
-// sempre grátis: o dono; a família fica em config/player.gratis (lista de emails, editável na consola)
+const PLAYER_APARELHOS = 3, PLAYER_AO_MESMO_TEMPO = 2, PLAYER_A_VER = 150e3; // aparelhos por conta; a ver em simultâneo; "a ver" = sinal há menos de 2,5 min
+const devId = (x) => (/^[a-z0-9]{4,24}$/i.test(String(x || "")) ? String(x) : "");
+// sempre grátis: o dono; o resto da lista fica em config/player.gratis (painel de gestão do site → AntunesPlayer)
 const PLAYER_DONO = ["j.p.r.n.antunes@gmail.com"];
 let iptvAuth = null;
 const authIptv = () => iptvAuth || (iptvAuth = admin.initializeApp({ projectId: "iptv-364a1" }, "iptv").auth());
@@ -442,6 +444,20 @@ exports.playerEstado = onRequest({ region: "europe-west1", maxInstances: 10, sec
     await ref.set({ ...d, criadoEm: admin.firestore.FieldValue.serverTimestamp() });
   }
   if (await playerGratis(email)) { res.json({ estado: "gratis" }); return; }
+  // aparelhos da conta: no máximo PLAYER_APARELHOS (os que não abrem a app há 60 dias saem sozinhos)
+  const dev = devId(req.query.dev);
+  if (dev) {
+    const devs = Object.fromEntries(Object.entries(d.devs || {}).filter(([, x]) => now - (x.visto || 0) < 60 * 86400e3));
+    if (!devs[dev] && Object.keys(devs).length >= PLAYER_APARELHOS) {
+      res.json({ estado: "limite", max: PLAYER_APARELHOS, aparelhos: Object.entries(devs).map(([id, x]) => ({ id, nome: x.nome || "Aparelho", visto: x.visto || 0 })) });
+      return;
+    }
+    const nome = cortar(req.query.nome, 40) || "Aparelho";
+    if (!devs[dev] || now - (devs[dev].visto || 0) > 3600e3 || devs[dev].nome !== nome) {
+      devs[dev] = { nome, visto: now };
+      await ref.set({ devs }, { mergeFields: ["devs"] });
+    }
+  }
   try {
     const pediu = req.query.pago === "1";
     if (!d.sub && (pediu || !d.procurado || now - d.procurado > 10 * 60e3) && now > d.inicio + PLAYER_TESTE - 3600e3) {
@@ -462,6 +478,34 @@ exports.playerEstado = onRequest({ region: "europe-west1", maxInstances: 10, sec
   const link = `${PLAYER_LINK}?client_reference_id=${encodeURIComponent(uid)}${email ? "&prefilled_email=" + encodeURIComponent(email) : ""}&locale=pt`;
   if (now < fimTeste) { res.json({ estado: "teste", fimTeste, link }); return; }
   res.json({ estado: "pagar", link });
+});
+// tira um aparelho da conta (para dar lugar a outro)
+exports.playerTirar = onRequest({ region: "europe-west1", maxInstances: 5, cors: true }, async (req, res) => {
+  const u = await playerConta(req);
+  if (!u) { res.status(401).json({ erro: "Entra com a tua conta Google." }); return; }
+  const dev = devId(req.query.id);
+  if (!dev) { res.status(400).json({ erro: "Aparelho inválido." }); return; }
+  await admin.firestore().collection("player").doc(u.uid).update({ ["devs." + dev]: admin.firestore.FieldValue.delete(), ["aver." + dev]: admin.firestore.FieldValue.delete() }).catch(() => {});
+  res.json({ ok: true });
+});
+// sinal enquanto um aparelho está a ver (cada minuto): no máximo PLAYER_AO_MESMO_TEMPO aparelhos ao mesmo tempo
+exports.playerVer = onRequest({ region: "europe-west1", maxInstances: 20, cors: true }, async (req, res) => {
+  const u = await playerConta(req);
+  if (!u) { res.status(401).json({ erro: "Entra com a tua conta Google." }); return; }
+  const dev = devId(req.query.dev);
+  if (!dev || (await playerGratis(String(u.email || "").toLowerCase()))) { res.json({ ok: true }); return; }
+  const ref = admin.firestore().collection("player").doc(u.uid), now = Date.now(), parar = req.query.parar === "1";
+  const r = await admin.firestore().runTransaction(async (t) => {
+    const s = await t.get(ref);
+    const d = s.exists ? s.data() : {};
+    const aver = Object.fromEntries(Object.entries(d.aver || {}).filter(([k, ts]) => k !== dev && now - ts < PLAYER_A_VER));
+    if (!parar && Object.keys(aver).length >= PLAYER_AO_MESMO_TEMPO)
+      return { ok: false, max: PLAYER_AO_MESMO_TEMPO, nomes: Object.keys(aver).map(k => (d.devs && d.devs[k] && d.devs[k].nome) || "Aparelho") };
+    if (!parar) aver[dev] = now;
+    t.set(ref, { aver }, { mergeFields: ["aver"] });
+    return { ok: true };
+  });
+  res.json(r);
 });
 // gerir ou cancelar a subscrição (portal do cliente do Stripe)
 exports.playerGerir = onRequest({ region: "europe-west1", maxInstances: 5, secrets: [STRIPE_SECRET], cors: true }, async (req, res) => {

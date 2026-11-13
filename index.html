@@ -647,6 +647,10 @@ form h3:first-of-type{border-top:0;padding-top:0}
   @page{margin:18mm}
 }
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(9.5rem,1fr));gap:.8rem;margin:0 0 1.6rem}
+.pg-list{list-style:none;margin:0 0 1.6rem;padding:0;border-top:1px solid var(--line)}
+.pg-list li{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.6rem 0;border-bottom:1px solid var(--line);min-width:0}
+.pg-list li span:first-child{min-width:0;overflow-wrap:anywhere}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .kpi{border:1px solid var(--line);border-radius:14px;padding:.9rem 1rem;background:var(--surface)}
 .kpi b{display:block;font:700 1.7rem/1.1 var(--display);letter-spacing:-.02em}
 .kpi span{font-size:.82rem;color:var(--muted)}
@@ -1776,6 +1780,9 @@ function demoStore(){
     async allSuporte(){ return [...(mem.suporte||[])].sort(byDate); },
     async updateSuporte(id,patch){ const p=(mem.suporte||[]).find(x=>x.id===id); if(p){Object.assign(p,patch,{atualizadoEm:Date.now()}); save();} },
     async allClientes(){ return [...(mem.clientes||[])].sort(byDate); },
+    async playerGratis(){ return [...(mem.playerGratis||[])]; },
+    async setPlayerGratis(l){ mem.playerGratis=l; save(); },
+    async playerContas(){ return []; },
     async saveCliente(id,d){ mem.clientes=mem.clientes||[]; if(id){ const c=mem.clientes.find(x=>x.id===id); if(c) Object.assign(c,d,{atualizadoEm:Date.now()}); } else mem.clientes.push({...d,id:"c"+Date.now(),criadoEm:Date.now(),atualizadoEm:Date.now()}); save(); }
   };
 }
@@ -1820,6 +1827,9 @@ async function firebaseStore(cfg){
     async allSuporte(){ return (await F.getDocs(F.collection(db,"suporte"))).docs.map(norm).sort(byDate); },
     async updateSuporte(id,patch){ await F.updateDoc(F.doc(db,"suporte",id),{...patch,atualizadoEm:F.serverTimestamp()}); },
     async allClientes(){ return (await F.getDocs(F.collection(db,"clientes"))).docs.map(norm).sort(byDate); },
+    async playerGratis(){ const s=await F.getDoc(F.doc(db,"config","player")); return (s.exists()&&s.data().gratis)||[]; },
+    async setPlayerGratis(l){ await F.setDoc(F.doc(db,"config","player"),{gratis:l}); },
+    async playerContas(){ return (await F.getDocs(F.collection(db,"player"))).docs.map(d=>({id:d.id,...d.data()})); },
     async saveCliente(id,d){ if(id) await F.updateDoc(F.doc(db,"clientes",id),{...d,atualizadoEm:F.serverTimestamp()}); else await F.addDoc(F.collection(db,"clientes"),{...d,criadoEm:F.serverTimestamp(),atualizadoEm:F.serverTimestamp()}); }
   };
 }
@@ -2313,7 +2323,7 @@ async function renderGestao(root){
   const tb=(k,l,n)=>`<button type="button" data-g="${k}" aria-pressed="${gtab===k}">${l}${n?`<span class="n">${n}</span>`:""}</button>`;
   root.innerHTML=`<div class="list-head"><h2>Gestão</h2></div>
     <div class="kpis">${kpi(novos,"Orçamentos novos",1)}${kpi(andamento,"Orçamentos em curso")}${kpi(sup,"Suporte por abrir",1)}${kpi(curso,"Suporte em curso")}${kpi(ativos.length,"Clientes ativos")}${kpi(eur(mrr).replace(",00",""),"Receita mensal")}${ren?kpi(ren,"Renovações em 30 dias",1):""}</div>
-    <div class="tabs" role="group" aria-label="Vistas">${tb("resumo","Resumo",0)}${tb("pedidos","Orçamentos",novos)}${tb("suporte","Suporte",sup)}${tb("clientes","Clientes",0)}<button type="button" data-g="meus" aria-pressed="${gtab==="meus"}">Os meus pedidos</button></div>
+    <div class="tabs" role="group" aria-label="Vistas">${tb("resumo","Resumo",0)}${tb("pedidos","Orçamentos",novos)}${tb("suporte","Suporte",sup)}${tb("clientes","Clientes",0)}${tb("player","AntunesPlayer",0)}<button type="button" data-g="meus" aria-pressed="${gtab==="meus"}">Os meus pedidos</button></div>
     <div id="listArea"></div>`;
   root.querySelectorAll("[data-g]").forEach(b=>b.addEventListener("click",()=>{gtab=b.dataset.g;renderApp();}));
   const area=$("listArea");
@@ -2330,7 +2340,25 @@ async function renderGestao(root){
     $("sfilt").addEventListener("change",e=>{supSite=e.target.value;renderApp();});
   }
   else if(gtab==="clientes"){ if(C===null) area.innerHTML=`<p class="err">Não foi possível ler os clientes. Confirma que as regras do Firestore incluem a coleção "clientes" (ficheiro firestore.rules).</p>`; else renderClientes(C,S,P); }
+  else if(gtab==="player") await renderPlayer(area);
   else renderMine(await store.myPedidos());
+}
+/* AntunesPlayer: quem usa a app sem pagar, e as contas da app (24 h grátis, depois 1 €/mês) */
+async function renderPlayer(area){
+  area.innerHTML=`<p class="muted">A carregar…</p>`;
+  let G,A;
+  try{ [G,A]=await Promise.all([store.playerGratis(),store.playerContas().catch(()=>null)]); }
+  catch(e){ area.innerHTML=`<p class="err">${esc(errMsg(e))}. Confirma que as regras do Firestore estão publicadas (ficheiro firestore.rules).</p>`; return; }
+  const now=Date.now(), pagos=(A||[]).filter(a=>a.sub&&["active","trialing","past_due"].includes(a.subEstado)&&(a.ate||0)>now);
+  const teste=(A||[]).filter(a=>!a.sub&&now-(a.inicio||0)<864e5);
+  area.innerHTML=`<div class="kpis">${[[pagos.length,"A pagar"],[eur(pagos.length).replace(",00",""),"Por mês"],[teste.length,"No dia grátis"],[(A||[]).length,"Contas"]].map(([n,l])=>`<div class="kpi"><b>${n}</b><span>${l}</span></div>`).join("")}</div>
+    <h3>Usam sem pagar</h3><p class="muted">Emails Gmail da conta com que a pessoa entra na app. A tua conta nunca paga.</p>
+    <form id="pgAdd" class="tools" style="gap:.5rem"><label class="f" style="margin:0;flex:1;min-width:14rem"><span class="sr-only">Email</span><input type="email" id="pgEmail" required placeholder="nome@gmail.com" autocomplete="off"></label><button class="btn solid small" type="submit">Adicionar</button></form>
+    <ul class="pg-list">${G.length?G.map(e=>`<li><span>${esc(e)}</span><button class="btn small" type="button" data-pgdel="${esc(e)}">Tirar</button></li>`).join(""):`<li class="muted">Ainda ninguém.</li>`}</ul>
+    ${pagos.length?`<h3>A pagar</h3><ul class="pg-list">${pagos.map(a=>`<li><span>${esc(a.email||a.id)}</span><span class="muted">${a.cancelada?"termina":"renova"} a ${new Date(a.ate).toLocaleDateString("pt-PT")}</span></li>`).join("")}</ul>`:""}`;
+  const guardar=async l=>{ try{ await store.setPlayerGratis(l); renderPlayer(area); }catch(e){ alert(errMsg(e)); } };
+  $("pgAdd").addEventListener("submit",e=>{ e.preventDefault(); const v=$("pgEmail").value.trim().toLowerCase(); if(v&&!G.includes(v)) guardar([...G,v]); });
+  area.querySelectorAll("[data-pgdel]").forEach(b=>b.addEventListener("click",()=>guardar(G.filter(x=>x!==b.dataset.pgdel))));
 }
 function clienteForm(c,id){
   const v=k=>esc(c?.[k]??"");
