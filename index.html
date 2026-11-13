@@ -766,7 +766,7 @@ details summary{cursor:pointer;color:var(--brand);font-weight:600;min-height:32p
 .bl-chips{display:flex;flex-wrap:wrap;gap:.45rem;margin:0;padding:0;list-style:none}
 .bl-chips button,.bl-tool{min-height:38px;padding:0 .95rem;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);font:inherit;font-size:.93rem;font-weight:500;cursor:pointer;transition:background-color .18s,color .18s,border-color .18s}
 @media (hover:hover){.bl-chips button:hover,.bl-tool:hover{border-color:var(--ink);color:var(--ink)}}
-.bl-chips button[aria-pressed="true"],.bl-tool[aria-expanded="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.bl-chips button[aria-pressed="true"],.bl-tool[aria-expanded="true"],.bl-tool[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
 .bl-row{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .9rem}
 .bl-sw{display:flex;align-items:center;gap:.4rem}
 .bl-sw button,.bl-sw label{width:30px;height:30px;border-radius:50%;border:2px solid var(--surface);box-shadow:0 0 0 1px var(--line);background:var(--c);cursor:pointer;padding:0;position:relative}
@@ -879,6 +879,112 @@ details summary{cursor:pointer;color:var(--brand);font-weight:600;min-height:32p
 .s-expl .board small{font-size:14px;color:#a9d7bd}
 .s-expl .board div{font-family:"Cormorant Garamond",Georgia,serif;font-size:44px;font-weight:600;line-height:1.35;margin-top:18px}
 .s-expl .board sup{font-size:.55em}.s-expl .board .gr{color:#6fdc9a}
+
+/* barra de páginas, editar e ecrã inteiro */
+.bl-tabs{display:flex;align-items:center;gap:.4rem;padding:.4rem .55rem;border-bottom:1px solid var(--line);background:var(--surface)}
+.bl-pages{display:flex;gap:.2rem;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none}
+.bl-pages button,.bl-tb{flex:none;min-height:36px;padding:0 .75rem;border-radius:8px;border:0;background:transparent;color:var(--muted);font:inherit;font-size:.88rem;font-weight:500;cursor:pointer;white-space:nowrap}
+.bl-pages button[aria-current]{background:var(--sunk);color:var(--ink);font-weight:600}
+@media (hover:hover){.bl-pages button:hover{color:var(--ink)}.bl-tb:hover{border-color:var(--ink)}}
+.bl-tb{display:inline-flex;align-items:center;gap:.4rem;border:1px solid var(--line);color:var(--ink)}
+.bl-tb[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.bl-tb svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+@media (max-width:560px){.bl-tb span{display:none}.bl-tb{padding:0 .6rem}}
+.bl-dlg{border:0;padding:0;background:transparent;width:min(1280px,calc(100vw - 32px),calc((100dvh - 140px)*1.6));max-width:none;max-height:none;overflow:visible}
+.bl-dlg::backdrop{background:rgba(11,18,32,.8)}
+.bl-dlg .bl-win{transform:none}
+.bl-rot{display:none;color:#fff;text-align:center;margin:.7rem 0 0;font-size:.95rem}
+@media (orientation:portrait) and (max-width:700px){.bl-rot{display:block}}
+
+/* o site de exemplo funciona: páginas, escolhas, pedidos */
+:where(.ms) button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer;text-align:inherit}
+.ms [data-go]{cursor:pointer}
+.ms button:focus-visible,.ms .fld:focus-visible{outline:2px solid #2547F5;outline-offset:3px}
+.ms .lk{padding:6px 0;border-bottom:2px solid transparent;transition:border-color .2s}
+.ms .lk[aria-current]{border-color:var(--a)}
+@media (hover:hover){.ms .lk:hover{border-color:color-mix(in srgb,var(--a) 55%,transparent)}}
+.s-expl .acts .lk{font-size:14px;color:#3e5a4c;margin-right:6px}
+.s-salao{--pbg:#faf6f8;--pin:#2b1f2a;--pmu:#6c5b67;--pln:#eadde4;--pcd:#fff;--hf:"Cormorant Garamond",Georgia,serif;--hw:500}
+.s-rest{--pbg:#f3ebdf;--pin:#2a1d15;--pmu:#6d5a4b;--pln:#dccfbd;--pcd:#fffaf2;--hf:"Cormorant Garamond",Georgia,serif;--hw:500}
+.s-foto{--pbg:#f6f0e8;--pin:#2d2620;--pmu:#5a5047;--pln:#ddd0c2;--pcd:#fff;--hf:"Cormorant Garamond",Georgia,serif;--hw:500}
+.s-baby{--pbg:#fbf3f1;--pin:#1d1b22;--pmu:#55505c;--pln:#efdfdb;--pcd:#fff;--hf:"Schibsted Grotesk",system-ui,sans-serif;--hw:800}
+.s-expl{--pbg:#eef5f0;--pin:#0f2f22;--pmu:#3e5a4c;--pln:#c9dccf;--pcd:#fff;--hf:"Schibsted Grotesk",system-ui,sans-serif;--hw:800}
+.ms .pg{position:absolute;left:0;right:0;top:74px;bottom:0;overflow:auto;padding:30px 44px 40px;background:var(--pbg);color:var(--pin);scrollbar-width:thin}
+.ms .pg p{opacity:1;max-width:none;color:var(--pin)}
+.ms .pt{font-family:var(--hf);font-weight:var(--hw);font-size:46px;line-height:1.05;margin:0 0 6px;letter-spacing:-.015em;color:var(--pin)}
+.ms .pg .ps{margin:0 0 20px;color:var(--pmu);font-size:16px;line-height:1.5}
+.ms .two{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:28px;align-items:start}
+.ms .card{background:var(--pcd);border:1px solid var(--pln);border-radius:18px;padding:22px 24px}
+.ms .frm{max-width:660px}.ms .frm.wide{max-width:none}.ms .two .frm{max-width:none}
+.ms .rows{list-style:none;margin:0;padding:0}
+.ms .rows li{display:flex;align-items:center;gap:16px;padding:13px 0;border-bottom:1px solid var(--pln)}
+.ms .rows li>div{flex:1;min-width:0}
+.ms .rows b{display:block;font-size:18px;font-weight:600}
+.ms .rows small{display:block;font-size:14px;color:var(--pmu);margin-top:2px}
+.ms .pr{font-family:var(--hf);font-size:21px;font-weight:600;white-space:nowrap;color:var(--pin)}
+.ms .rows .pill{height:40px;padding:0 18px}
+.ms .add{width:44px;height:44px;border-radius:50%;background:var(--a);color:var(--ai);font-size:26px;line-height:1;display:grid;place-items:center;flex:none;transition:transform .15s}
+.ms .add:active{transform:scale(.9)}
+.ms .del{width:34px;height:34px;border-radius:50%;border:1px solid var(--pln);color:var(--pmu);font-size:18px;line-height:1;display:grid;place-items:center;flex:none;text-align:center}
+.ms .addl{margin-top:14px;height:44px;padding:0 18px;border-radius:999px;border:1.5px dashed var(--pmu);color:var(--pin);font-size:15px;font-weight:600}
+.ms .lab{display:block;font-size:14px;font-weight:600;color:var(--pmu);margin:16px 0 8px}.ms .lab:first-child{margin-top:0}
+.ms .opts{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+.ms .opts button{min-height:44px;padding:0 16px;border-radius:12px;border:1.5px solid var(--pln);background:var(--pcd);color:var(--pin);font-size:15px;font-weight:600;transition:background-color .15s,border-color .15s}
+@media (hover:hover){.ms .opts button:not(:disabled):hover{border-color:var(--pin)}}
+.ms .opts button[aria-pressed="true"]{background:var(--a);border-color:var(--a);color:var(--ai)}
+.ms .opts button:disabled{opacity:.4;text-decoration:line-through;cursor:not-allowed}
+.ms .fld{width:100%;height:48px;border-radius:12px;border:1.5px solid var(--pln);background:var(--pcd);color:var(--pin);font:inherit;font-size:16px;padding:0 14px}
+.ms .go{margin-top:20px;height:52px;padding:0 28px;font-size:16px}
+.ms .pg .err{color:#b3261e;font-size:15px;font-weight:600;margin:14px 0 0}
+.ms .pill.o{border:1.5px solid var(--pln);color:var(--pin)}
+.ms .cart h4,.ms .est h4{margin:0 0 12px;font-family:var(--hf);font-weight:var(--hw);font-size:26px;color:var(--pin)}
+.ms .cart ul{list-style:none;margin:0;padding:0}
+.ms .cart li{display:flex;align-items:center;gap:10px;padding:7px 0;font-size:15px}.ms .cart li span{flex:1;min-width:0}
+.ms .pg .tot{display:flex;justify-content:space-between;border-top:1px solid var(--pln);padding-top:12px;margin:8px 0 0;font-size:18px}
+.ms .cart .go{width:100%}
+.ms .est .big{display:block;font-family:var(--hf);font-size:52px;font-weight:600;line-height:1;margin:6px 0 10px}
+.ms .pk{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.ms .pkc{border:1.5px solid var(--pln);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:4px}
+.ms .pkc.on{border-color:var(--a);box-shadow:inset 0 0 0 1px var(--a)}
+.ms .pkc b{font-size:16px}.ms .pkc small{font-size:13px;color:var(--pmu);flex:1}.ms .pkc .pr{font-size:24px;margin:4px 0 8px}.ms .pkc .pill{height:38px;font-size:14px}
+.ms .pf{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.ms .pf figure{margin:0}
+.ms .pf .ph{display:block;width:100%;height:200px;border-radius:10px;overflow:hidden}
+.ms .pf img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s}
+@media (hover:hover){.ms .pf .ph:hover img{transform:scale(1.04)}}
+.ms .pf figcaption{font-size:14px;color:var(--pmu);margin-top:8px}
+.ms .zoom{position:absolute;inset:0;z-index:5;background:rgba(20,16,12,.94);display:flex;align-items:center;justify-content:center;gap:24px;padding:30px}
+.ms .zoom img{max-width:76%;max-height:100%;object-fit:contain;border-radius:6px}
+.ms .zoom button{color:#fff;font-size:34px;width:56px;height:56px;border-radius:50%;border:1.5px solid rgba(255,255,255,.45);display:grid;place-items:center;flex:none;text-align:center}
+.ms .zoom .x{position:absolute;top:18px;right:18px;font-size:20px;width:46px;height:46px}
+.ms .okc{max-width:620px;margin:34px auto 0;text-align:center}
+.ms .okc>i{display:grid;place-items:center;width:72px;height:72px;margin:0 auto 18px;border-radius:50%;background:var(--a);color:var(--ai);font-size:34px;font-style:normal}
+.ms .okc h3{font-family:var(--hf);font-weight:var(--hw);font-size:48px;margin:0 0 10px;color:var(--pin);line-height:1.05}
+.ms .pg .okc p{font-size:19px;line-height:1.5;margin:0}
+.ms .okc small{display:block;margin:14px 0 24px;font-size:14px;color:var(--pmu)}
+.ms .okc .pill{height:48px;margin:0 5px}
+.ms .sg{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:6px 0 22px}
+.ms .sg small{display:block;font-size:13px;color:var(--pmu)}.ms .sg b{display:block;font-size:19px;margin-top:6px}
+.ms .ct{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.ms .ct dl{margin:0}
+.ms .ct dt{font-size:13px;font-weight:600;color:var(--pmu);margin-top:16px}.ms .ct dt:first-child{margin-top:0}
+.ms .ct dd{margin:2px 0 0;font-size:19px}
+.ms .mapa{position:relative;min-height:290px;border-radius:18px;overflow:hidden;border:1px solid var(--pln);
+  background:linear-gradient(90deg,transparent 46%,#fff 46% 49%,transparent 49%),linear-gradient(0deg,transparent 34%,#fff 34% 37%,transparent 37%),
+  linear-gradient(32deg,transparent 62%,#fff 62% 64.5%,transparent 64.5%),linear-gradient(150deg,transparent 20%,#cfe0c8 20% 34%,transparent 34%),#e9e4d8}
+.ms .mapa i{position:absolute;left:47.5%;top:36%;width:34px;height:34px;border-radius:50% 50% 50% 0;background:var(--a);transform:translate(-50%,-100%) rotate(-45deg);box-shadow:0 6px 14px -4px rgba(0,0,0,.4)}
+.ms .mapa i::after{content:"";position:absolute;inset:11px;border-radius:50%;background:#fff}
+.s-baby .grid button{height:40px;border-radius:9px;display:grid;place-items:center;font-size:13px;font-weight:700;background:#f0b27a;color:#3d2410;text-align:center;transition:transform .15s}
+@media (hover:hover){.s-baby .grid button:hover{transform:scale(1.08);box-shadow:0 0 0 2px #3d2410}}
+.s-rest .k2 li[data-go]{cursor:pointer}
+.s-rest .k2 li span:first-child{color:inherit;font-family:inherit;font-size:inherit}
+.bl-vp.pgo .pg [data-l],.bl-vp.pgo .zoom{animation:bl-page .45s cubic-bezier(.2,.75,.2,1) both;animation-delay:calc(var(--d,0)*55ms)}
+@keyframes bl-page{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.bl-vp.pgo .pg [data-l],.bl-vp.pgo .zoom{animation:none}}
+/* modo de edição: tudo o que se escreve fica marcado */
+.ms.edit [data-e]{outline:1.5px dashed color-mix(in srgb,var(--a) 75%,#888);outline-offset:3px;border-radius:3px;cursor:text;min-width:1ch}
+.ms.edit [data-e]:focus{outline-style:solid;outline-width:2px;background:color-mix(in srgb,var(--a) 12%,transparent)}
+.ms.edit [data-e]:empty::before{content:"escreve aqui";opacity:.5}
 </style>
 </head>
 <body>
@@ -938,7 +1044,10 @@ details summary{cursor:pointer;color:var(--brand);font-weight:600;min-height:32p
               <div class="bl-dots"><i></i><i></i><i></i></div>
               <div class="bl-url"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg><span>https://<b id="blSlug">studio-aurora</b>.pt</span></div>
             </div>
-            <div class="bl-vp" id="blVp" role="img" aria-label="Pré-visualização do site"><div class="ms" id="blMs"></div></div>
+            <div class="bl-tabs"><div class="bl-pages" id="blTabs" role="group" aria-label="Páginas do site"></div>
+              <button class="bl-tb" type="button" id="blEdit" aria-pressed="false" aria-label="Editar textos"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg><span>Editar textos</span></button>
+              <button class="bl-tb" type="button" id="blFull" aria-pressed="false" aria-label="Ver em ecrã inteiro"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button></div>
+            <div class="bl-vp" id="blVp" role="region" aria-label="Site de exemplo"><div class="ms" id="blMs"></div></div>
           </div>
         </div>
         <div class="bl-dock">
@@ -959,8 +1068,9 @@ details summary{cursor:pointer;color:var(--brand);font-weight:600;min-height:32p
             <label class="bl-lbl" for="blHead">A tua frase principal</label>
             <input class="bl-in" id="blHead" type="text" maxlength="60" placeholder="Por exemplo: A melhor pizza de Matosinhos" spellcheck="true">
           </div>
-          <p class="bl-note" id="blNote" aria-live="polite">Modelo Studio. Experimenta o teu nome, a tua cor e as tuas fotos.</p>
+          <p class="bl-note" id="blNote" aria-live="polite">Modelo Studio. Experimenta o teu nome, a tua cor e as tuas fotos, e navega no site como um cliente.</p>
         </div>
+        <dialog class="bl-dlg" id="blDlg" aria-label="Site de exemplo em ecrã inteiro"><p class="bl-rot">Roda o telemóvel para veres maior.</p></dialog>
       </div>
     </div>
   </section>
@@ -2909,97 +3019,319 @@ else try{
 })();
 </script>
 <script>
-/* hero ao vivo: o visitante monta o site do negócio dele num dos cinco modelos.
+/* hero ao vivo: o visitante monta o site do negócio dele num dos cinco modelos, e experimenta-o a sério.
    Nome, tipo, cor, fotos (ficam só no aparelho dele) e frase; ou um link (site, Facebook, Google Maps) de onde a função
-   lerLink vai buscar o nome, a foto e a cor. Até alguém mexer, mostra os modelos um a um. */
+   lerLink vai buscar o nome, a foto e a cor. Cada modelo tem várias páginas que funcionam (cardápio com pedido, marcações,
+   reservas, orçamento, horário, conta de aluno) e, com "Editar textos", qualquer texto, prato, serviço ou preço muda-se
+   ali mesmo. Até alguém mexer, mostra os modelos um a um. Nada sai do aparelho: é tudo uma demonstração. */
 (() => {
   const vp = document.getElementById('blVp');
   if (!vp) return;
-  const ms = document.getElementById('blMs'), input = document.getElementById('blName'), slug = document.getElementById('blSlug'),
-    note = document.getElementById('blNote'), chips = document.getElementById('blTypes'), sw = document.getElementById('blSw'),
-    pick = document.getElementById('blPick'), files = document.getElementById('blFiles'), thumbs = document.getElementById('blThumbs'),
-    more = document.getElementById('blMore'), moreBtn = document.getElementById('blMoreBtn'), head = document.getElementById('blHead'),
-    link = document.getElementById('blLink'), linkGo = document.getElementById('blLinkGo'), linkNote = document.getElementById('blLinkNote');
+  const $id = id => document.getElementById(id);
+  const ms = $id('blMs'), input = $id('blName'), slug = $id('blSlug'), note = $id('blNote'), chips = $id('blTypes'),
+    sw = $id('blSw'), files = $id('blFiles'), thumbs = $id('blThumbs'), more = $id('blMore'), moreBtn = $id('blMoreBtn'),
+    head = $id('blHead'), link = $id('blLink'), linkGo = $id('blLinkGo'), linkNote = $id('blLinkNote'),
+    tabs = $id('blTabs'), editBtn = $id('blEdit'), fullBtn = $id('blFull'), dlg = $id('blDlg');
+  const win = vp.closest('.bl-win'), stage = win.parentNode;
   const LER = 'https://europe-west1-aw-sites-e31c3.cloudfunctions.net/lerLink';
-  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
   const N = '<span class="nm" data-name></span>';
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const DEF_IMG = ['img/hero/mesa.jpg', 'img/hero/fotografa.jpg', 'img/hero/aliancas.jpg'];
-  const st = { t: 'salao', a: '', ph: [], h: '' };
+  /* listas que o visitante pode mudar, juntar e apagar */
+  const LISTS = {
+    svc: [
+      { n: 'Corte e brushing', d: '45 min', p: '25,00 €' },
+      { n: 'Coloração', d: '1 h 30', p: '45,00 €' },
+      { n: 'Manicure com gel', d: '1 h', p: '20,00 €' },
+      { n: 'Limpeza de pele', d: '1 h', p: '40,00 €' },
+      { n: 'Design de sobrancelhas', d: '20 min', p: '8,00 €' }
+    ],
+    menu: [
+      { c: 'Entradas', n: 'Pão, azeitonas e manteiga de ervas', d: '', p: '3,50 €' },
+      { c: 'Entradas', n: 'Polvo à galega', d: 'Batata, colorau e azeite', p: '11,50 €' },
+      { c: 'Entradas', n: 'Pica-pau do lombo', d: 'Com pickles da casa', p: '9,00 €' },
+      { c: 'Pratos', n: 'Arroz de pato à moda antiga', d: 'Com chouriço e laranja', p: '14,50 €' },
+      { c: 'Pratos', n: 'Bacalhau à lagareiro', d: 'Batata a murro e grelos', p: '18,50 €' },
+      { c: 'Pratos', n: 'Bitoque do lombo', d: 'Ovo, batata frita e salada', p: '12,00 €' },
+      { c: 'Pratos', n: 'Risotto de cogumelos', d: 'Vegetariano', p: '13,00 €' },
+      { c: 'Sobremesas', n: 'Leite-creme queimado', d: '', p: '4,50 €' },
+      { c: 'Sobremesas', n: 'Bolo de bolacha', d: '', p: '4,00 €' },
+      { c: 'Bebidas', n: 'Vinho da casa, jarro', d: 'Tinto ou branco, 50 cl', p: '8,00 €' },
+      { c: 'Bebidas', n: 'Água das Pedras', d: '', p: '2,00 €' }
+    ],
+    pac: [
+      { n: 'Batizado ou aniversário', d: '3 horas e 150 fotografias editadas', p: '350 €' },
+      { n: 'Casamento, dia inteiro', d: 'Dos preparativos à festa, com álbum', p: '1450 €' },
+      { n: 'Sessão de marca', d: '2 horas e 40 fotografias para redes sociais', p: '280 €' }
+    ],
+    aul: [
+      { n: 'Matemática A', d: '10.º ao 12.º ano', p: 'Seg e Qui, 18:00' },
+      { n: 'Físico-Química', d: '10.º e 11.º ano', p: 'Ter, 18:30' },
+      { n: 'Matemática', d: '7.º ao 9.º ano', p: 'Qua, 17:30' },
+      { n: 'Preparação para exame', d: '12.º ano', p: 'Sáb, 10:00' }
+    ]
+  };
+  const st = { t: 'salao', a: '', ph: [], h: '', pg: 'home', f: {}, ed: {}, edit: false, L: JSON.parse(JSON.stringify(LISTS)) };
 
-  /* frase principal: a do modelo, ou a do visitante */
-  const H = (def, cls = '') => (st.h ? `<h2 class="${cls} ${st.h.length > 34 ? 'long' : ''}">${esc(st.h)}</h2>` : `<h2 class="${cls}">${def}</h2>`);
+  /* ---------- pequenas peças ---------- */
+  const DS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+  const MS = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+  function dias(n, semDomingo = true) {
+    const out = [], d = new Date();
+    while (out.length < n) {
+      d.setDate(d.getDate() + 1);
+      if (semDomingo && d.getDay() === 0) continue;
+      out.push(`${DS[d.getDay()]} ${d.getDate()}`);
+    }
+    return out;
+  }
+  function meses(n) {
+    const m = new Date().getMonth();
+    return Array.from({ length: n }, (_, i) => MS[(m + 1 + i) % 12].replace(/^./, c => c.toUpperCase()));
+  }
+  const num = p => parseFloat(String(p).replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+  const eur = n => n.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' });
+  /* textos que se editam: E(chave, texto do modelo); linhas das listas: LE(lista, i, campo) */
+  const E = (k, def) => `<span data-e="${k}">${esc(k in st.ed ? st.ed[k] : def)}</span>`;
+  const LE = (l, i, f) => `<span data-e="L.${l}.${i}.${f}">${esc(st.L[l][i][f])}</span>`;
+  /* frase principal: a do modelo, ou a do visitante (também se edita no próprio site) */
+  const H = (def, cls = '') =>
+    st.h ? `<h2 data-e="h" class="${cls} ${st.h.length > 34 ? 'long' : ''}">${esc(st.h)}</h2>` : `<h2 data-e="h" class="${cls}">${def}</h2>`;
+  const lk = (pg, l) => `<button type="button" class="lk" data-go="${pg}"${st.pg === pg ? ' aria-current="page"' : ''}>${l}</button>`;
+  const PG = h => `<div class="pg">${h}</div>`;
+  const TT = (k, def, sub) =>
+    `<h3 class="pt" data-l style="--d:1">${E(k, def)}</h3>${sub ? `<p class="ps" data-l style="--d:2">${E(k + '.s', sub)}</p>` : ''}`;
+  const LAB = l => `<span class="lab">${l}</span>`;
+  const FLD = (k, ph) => `<input class="fld" data-f="${k}" value="${esc(st.f[k] || '')}" placeholder="${ph}" maxlength="40" autocomplete="off">`;
+  const ERR = () => (st.f.err ? `<p class="err" role="alert">${esc(st.f.err)}</p>` : '');
+  const GO = l => `<button type="button" class="pill acc go" data-act="send">${l}</button>`;
+  const OPT = (k, vals, ocupado = []) =>
+    `<div class="opts">${vals
+      .map(v => `<button type="button" data-act="set" data-v="${esc(k + '=' + v)}" aria-pressed="${st.f[k] === v}"${ocupado.includes(v) ? ' disabled' : ''}>${esc(v)}</button>`)
+      .join('')}</div>`;
+  const OK = (h, p, extra = '') =>
+    PG(`<div class="okc" data-l style="--d:1"><i>✓</i><h3>${h}</h3><p>${p}</p>
+      <small>É uma demonstração: nada foi enviado. No teu site, isto chegava-te ao telemóvel na hora.</small>${extra}
+      <button type="button" class="pill acc" data-act="again">Fazer outro</button><button type="button" class="pill o" data-go="home">Voltar ao início</button></div>`);
+  /* linhas de uma lista, com o botão de cada uma; no modo de edição dá para apagar e juntar */
+  const ROWS = (l, btn, filtro, juntar) =>
+    `<ul class="rows" data-l style="--d:3">${st.L[l]
+      .map((x, i) => [x, i])
+      .filter(([x]) => !filtro || filtro(x))
+      .map(
+        ([x, i]) =>
+          `<li><div><b>${LE(l, i, 'n')}</b><small>${LE(l, i, 'd')}</small></div><span class="pr">${LE(l, i, 'p')}</span>${btn(x, i)}` +
+          (st.edit ? `<button type="button" class="del" data-act="del" data-v="${l}.${i}" aria-label="Apagar ${esc(x.n)}">×</button>` : '') +
+          '</li>'
+      )
+      .join('')}</ul>` + (st.edit ? `<button type="button" class="addl" data-act="addItem" data-v="${juntar || l}">+ Juntar mais um</button>` : '');
+  const nameNow = () => input.value.trim() || T[st.t].def;
+  const toSlug = s =>
+    s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/&/g, 'e').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 28) || 'o-teu-negocio';
+  /* contactos, igual em todos os modelos que os têm */
+  const CONT = titulo =>
+    PG(`${TT('ct.t', titulo, 'Aparece, liga ou manda mensagem.')}
+      <div class="ct" data-l style="--d:3"><div class="card"><dl>
+        <dt>Morada</dt><dd>${E('ct.m', 'Rua de Brito Capelo, 210, Matosinhos')}</dd>
+        <dt>Horário</dt><dd>${E('ct.h', 'Terça a sábado, das 9h às 19h')}</dd>
+        <dt>Telefone</dt><dd>${E('ct.f', '912 345 678')}</dd>
+        <dt>Email</dt><dd>${E('ct.e', 'ola@' + toSlug(nameNow()) + '.pt')}</dd></dl></div>
+      <div class="mapa" aria-hidden="true"><i></i></div></div>`);
+  const FREE_PAT = 'oo.ffmf.ffoffm.ofofff.offf..'.split('');
+  const dia = i => ((i + 3) % 30) + 1;
+  const FREE = FREE_PAT.map((c, i) => (c === 'f' ? 'Dia ' + dia(i) : null)).filter(Boolean);
+
+  /* ---------- os cinco modelos e as suas páginas ---------- */
   const T = {
     salao: {
       label: 'Salão', model: 'Studio', def: 'Studio Aurora', a: '#C98EA4', sw: ['#C98EA4', '#B9935A', '#7FA88E', '#8E7CC3', '#D96C5F'],
-      html: () => `
+      pages: [['home', 'Início'], ['servicos', 'Serviços'], ['marcar', 'Marcar'], ['contactos', 'Contactos']],
+      nav: () => `
+      <div class="m-nav" data-l style="--d:1"><div class="brand" data-go="home">${st.ph[1] ? `<img class="av" src="${st.ph[1]}" alt="" width="38" height="38">` : '<span class="mk">✦</span>'}<div>${N}<small>BELEZA &amp; BEM-ESTAR</small></div></div>
+        <div class="m-links">${lk('home', 'Início')}${lk('servicos', 'Serviços')}${lk('contactos', 'Contactos')}</div><button type="button" class="pill" data-go="marcar" style="background:#fff;color:#2b1f2a">Marcar</button></div>`,
+      home: () => `
       <div class="blob" data-l style="--d:0"></div>
-      <div class="m-nav" data-l style="--d:1"><div class="brand">${st.ph[1] ? `<img class="av" src="${st.ph[1]}" alt="" width="38" height="38">` : '<span class="mk">✦</span>'}<div>${N}<small>BELEZA &amp; BEM-ESTAR</small></div></div>
-        <div class="m-links"><span>Serviços</span><span>Trabalhos</span><span>Avaliações</span><span>Contactos</span></div><span class="pill" style="background:#fff;color:#2b1f2a">Marcar</span></div>
-      <div class="copy"><div class="eb" data-l style="--d:2">Beleza &amp; Bem-estar</div>
+      <div class="copy"><div class="eb" data-l style="--d:2">${E('s.eb', 'Beleza & Bem-estar')}</div>
         <div data-l style="--d:3">${H('A sua beleza<br>começa <em>aqui</em>')}</div>
-        <p data-l style="--d:4">Marque online em segundos e receba a confirmação no WhatsApp.</p>
-        <div data-l style="--d:5"><span class="pill acc b1">Marcar agora</span><span class="pill b2">Ver serviços</span></div></div>
-      <div class="c1" data-l style="--d:6"><i>▦</i><div><small>Próxima vaga</small><b>Amanhã às 09:30</b></div></div>
+        <p data-l style="--d:4">${E('s.p', 'Marque online em segundos e receba a confirmação no WhatsApp.')}</p>
+        <div data-l style="--d:5"><button type="button" class="pill acc b1" data-go="marcar">Marcar agora</button><button type="button" class="pill b2" data-go="servicos">Ver serviços</button></div></div>
+      <div class="c1" data-go="marcar" data-l style="--d:6"><i>▦</i><div><small>Próxima vaga</small><b>Amanhã às 09:30</b></div></div>
       <div class="c2" data-l style="--d:7"><b>4,9</b><span>★★★★★</span><small>120 avaliações no Google (exemplo)</small></div>`,
+      servicos: () =>
+        PG(TT('s.st', 'Serviços e preços', 'Escolhe um serviço e marca logo a seguir.') +
+          ROWS('svc', x => `<button type="button" class="pill acc" data-go="marcar" data-v="${esc('svc=' + x.n)}">Marcar</button>`)),
+      marcar: () =>
+        st.f.done
+          ? OK('Marcação feita', esc(`${st.f.svc}, ${st.f.dia} às ${st.f.hora}. Recebias a confirmação no WhatsApp e um lembrete na véspera.`))
+          : PG(`${TT('s.mt', 'Marcar', 'Três toques e fica marcado.')}<div class="card frm" data-l style="--d:3">
+            ${LAB('Serviço')}${OPT('svc', st.L.svc.map(x => x.n))}${LAB('Dia')}${OPT('dia', dias(6))}
+            ${LAB('Hora')}${OPT('hora', ['09:30', '10:30', '11:30', '14:00', '15:30', '17:00', '18:00'], ['10:30', '15:30'])}
+            ${LAB('O teu nome')}${FLD('nome', 'Para sabermos quem vem')}${ERR()}${GO('Confirmar marcação')}</div>`),
+      contactos: () => CONT('Contactos'),
+      req: { marcar: ['svc', 'dia', 'hora', 'nome'] },
       ph: () => (st.ph[0] ? 'ph' : '')
     },
     rest: {
       label: 'Restaurante', model: 'Restaurante', def: 'Brasa & Alecrim', a: '#B5522B', sw: ['#B5522B', '#2F6B4F', '#B8862B', '#8C2F39', '#2B4C7E'],
-      html: () => `
-      <div class="m-nav" data-l style="--d:0"><div class="brand">${st.ph[1] ? `<img class="av" src="${st.ph[1]}" alt="" width="36" height="36">` : '<span class="mk">♨</span>'}${N}</div>
-        <div class="m-links"><span>Hoje</span><span>Cardápio</span><span>Visitar</span></div><span class="pill acc">Ver cardápio</span></div>
+      pages: [['home', 'Hoje'], ['cardapio', 'Cardápio'], ['reservar', 'Reservar mesa'], ['contactos', 'Visitar']],
+      nav: () => `
+      <div class="m-nav" data-l style="--d:0"><div class="brand" data-go="home">${st.ph[1] ? `<img class="av" src="${st.ph[1]}" alt="" width="36" height="36">` : '<span class="mk">♨</span>'}${N}</div>
+        <div class="m-links">${lk('home', 'Hoje')}${lk('cardapio', 'Cardápio')}${lk('contactos', 'Visitar')}</div><button type="button" class="pill acc" data-go="reservar">Reservar mesa</button></div>`,
+      home: () => {
+        const M = st.L.menu, pd = Math.max(0, M.findIndex(m => m.c === 'Pratos'));
+        const sug = M.map((m, i) => i).filter(i => i !== pd && M[i].c !== 'Bebidas' && M[i].d).slice(0, 3);
+        return `
       <div class="head"><div data-l style="--d:1">${H('Hoje na cozinha')}</div><div class="rule" data-l style="--d:2"><i></i><b></b><i></i></div>
-        <p data-l style="--d:3">O prato do dia e as sugestões do chef, sempre atualizados.</p></div>
-      <div class="k1 ${st.ph[0] ? 'ph' : ''}" data-l style="--d:4"><small>PRATO DO DIA</small><h3>Arroz de pato à moda antiga</h3><em>Com chouriço e laranja</em><b>14,50 €</b></div>
-      <div class="k2" data-l style="--d:5"><h4>Sugestões do chef</h4><ul><li>Polvo à galega<i></i><span>11,50 €</span></li><li>Bacalhau à lagareiro<i></i><span>18,50 €</span></li><li>Leite-creme queimado<i></i><span>4,50 €</span></li></ul></div>`
+        <p data-l style="--d:3">${E('r.p', 'O prato do dia e as sugestões do chef, sempre atualizados.')}</p></div>
+      ${M[pd] ? `<div class="k1 ${st.ph[0] ? 'ph' : ''}" data-go="cardapio" data-l style="--d:4"><small>PRATO DO DIA</small><h3>${LE('menu', pd, 'n')}</h3><em>${LE('menu', pd, 'd')}</em><b>${LE('menu', pd, 'p')}</b></div>` : ''}
+      <div class="k2" data-l style="--d:5"><h4>Sugestões do chef</h4><ul>${sug.map(i => `<li data-go="cardapio">${LE('menu', i, 'n')}<i></i>${LE('menu', i, 'p')}</li>`).join('')}</ul></div>`;
+      },
+      cardapio: () => {
+        const CATS = ['Entradas', 'Pratos', 'Sobremesas', 'Bebidas'];
+        st.f.cat = st.f.cat || 'Pratos';
+        const cart = st.f.cart || {},
+          lines = Object.keys(cart).filter(i => cart[i] > 0 && st.L.menu[i]).map(i => [st.L.menu[i], cart[i], i]),
+          qt = lines.reduce((s, x) => s + x[1], 0),
+          tot = lines.reduce((s, [m, q]) => s + num(m.p) * q, 0);
+        if (st.f.done) return OK('Pedido recebido', esc(`${qt} ${qt === 1 ? 'artigo' : 'artigos'}, ${eur(tot)}. Fica pronto para levantar daqui a 25 minutos.`));
+        return PG(`<div class="two"><div>${TT('r.ct', 'Cardápio', 'Toca em + para juntar ao teu pedido para levantar.')}
+          <div data-l style="--d:2">${OPT('cat', CATS)}</div>
+          ${ROWS('menu', (x, i) => `<button type="button" class="add" data-act="add" data-v="${i}" aria-label="Juntar ${esc(x.n)} ao pedido">+</button>`, x => x.c === st.f.cat, 'menu:' + st.f.cat)}</div>
+          <aside class="card cart" data-l style="--d:4"><h4>O teu pedido</h4>${
+            lines.length
+              ? `<ul>${lines.map(([m, q, i]) => `<li><button type="button" class="del" data-act="rmc" data-v="${i}" aria-label="Tirar um ${esc(m.n)}">−</button><span>${q}× ${esc(m.n)}</span><b>${eur(num(m.p) * q)}</b></li>`).join('')}</ul>
+                 <p class="tot"><span>Total</span><b>${eur(tot)}</b></p>${GO('Encomendar para levantar')}`
+              : '<p class="ps">Ainda está vazio. Toca em + num prato.</p>'
+          }${ERR()}</aside></div>`);
+      },
+      reservar: () =>
+        st.f.done
+          ? OK('Mesa reservada', esc(`Mesa para ${st.f.pes} pessoas, ${st.f.dia} às ${st.f.hora}, em nome de ${st.f.nome}.`))
+          : PG(`${TT('r.rt', 'Reservar mesa', 'Escolhe o dia e a hora. A confirmação é na hora.')}<div class="card frm" data-l style="--d:3">
+            ${LAB('Quantas pessoas')}${OPT('pes', ['2', '3', '4', '5', '6', '7', '8+'])}${LAB('Dia')}${OPT('dia', dias(6, false))}
+            ${LAB('Hora')}${OPT('hora', ['12:30', '13:00', '13:30', '19:30', '20:00', '20:30', '21:00'], ['13:00', '20:30'])}
+            ${LAB('Em nome de')}${FLD('nome', 'O teu nome')}${ERR()}${GO('Reservar')}</div>`),
+      contactos: () => CONT('Como chegar'),
+      req: { reservar: ['pes', 'dia', 'hora', 'nome'] }
     },
     foto: {
       label: 'Fotografia', model: 'Momento', def: 'Lume', a: '#8A6A4F', sw: ['#8A6A4F', '#2D2620', '#9C5B6B', '#4F6D7A', '#6B7F4F'],
-      html: () => {
+      pages: [['home', 'Sobre'], ['portfolio', 'Portfólio'], ['orcamento', 'Pedir orçamento'], ['contactos', 'Contactos']],
+      nav: () => `
+      <div class="m-nav" data-l style="--d:0"><div class="brand" data-go="home">${N}</div>
+        <div class="m-links">${lk('home', 'Sobre')}${lk('portfolio', 'Portfólio')}${lk('contactos', 'Contactos')}</div><button type="button" class="pill acc" data-go="orcamento">Pedir orçamento</button></div>`,
+      home: () => {
         const p = i => st.ph[i] || DEF_IMG[i];
         return `
-      <div class="m-nav" data-l style="--d:0"><div class="brand">${N}</div>
-        <div class="m-links"><span>Sobre</span><span>Serviços</span><span>Portfólio</span><span>Contactos</span></div><span class="pill acc">Pedir orçamento</span></div>
-      <div class="copy"><div class="eb" data-l style="--d:1">FOTOGRAFIA, CONTEÚDO E EVENTOS</div>
+      <div class="copy"><div class="eb" data-l style="--d:1">${E('f.eb', 'FOTOGRAFIA, CONTEÚDO E EVENTOS')}</div>
         <div data-l style="--d:2">${H('Os teus momentos, contados com <em>cuidado</em>.')}</div>
-        <p data-l style="--d:3">Casamentos, batizados, aniversários e marcas. Do primeiro contacto à entrega das fotografias, tudo num só sítio.</p>
-        <div data-l style="--d:4"><span class="pill acc b1">Pedir orçamento</span><span class="pill b2">Ver trabalhos</span></div></div>
-      <div class="pol p1" data-l style="--d:5"><img src="${p(0)}" alt=""></div>
-      <div class="pol p2" data-l style="--d:6"><img src="${p(1)}" alt=""></div>
-      <div class="pol p3" data-l style="--d:7"><img src="${p(2)}" alt=""></div>`;
-      }
+        <p data-l style="--d:3">${E('f.p', 'Casamentos, batizados, aniversários e marcas. Do primeiro contacto à entrega das fotografias, tudo num só sítio.')}</p>
+        <div data-l style="--d:4"><button type="button" class="pill acc b1" data-go="orcamento">Pedir orçamento</button><button type="button" class="pill b2" data-go="portfolio">Ver trabalhos</button></div></div>
+      <div class="pol p1" data-go="portfolio" data-v="zoom=0" data-l style="--d:5"><img src="${p(0)}" alt=""></div>
+      <div class="pol p2" data-go="portfolio" data-v="zoom=1" data-l style="--d:6"><img src="${p(1)}" alt=""></div>
+      <div class="pol p3" data-go="portfolio" data-v="zoom=2" data-l style="--d:7"><img src="${p(2)}" alt=""></div>`;
+      },
+      portfolio: () => {
+        const imgs = [...st.ph, ...DEF_IMG.filter(u => !st.ph.includes(u))].slice(0, 6),
+          CAP = ['Mesa de casamento', 'Sessão de retrato', 'As alianças', 'Batizado', 'Aniversário', 'Pormenores'],
+          z = st.f.zoom === '' || st.f.zoom == null ? -1 : +st.f.zoom % imgs.length;
+        return (
+          PG(`${TT('f.pt', 'Portfólio', 'Alguns trabalhos recentes. Toca numa fotografia para a veres maior.')}
+          <div class="pf" data-l style="--d:3">${imgs
+            .map((u, i) => `<figure><button type="button" class="ph" data-act="set" data-v="zoom=${i}" aria-label="Ver maior"><img src="${esc(u)}" alt=""></button><figcaption>${E('f.c' + i, CAP[i])}</figcaption></figure>`)
+            .join('')}</div>`) +
+          (z < 0
+            ? ''
+            : `<div class="zoom"><button type="button" data-act="set" data-v="zoom=${(z + imgs.length - 1) % imgs.length}" aria-label="Anterior">‹</button>
+            <img src="${esc(imgs[z])}" alt=""><button type="button" data-act="set" data-v="zoom=${(z + 1) % imgs.length}" aria-label="Seguinte">›</button>
+            <button type="button" class="x" data-act="set" data-v="zoom=" aria-label="Fechar">✕</button></div>`)
+        );
+      },
+      orcamento: () =>
+        st.f.done
+          ? OK('Pedido enviado', esc(`${st.f.tipo}, ${st.f.pac}${st.f.mes ? ', em ' + st.f.mes.toLowerCase() : ''}. Recebias a proposta em menos de 24 horas.`))
+          : PG(`${TT('f.ot', 'Pedir orçamento', 'Diz-me o que procuras. Respondo em menos de 24 horas.')}<div class="card frm wide" data-l style="--d:3">
+            ${LAB('Tipo de sessão')}${OPT('tipo', ['Casamento', 'Batizado', 'Aniversário', 'Marca', 'Outro'])}
+            ${LAB('Pacote')}<div class="pk">${st.L.pac
+              .map((x, i) => {
+                const on = st.f.pac === x.n;
+                return `<div class="pkc${on ? ' on' : ''}"><b>${LE('pac', i, 'n')}</b><small>${LE('pac', i, 'd')}</small><span class="pr">${LE('pac', i, 'p')}</span>
+                  <button type="button" class="pill ${on ? 'acc' : 'o'}" data-act="set" data-v="${esc('pac=' + x.n)}" aria-pressed="${on}">${on ? 'Escolhido' : 'Escolher'}</button></div>`;
+              })
+              .join('')}</div>
+            ${LAB('Para quando')}${OPT('mes', meses(6))}${LAB('O teu nome')}${FLD('nome', 'O teu nome')}${ERR()}${GO('Enviar pedido')}</div>`),
+      contactos: () => CONT('Contactos'),
+      req: { orcamento: ['tipo', 'pac', 'nome'] }
     },
     baby: {
       label: 'Babysitter', model: 'Ninho', def: 'Marta Silva', a: '#4F7F75', sw: ['#4F7F75', '#C2577A', '#3F6FB5', '#B87333', '#6A5ACD'],
-      html: () => {
-        const s = 'oo.ffmf.ffoffm.ofofff.offf..'.split(''), days = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
-        let g = days.map(d => `<b>${d}</b>`).join('');
-        s.forEach((c, i) => (g += `<i class="${c === 'f' ? 'f' : c === 'm' ? 'm' : ''}">${((i + 3) % 30) + 1}</i>`));
+      pages: [['home', 'Início'], ['pedido', 'Pedir babysitting']],
+      nav: () => `
+      <div class="m-nav" data-l style="--d:0"><div class="brand" data-go="home">${st.ph[0] ? `<img class="av" src="${st.ph[0]}" alt="" width="34" height="34">` : ''}${N}</div>
+        <div class="m-links">${lk('home', 'Início')}</div><button type="button" class="pill acc" data-go="pedido">Pedir babysitting</button></div>`,
+      home: () => {
+        const ds = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+        let g = ds.map(d => `<b>${d}</b>`).join('');
+        FREE_PAT.forEach((c, i) =>
+          (g += c === 'f' ? `<button type="button" class="f" data-go="pedido" data-v="dia=Dia ${dia(i)}" aria-label="Pedir para o dia ${dia(i)}">${dia(i)}</button>` : `<i class="${c === 'm' ? 'm' : ''}">${dia(i)}</i>`)
+        );
         return `
-      <div class="m-nav" data-l style="--d:0"><div class="brand">${st.ph[0] ? `<img class="av" src="${st.ph[0]}" alt="" width="34" height="34">` : ''}${N}</div><span class="pill acc">Entrar</span></div>
       <div class="copy">${st.ph[0] ? `<img class="av" src="${st.ph[0]}" alt="" data-l style="--d:1">` : ''}<div data-l style="--d:1">${H('Babysitter de confiança')}</div>
-        <p data-l style="--d:2">Noites, fins de semana e saídas da escola. Cuido de crianças desde bebés até aos 12 anos, em tua casa.</p>
-        <div class="chips" data-l style="--d:3"><span>Primeiros socorros pediátricos</span><span>5 anos de experiência</span><span>10,00 € por hora</span></div>
-        <div data-l style="--d:4"><span class="pill acc b1">Pedir babysitting</span></div></div>
-      <div class="cal" data-l style="--d:5"><h4>Disponibilidade nas próximas 4 semanas</h4><div class="grid">${g}</div>
+        <p data-l style="--d:2">${E('b.p', 'Noites, fins de semana e saídas da escola. Cuido de crianças desde bebés até aos 12 anos, em tua casa.')}</p>
+        <div class="chips" data-l style="--d:3"><span>${E('b.c1', 'Primeiros socorros pediátricos')}</span><span>${E('b.c2', '5 anos de experiência')}</span><span>${E('b.r', '10,00 € por hora')}</span></div>
+        <div data-l style="--d:4"><button type="button" class="pill acc b1" data-go="pedido">Pedir babysitting</button></div></div>
+      <div class="cal" data-l style="--d:5"><h4>Toca num dia livre para pedir</h4><div class="grid">${g}</div>
         <div class="leg"><span style="--c:#f0b27a">Livre</span><span style="--c:#f1ebe8">Ocupado</span><span style="--c:var(--a)">Já marcado</span></div></div>`;
       },
+      pedido: () => {
+        const rate = num(st.ed['b.r'] || '10,00'),
+          h = st.f.ini && st.f.fim ? (parseInt(st.f.fim) - parseInt(st.f.ini) + 24) % 24 || 24 : 0;
+        if (st.f.done) return OK('Pedido enviado', esc(`${st.f.dia}, das ${st.f.ini} às ${st.f.fim}, ${st.f.cri || '1'} ${st.f.cri > 1 ? 'crianças' : 'criança'}. Cerca de ${eur(h * rate)}. ${nameNow()} responde por mensagem.`));
+        return PG(`${TT('b.pt', 'Pedir babysitting', 'Escolhe o dia e as horas. Respondo por mensagem.')}<div class="two">
+          <div class="card frm" data-l style="--d:3">${LAB('Dia')}${OPT('dia', FREE)}${LAB('Das')}${OPT('ini', ['18:00', '19:00', '20:00', '21:00'])}
+          ${LAB('Até às')}${OPT('fim', ['22:00', '23:00', '00:00', '01:00'])}${LAB('Quantas crianças')}${OPT('cri', ['1', '2', '3'])}
+          ${LAB('O teu nome')}${FLD('nome', 'O teu nome')}${ERR()}${GO('Enviar pedido')}</div>
+          <aside class="card est" data-l style="--d:4"><h4>Quanto fica</h4><b class="big">${h ? eur(h * rate) : '—'}</b>
+          <p class="ps">${h ? `${h} ${h === 1 ? 'hora' : 'horas'} a ${eur(rate)} por hora.` : 'Escolhe as horas para veres o valor.'}</p></aside></div>`);
+      },
+      req: { pedido: ['dia', 'ini', 'fim', 'nome'] },
       ph: () => (st.ph[0] ? 'ph' : '')
     },
     expl: {
       label: 'Explicações', model: 'Quadro', def: 'Explica+', a: '#2E8B57', sw: ['#2E8B57', '#2547F5', '#C0392B', '#8E44AD', '#D68910'],
-      html: () => `
-      <div class="m-nav" data-l style="--d:0"><div class="brand">${N}</div>
-        <div class="acts"><span style="font-size:14px;color:#3e5a4c;margin-right:8px">Início · Horário</span><span class="pill o">Instalar app</span><span class="pill acc g">Entrar</span></div></div>
-      <div class="ban acc" data-l style="--d:1">Inscrições abertas para a preparação de exames nacionais.</div>
+      pages: [['home', 'Início'], ['horario', 'Horário'], ['conta', 'Entrar']],
+      nav: () => `
+      <div class="m-nav" data-l style="--d:0"><div class="brand" data-go="home">${N}</div>
+        <div class="acts">${lk('home', 'Início')}${lk('horario', 'Horário')}<span class="pill o">Instalar app</span><button type="button" class="pill acc g" data-go="conta">Entrar</button></div></div>`,
+      home: () => `
+      <div class="ban acc" data-l style="--d:1">${E('e.b', 'Inscrições abertas para a preparação de exames nacionais.')}</div>
       <div class="copy"><div data-l style="--d:2">${H('Explicações de Matemática e Físico-Química')}</div>
-        <p data-l style="--d:3">Do 7.º ao 12.º ano, no nosso espaço ou online. Cada turma tem a sua sala, com a aula, as fichas e os avisos no mesmo sítio.</p>
-        <div data-l style="--d:4"><span class="pill acc b1">Criar conta de aluno</span><span class="pill b2">Ver horário</span></div></div>
-      <div class="board ${st.ph[0] ? 'ph' : ''}" data-l style="--d:5"><small>Quinta-feira, Matemática A</small><div>f(x) = 2<sup>x</sup><br>lim f(x) = <span class="gr">+∞</span><br>f′(x) = 2<sup>x</sup> ln 2</div></div>`
+        <p data-l style="--d:3">${E('e.p', 'Do 7.º ao 12.º ano, no nosso espaço ou online. Cada turma tem a sua sala, com a aula, as fichas e os avisos no mesmo sítio.')}</p>
+        <div data-l style="--d:4"><button type="button" class="pill acc b1" data-go="conta">Criar conta de aluno</button><button type="button" class="pill b2" data-go="horario">Ver horário</button></div></div>
+      <div class="board ${st.ph[0] ? 'ph' : ''}" data-l style="--d:5"><small>Quinta-feira, Matemática A</small><div>f(x) = 2<sup>x</sup><br>lim f(x) = <span class="gr">+∞</span><br>f′(x) = 2<sup>x</sup> ln 2</div></div>`,
+      horario: () =>
+        PG(TT('e.ht', 'Horário', 'Turmas pequenas, no máximo seis alunos.') +
+          ROWS('aul', x => `<button type="button" class="pill acc" data-go="conta" data-v="${esc('aula=' + x.n)}">Inscrever</button>`)),
+      conta: () => {
+        if (st.f.done) {
+          const a = st.L.aul.find(x => x.n === st.f.aula);
+          return PG(`<div class="sala" data-l style="--d:1"><h3 class="pt">Olá, ${esc(st.f.nome.split(' ')[0])}</h3>
+            <p class="ps">Esta é a tua sala de ${esc(st.f.aula)}, ${esc(st.f.ano)} ano.</p>
+            <div class="sg"><div class="card"><small>Próxima aula</small><b>${esc(a ? a.p : 'Qui, 18:00')}</b></div>
+            <div class="card"><small>Ficha nova</small><b>Ficha 3: funções exponenciais</b></div>
+            <div class="card"><small>Aviso</small><b>O teste passa para dia 28.</b></div></div>
+            <p class="ps">É uma demonstração: a conta não foi criada.</p><button type="button" class="pill o" data-act="again">Sair</button></div>`);
+        }
+        return PG(`${TT('e.ct', 'Criar conta de aluno', 'Ficas com a aula, as fichas e os avisos num só sítio.')}<div class="card frm" data-l style="--d:3">
+          ${LAB('O teu nome')}${FLD('nome', 'Nome do aluno')}${LAB('Ano')}${OPT('ano', ['7.º', '8.º', '9.º', '10.º', '11.º', '12.º'])}
+          ${LAB('Disciplina')}${OPT('aula', st.L.aul.map(x => x.n))}${ERR()}${GO('Criar conta')}</div>`);
+      },
+      req: { conta: ['nome', 'ano', 'aula'] }
     }
   };
   const order = ['salao', 'rest', 'foto', 'baby', 'expl'];
+  const NOMES = { pes: 'quantas pessoas', dia: 'o dia', hora: 'a hora', nome: 'o nome', svc: 'o serviço', tipo: 'o tipo de sessão', pac: 'o pacote', ini: 'a hora de início', fim: 'a hora de fim', ano: 'o ano', aula: 'a disciplina' };
 
   /* texto legível em cima da cor escolhida */
   function inkOn(hex) {
@@ -3009,28 +3341,157 @@ else try{
     const l = 0.2126 * L(n >> 16) + 0.7152 * L((n >> 8) & 255) + 0.0722 * L(n & 255);
     return l > 0.45 ? '#141414' : '#fff';
   }
-  const nameNow = () => input.value.trim() || T[st.t].def;
-  const toSlug = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/&/g, 'e').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 28) || 'o-teu-negocio';
   function fillName() {
     const n = nameNow();
     ms.querySelectorAll('[data-name]').forEach(e => (e.textContent = n));
     slug.textContent = toSlug(n);
-    vp.setAttribute('aria-label', `Pré-visualização do site ${n}, modelo ${T[st.t].model}`);
+    const pg = T[st.t].pages.find(p => p[0] === st.pg);
+    vp.setAttribute('aria-label', `Site de exemplo ${n}, modelo ${T[st.t].model}, página ${pg ? pg[1] : ''}`);
   }
-  function paint(animate) {
+  function tabsRender() {
+    tabs.innerHTML = T[st.t].pages.map(([p, l]) => `<button type="button" data-go="${p}"${st.pg === p ? ' aria-current="page"' : ''}>${l}</button>`).join('');
+  }
+  /* desenha o site; anim: true (montar tudo), 'pgo' (só a página nova) ou false (sem animação, mantém o scroll e o foco) */
+  function paint(anim) {
     const t = T[st.t], a = st.a || t.a;
-    ms.className = 'ms s-' + st.t + ' ' + (t.ph ? t.ph() : '');
+    if (!t.pages.some(p => p[0] === st.pg)) st.pg = 'home';
+    const old = ms.querySelector('.pg'), sc = old ? old.scrollTop : 0, fa = document.activeElement;
+    let fk = '';
+    if (!anim && fa && ms.contains(fa) && fa.matches('button'))
+      fk = ['act', 'go', 'v'].filter(k => fa.dataset[k] != null).map(k => `[data-${k}="${CSS.escape(fa.dataset[k])}"]`).join('');
+    ms.className = 'ms s-' + st.t + ' ' + (t.ph ? t.ph() : '') + (st.edit ? ' edit' : '') + (st.pg === 'home' ? '' : ' sub');
     ms.style.setProperty('--a', a);
     ms.style.setProperty('--ai', inkOn(a));
     ms.style.setProperty('--p0', st.ph[0] ? `url("${st.ph[0]}")` : 'none');
-    ms.innerHTML = t.html();
+    ms.innerHTML = t.nav() + (st.pg === 'home' ? t.home() : t[st.pg]());
     fillName();
-    if (animate && !reduce) {
-      vp.classList.remove('build');
+    tabsRender();
+    if (st.edit)
+      ms.querySelectorAll('[data-e]').forEach(el => {
+        try {
+          el.contentEditable = 'plaintext-only';
+        } catch (e) {
+          el.contentEditable = 'true';
+        }
+        el.spellcheck = false;
+      });
+    const pg = ms.querySelector('.pg');
+    if (pg && !anim) pg.scrollTop = sc;
+    if (fk) {
+      const n = ms.querySelector('button' + fk);
+      if (n) n.focus({ preventScroll: true });
+    }
+    if (anim && !reduce) {
+      vp.classList.remove('build', 'pgo');
       void vp.offsetWidth;
-      vp.classList.add('build');
+      vp.classList.add(anim === true ? 'build' : anim);
     }
   }
+  const setF = v => {
+    const i = v.indexOf('=');
+    st.f[v.slice(0, i)] = v.slice(i + 1);
+  };
+  function go(pg, v) {
+    st.pg = pg;
+    st.f.done = '';
+    st.f.err = '';
+    st.f.zoom = '';
+    if (v) setF(v);
+    paint('pgo');
+    const p = ms.querySelector('.pg');
+    if (p) p.scrollTop = 0;
+  }
+  function act(a, v) {
+    if (a === 'set') {
+      setF(v);
+      st.f.err = '';
+    } else if (a === 'add') {
+      const c = (st.f.cart = st.f.cart || {});
+      c[v] = (c[v] || 0) + 1;
+      st.f.err = '';
+    } else if (a === 'rmc') {
+      const c = st.f.cart || {};
+      c[v] = Math.max(0, (c[v] || 0) - 1);
+    } else if (a === 'del') {
+      const [l, i] = v.split('.');
+      st.L[l].splice(+i, 1);
+      st.f.cart = {};
+    } else if (a === 'addItem') {
+      const [l, c] = v.split(':'),
+        n = { n: { menu: 'Prato novo', svc: 'Serviço novo', pac: 'Pacote novo', aul: 'Disciplina nova' }[l], d: '', p: l === 'aul' ? 'Dia e hora' : '0,00 €' };
+      if (c) n.c = c;
+      st.L[l].push(n);
+      paint(false);
+      const el = ms.querySelector(`[data-e="L.${l}.${st.L[l].length - 1}.n"]`);
+      if (el) {
+        el.focus();
+        getSelection().selectAllChildren(el);
+      }
+      return;
+    } else if (a === 'send') {
+      const miss = ((T[st.t].req || {})[st.pg] || []).filter(k => !st.f[k] || !String(st.f[k]).trim());
+      if (st.pg === 'cardapio' && !Object.values(st.f.cart || {}).some(q => q > 0)) miss.push('');
+      if (miss.length) st.f.err = miss[0] ? 'Falta ' + miss.map(k => NOMES[k]).join(', ').replace(/, ([^,]*)$/, ' e $1') + '.' : 'Junta pelo menos um prato.';
+      else {
+        st.f.err = '';
+        st.f.done = st.pg;
+        paint('pgo');
+        return;
+      }
+    } else if (a === 'again') {
+      st.f = { cat: st.f.cat };
+      paint('pgo');
+      return;
+    }
+    paint(false);
+  }
+  /* cliques dentro do site: mudar de página e experimentar */
+  ms.addEventListener('click', e => {
+    if (st.edit && e.target.closest('[data-e]')) return; // está a escrever
+    const b = e.target.closest('[data-go],[data-act]');
+    if (!b || b.disabled) return;
+    e.preventDefault();
+    if (b.dataset.go) go(b.dataset.go, b.dataset.v);
+    else act(b.dataset.act, b.dataset.v);
+  });
+  tabs.addEventListener('click', e => {
+    const b = e.target.closest('[data-go]');
+    if (b) go(b.dataset.go);
+  });
+  /* o que o visitante escreve: campos dos formulários e textos editados no próprio site */
+  ms.addEventListener('input', e => {
+    const f = e.target.dataset && e.target.dataset.f;
+    if (f) {
+      st.f[f] = e.target.value;
+      return;
+    }
+    const el = e.target.closest && e.target.closest('[data-e]');
+    if (!el) return;
+    const k = el.dataset.e, v = el.textContent.replace(/\s+/g, ' ').trim();
+    if (k === 'h') {
+      st.h = v;
+      head.value = v;
+    } else if (k.startsWith('L.')) {
+      const [, l, i, fl] = k.split('.');
+      if (st.L[l][+i]) st.L[l][+i][fl] = v;
+    } else st.ed[k] = v;
+    // o mesmo texto pode aparecer noutro sítio da página (prato do dia, sugestões)
+    ms.querySelectorAll(`[data-e="${CSS.escape(k)}"]`).forEach(x => x !== el && (x.textContent = v));
+  });
+  ms.addEventListener('focusin', e => {
+    const el = e.target;
+    if (st.edit && el.dataset && el.dataset.e === 'h' && !st.h) el.textContent = el.innerText.replace(/\s+/g, ' ').trim();
+  });
+  ms.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && e.target.closest && e.target.closest('[data-e]')) {
+      e.preventDefault();
+      e.target.blur();
+    } else if (e.key === 'Enter' && e.target.dataset && e.target.dataset.f) {
+      e.preventDefault();
+      act('send');
+    }
+  });
+
   function swatches() {
     const t = T[st.t], cur = (st.a || t.a).toLowerCase();
     sw.innerHTML =
@@ -3044,12 +3505,18 @@ else try{
     ms.style.setProperty('--a', c);
     ms.style.setProperty('--ai', inkOn(c));
   }
+  const noteText = () =>
+    st.edit
+      ? 'Toca em qualquer texto do site e escreve por cima. Nos pratos, serviços e preços também podes juntar e apagar linhas.'
+      : `Modelo ${T[st.t].model}. Experimenta o teu nome, a tua cor e as tuas fotos, e navega no site como um cliente.`;
   function setType(t, animate) {
     st.t = t;
     st.a = '';
+    st.pg = 'home';
+    st.f = {};
     chips.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.t === t)));
     input.placeholder = 'Nome do teu negócio, por exemplo ' + T[t].def;
-    note.textContent = `Modelo ${T[t].model}. Experimenta o teu nome, a tua cor e as tuas fotos.`;
+    note.textContent = noteText();
     swatches();
     paint(animate);
   }
@@ -3067,6 +3534,14 @@ else try{
   head.addEventListener('input', () => {
     st.h = head.value.trim();
     paint(false);
+  });
+  editBtn.addEventListener('click', () => {
+    st.edit = !st.edit;
+    editBtn.setAttribute('aria-pressed', String(st.edit));
+    note.textContent = noteText();
+    paint(false);
+    const first = st.edit && ms.querySelector('[data-e]');
+    if (first) first.focus({ preventScroll: true });
   });
   /* fotos: lidas no próprio aparelho, nada é enviado */
   files.addEventListener('change', () => {
@@ -3127,6 +3602,22 @@ else try{
   const fit = () => (ms.style.transform = `scale(${vp.clientWidth / 1000})`);
   new ResizeObserver(fit).observe(vp);
   fit();
+  /* ecrã inteiro: a janela do site passa para um diálogo por cima da página */
+  function full(on) {
+    if (on) {
+      dlg.prepend(win);
+      dlg.showModal();
+    } else {
+      stage.append(win);
+      if (dlg.open) dlg.close();
+    }
+    fullBtn.setAttribute('aria-pressed', String(on));
+    fullBtn.setAttribute('aria-label', on ? 'Sair do ecrã inteiro' : 'Ver em ecrã inteiro');
+    fit();
+  }
+  fullBtn.addEventListener('click', () => full(!dlg.open));
+  dlg.addEventListener('close', () => win.parentNode === dlg && full(false));
+  dlg.addEventListener('click', e => e.target === dlg && full(false));
   /* volta guiada pelos modelos até alguém mexer, só com a pré-visualização à vista */
   let onScreen = true, touched = false, tour = 0;
   new IntersectionObserver(es => (onScreen = es[0].isIntersecting)).observe(vp);
@@ -3135,6 +3626,7 @@ else try{
     clearInterval(tour);
   };
   ['pointerdown', 'focusin', 'keydown'].forEach(ev => document.getElementById('builder').addEventListener(ev, stop));
+  dlg.addEventListener('pointerdown', stop);
   if (!reduce)
     tour = setInterval(() => {
       if (touched || !onScreen || document.hidden) return;
