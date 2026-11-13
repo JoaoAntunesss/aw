@@ -229,6 +229,11 @@ exports.stripeWebhook = onRequest({ secrets: [STRIPE_SECRET, STRIPE_WEBHOOK_SECR
     if (ev.type === "checkout.session.completed" || ev.type === "checkout.session.async_payment_succeeded") {
       const { pedidoId, tipo } = o.metadata || {};
       if (pedidoId && pago(o)) await marcarPago(pedidoId, tipo === "mensal" ? "mensal" : "montagem", o);
+      // AntunesPlayer: liga a subscrição à conta da app e avisa-me
+      else if (o.payment_link === PLAYER_PLINK && pago(o) && o.client_reference_id) {
+        await playerLigar(o.client_reference_id, o);
+        try { await avisar(`AntunesPlayer: nova subscrição 💶\n${cortar(o.customer_details?.email || o.customer_email, 80)}\n${((o.amount_total || 0) / 100).toFixed(2)} €/mês`); } catch (e) { console.error(e); }
+      }
     } else if (ev.type === "customer.subscription.updated") {
       const f = await pedidoDaSubscricao(o); if (f) {
         const g = f.p.pagamento || {}, cancelada = !!(o.cancel_at_period_end || o.cancel_at);
@@ -380,4 +385,93 @@ exports.lerLink = onRequest({ region: "europe-west1", maxInstances: 3, memory: "
   } catch (e) {
     return res.status(502).json({ erro: "não consegui abrir" });
   } finally { clearTimeout(t); }
+});
+
+/* ---- AntunesPlayer: 24 horas grátis, depois 1 €/mês (link de pagamento do Stripe) ----
+   A app (projeto Firebase iptv-364a1) manda o token da conta Google; aqui confirma-se quem é e se pagou.
+   O pagamento faz-se no link do Stripe com client_reference_id = uid da conta; o webhook acima e a procura
+   abaixo ligam a subscrição a essa conta (coleção "player", só as funções lhe mexem). */
+const PLAYER_LINK = "https://buy.stripe.com/4gM9AL24H00n6Wo6zD93y00";
+const PLAYER_PLINK = "plink_1UbTfy1B8fzyW0R2yD8oLWon";
+const PLAYER_TESTE = 24 * 3600e3;
+// sempre grátis: o dono; a família fica em config/player.gratis (lista de emails, editável na consola)
+const PLAYER_DONO = ["j.p.r.n.antunes@gmail.com"];
+let iptvAuth = null;
+const authIptv = () => iptvAuth || (iptvAuth = admin.initializeApp({ projectId: "iptv-364a1" }, "iptv").auth());
+const subAtiva = (d, now) => ["active", "trialing", "past_due"].includes(d.subEstado) && (d.ate || 0) > now - 3 * 86400e3;
+async function playerConta(req) {
+  const tok = String(req.get("authorization") || "").replace(/^Bearer\s+/i, "");
+  if (!tok) return null;
+  try { return await authIptv().verifyIdToken(tok); } catch (e) { return null; }
+}
+async function playerGratis(email) {
+  if (!email) return false;
+  if (PLAYER_DONO.includes(email)) return true;
+  try {
+    const s = await admin.firestore().collection("config").doc("player").get();
+    return ((s.exists && s.data().gratis) || []).map(x => String(x).toLowerCase().trim()).includes(email);
+  } catch (e) { return false; }
+}
+async function playerLigar(uid, ses) {
+  if (!uid || !ses || !ses.subscription) return;
+  await admin.firestore().collection("player").doc(uid).set({ sub: String(ses.subscription), cliente: String(ses.customer || ""), subVisto: 0 }, { merge: true });
+}
+// procura no Stripe um pagamento desta conta pelo link (quando a pessoa diz que já pagou)
+async function playerProcurar(uid) {
+  let ini;
+  for (let p = 0; p < 5; p++) {
+    const l = await stripeDe().checkout.sessions.list({ payment_link: PLAYER_PLINK, limit: 100, ...(ini ? { starting_after: ini } : {}) });
+    const s = l.data.find(x => x.client_reference_id === uid && x.status === "complete" && x.subscription);
+    if (s) return s;
+    if (!l.has_more) return null;
+    ini = l.data[l.data.length - 1].id;
+  }
+  return null;
+}
+exports.playerEstado = onRequest({ region: "europe-west1", maxInstances: 10, secrets: [STRIPE_SECRET], cors: true }, async (req, res) => {
+  const u = await playerConta(req);
+  if (!u) { res.status(401).json({ erro: "Entra com a tua conta Google." }); return; }
+  const email = String(u.email || "").toLowerCase(), uid = u.uid, now = Date.now();
+  const ref = admin.firestore().collection("player").doc(uid);
+  const snap = await ref.get();
+  let d = snap.exists ? snap.data() : null;
+  if (!d) {
+    // o período grátis conta desde a primeira vez que a app abriu neste aparelho (nunca depois de agora)
+    const ini = Math.min(now, Math.max(now - 30 * 86400e3, Number(req.query.inicio) || now));
+    d = { email, inicio: ini };
+    await ref.set({ ...d, criadoEm: admin.firestore.FieldValue.serverTimestamp() });
+  }
+  if (await playerGratis(email)) { res.json({ estado: "gratis" }); return; }
+  try {
+    const pediu = req.query.pago === "1";
+    if (!d.sub && (pediu || !d.procurado || now - d.procurado > 10 * 60e3) && now > d.inicio + PLAYER_TESTE - 3600e3) {
+      const s = await playerProcurar(uid);
+      d.procurado = now;
+      if (s) { d.sub = String(s.subscription); d.cliente = String(s.customer || ""); d.subVisto = 0; }
+      await ref.set({ procurado: now, ...(s ? { sub: d.sub, cliente: d.cliente, subVisto: 0 } : {}) }, { merge: true });
+    }
+    if (d.sub && (pediu || !d.subVisto || now - d.subVisto > 6 * 3600e3)) {
+      const sub = await stripeDe().subscriptions.retrieve(d.sub);
+      const fim = fimPeriodo(sub);
+      Object.assign(d, { subEstado: sub.status, ate: fim ? fim * 1000 : 0, cancelada: !!sub.cancel_at_period_end, subVisto: now });
+      await ref.set({ subEstado: d.subEstado, ate: d.ate, cancelada: d.cancelada, subVisto: now }, { merge: true });
+    }
+  } catch (e) { console.error("playerEstado", e); }
+  if (d.sub && subAtiva(d, now)) { res.json({ estado: "pago", ate: d.ate, cancelada: !!d.cancelada }); return; }
+  const fimTeste = d.inicio + PLAYER_TESTE;
+  const link = `${PLAYER_LINK}?client_reference_id=${encodeURIComponent(uid)}${email ? "&prefilled_email=" + encodeURIComponent(email) : ""}&locale=pt`;
+  if (now < fimTeste) { res.json({ estado: "teste", fimTeste, link }); return; }
+  res.json({ estado: "pagar", link });
+});
+// gerir ou cancelar a subscrição (portal do cliente do Stripe)
+exports.playerGerir = onRequest({ region: "europe-west1", maxInstances: 5, secrets: [STRIPE_SECRET], cors: true }, async (req, res) => {
+  const u = await playerConta(req);
+  if (!u) { res.status(401).json({ erro: "Entra com a tua conta Google." }); return; }
+  const s = await admin.firestore().collection("player").doc(u.uid).get();
+  const c = s.exists && s.data().cliente;
+  if (!c) { res.status(404).json({ erro: "Ainda não tens nenhuma subscrição." }); return; }
+  try {
+    const p = await stripeDe().billingPortal.sessions.create({ customer: c, locale: "pt", return_url: "https://joaoantunesss.github.io/AntunesPlayer/" });
+    res.json({ url: p.url });
+  } catch (e) { console.error("playerGerir", e); res.status(500).json({ erro: "Não foi possível abrir a gestão da subscrição." }); }
 });
