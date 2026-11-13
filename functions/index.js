@@ -346,7 +346,7 @@ exports.lerLink = onRequest({ region: "europe-west1", maxInstances: 3, memory: "
     if (nome.length < 4) nome = titulo || nome;
     const inteiro = nome;
     nome = nome.split(/\s+[|–—-]\s+|\s+\(@/)[0].replace(/\s+(on|no) Instagram.*$/i, "").trim();
-    if (nome.length < 4) nome = inteiro.split(/\s+[|–—]\s+/)[0].trim();
+    if (nome.length < 4) { const p = inteiro.split(/\s+[|–—-]\s+/); nome = (p[1] ? p[0] + " " + p[1] : p[0]).trim(); }
     nome = nome.slice(0, 60);
     if (/^(instagram|facebook|google maps|google|log ?in|entrar|iniciar sessão)$/i.test(nome)) nome = "";
     /* sem nome, é uma página de entrada ou genérica (Instagram, Maps sem sessão): não serve para nada */
