@@ -397,7 +397,7 @@ const PLAYER_TESTE = 24 * 3600e3;
 const PLAYER_APARELHOS = 3, PLAYER_AO_MESMO_TEMPO = 2, PLAYER_A_VER = 150e3; // aparelhos por conta; a ver em simultâneo; "a ver" = sinal há menos de 2,5 min
 const devId = (x) => (/^[a-z0-9]{4,24}$/i.test(String(x || "")) ? String(x) : "");
 // sempre grátis: o dono; o resto da lista fica em config/player.gratis (painel de gestão do site → AntunesPlayer)
-const PLAYER_DONO = ["j.p.r.n.antunes@gmail.com"];
+const PLAYER_DONO = ["j.p.r.n.antunes@gmail.com", "firmino.antunes@gmail.com"];
 let iptvAuth = null;
 const authIptv = () => iptvAuth || (iptvAuth = admin.initializeApp({ projectId: "iptv-364a1" }, "iptv").auth());
 const subAtiva = (d, now) => ["active", "trialing", "past_due"].includes(d.subEstado) && (d.ate || 0) > now - 3 * 86400e3;
