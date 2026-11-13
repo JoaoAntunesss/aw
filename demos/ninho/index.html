@@ -179,7 +179,7 @@ dialog#dataDlg h2{margin:0 0 .6rem}
   </div></header>
 </div>
 <main id="view"></main>
-<footer><div class="wrap">Marta Silva, babysitter. Dados fictícios, para demonstração. <a href="https://joaoantunesss.github.io/aw/#suporte" target="_blank" rel="noopener">Pedir suporte</a></div></footer>
+<footer><div class="wrap">Marta Silva, babysitter. Dados fictícios, para demonstração. <a href="https://awdigital.pt/#suporte" target="_blank" rel="noopener">Pedir suporte</a></div></footer>
 <div class="toast" id="toast" role="status" hidden></div>
 
 <script>
@@ -439,7 +439,7 @@ function pageBaby(){
   const mes=hoje.slice(0,7), mesConf=conf.filter(p=>p.data.startsWith(mes)), h=mesConf.reduce((s,p)=>s+horas(p),0);
   const fams=Object.values(db.users).filter(u=>u.role==="familia"&&conversaAberta(u.uid));
   const P=db.pagamentos, ck=(n,l)=>`<label class="chk"><input type="checkbox" name="${n}"${P[n]?" checked":""}>${l}</label>`;
-  return `<div class="wrap area"><h1>Painel</h1><div class="row" style="justify-content:space-between;margin-bottom:1.2rem"><p class="sub" style="margin:0">Olá, ${esc(b.nome.split(" ")[0])}. Pedidos, disponibilidade, conversas e pagamentos.</p><span class="row" style="gap:.5rem"><a class="btn small" href="#definicoes">Definições do site</a><a class="btn small" href="https://joaoantunesss.github.io/aw/#suporte" target="_blank" rel="noopener">Pedir suporte</a></span></div>
+  return `<div class="wrap area"><h1>Painel</h1><div class="row" style="justify-content:space-between;margin-bottom:1.2rem"><p class="sub" style="margin:0">Olá, ${esc(b.nome.split(" ")[0])}. Pedidos, disponibilidade, conversas e pagamentos.</p><span class="row" style="gap:.5rem"><a class="btn small" href="#definicoes">Definições do site</a><a class="btn small" href="https://awdigital.pt/#suporte" target="_blank" rel="noopener">Pedir suporte</a></span></div>
   <div class="stats"><div class="stat"><b>${pend.length}</b><span>pedidos para responder</span></div><div class="stat"><b>${h} h</b><span>marcadas este mês</span></div><div class="stat"><b>${eur(mesConf.reduce((s,p)=>s+valorPedido(p),0))}</b><span>a receber este mês</span></div></div>
   <div class="grid2"><div>
     <div class="card"><h2>Pedidos para responder</h2>${pend.length?`<ul class="list">${pend.map(pedidoHTML).join("")}</ul>`:`<p class="empty">Não há pedidos pendentes.</p>`}</div>

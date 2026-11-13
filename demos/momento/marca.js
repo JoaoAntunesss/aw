@@ -110,6 +110,6 @@ window.MARCA = {
   regiaoBD: "europe-west1",
   fuso: "Europe/Lisbon",
 
-  // Ao entregar o site: https://joaoantunesss.github.io/aw/#suporte?site=NOME-DO-SITE
+  // Ao entregar o site: https://awdigital.pt/#suporte?site=NOME-DO-SITE
   suporteUrl: ""
 };

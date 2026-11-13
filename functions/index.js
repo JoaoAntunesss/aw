@@ -20,16 +20,16 @@ const opts = { secrets: [TG_TOKEN, TG_CHAT], region: "europe-west1" };
 
 exports.novoPedido = onDocumentCreated({ ...opts, document: "pedidos/{id}" }, async (ev) => {
   const p = ev.data?.data() || {}, r = p.respostas || {};
-  await avisar(`AW: novo orçamento\n${cortar(r.negocio, 60)} (${cortar(p.template, 20)})\n${cortar(p.nome, 40)} · ${cortar(p.telefone || p.email, 40)}\nProposta: ${r.budgetMontagem ?? "?"} € + ${r.budgetMensal ?? "?"} €/mês\nhttps://joaoantunesss.github.io/aw/#gestao`);
+  await avisar(`AW: novo orçamento\n${cortar(r.negocio, 60)} (${cortar(p.template, 20)})\n${cortar(p.nome, 40)} · ${cortar(p.telefone || p.email, 40)}\nProposta: ${r.budgetMontagem ?? "?"} € + ${r.budgetMensal ?? "?"} €/mês\nhttps://awdigital.pt/#gestao`);
 });
 exports.novoSuporte = onDocumentCreated({ ...opts, document: "suporte/{id}" }, async (ev) => {
   const p = ev.data?.data() || {};
-  await avisar(`AW: novo pedido de suporte\n${cortar(p.site, 60)}: ${cortar(p.tipo, 60)}\n${cortar(p.nome, 40)} · ${cortar(p.telefone || p.email, 40)}\n${cortar(p.descricao, 200)}\nhttps://joaoantunesss.github.io/aw/#gestao`);
+  await avisar(`AW: novo pedido de suporte\n${cortar(p.site, 60)}: ${cortar(p.tipo, 60)}\n${cortar(p.nome, 40)} · ${cortar(p.telefone || p.email, 40)}\n${cortar(p.descricao, 200)}\nhttps://awdigital.pt/#gestao`);
 });
 
 
 /* ---- Emails para o cliente quando respondes ---- */
-const SITE = "https://joaoantunesss.github.io/aw/";
+const SITE = "https://awdigital.pt/";
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const mailOpts = { secrets: [MAIL_USER, MAIL_PASS], region: "europe-west1" };
 
@@ -177,7 +177,7 @@ async function marcarPago(pedidoId, tipo, ses) {
         await fichaCliente(pedidoId, mudou, { mensal: valor, estado: "ativo" });
       } else await fichaCliente(pedidoId, mudou, { montagemPaga: true });
     } catch (e) { console.error("ficha de cliente", e); }
-    try { await avisar(`AW: pagamento recebido 💶\n${cortar((mudou.respostas || {}).negocio, 60)} (${cortar(mudou.nome, 40)})\n${tipo === "mensal" ? "Mensalidade ativada" : "Montagem paga"}: ${valor.toFixed(2)} €${tipo === "mensal" ? "/mês" : ""}\nhttps://joaoantunesss.github.io/aw/#gestao`); }
+    try { await avisar(`AW: pagamento recebido 💶\n${cortar((mudou.respostas || {}).negocio, 60)} (${cortar(mudou.nome, 40)})\n${tipo === "mensal" ? "Mensalidade ativada" : "Montagem paga"}: ${valor.toFixed(2)} €${tipo === "mensal" ? "/mês" : ""}\nhttps://awdigital.pt/#gestao`); }
     catch (e) { console.error("aviso de pagamento falhou", e); }
   }
 }
@@ -206,7 +206,7 @@ exports.cancelarManutencao = onCall(confOpts, async (req) => {
   const fim = sub.cancel_at || sub.current_period_end || (sub.items?.data?.[0]?.current_period_end) || null;
   await ref.update({ "pagamento.mensalCancelada": true, "pagamento.mensalFim": fim ? fim * 1000 : null, atualizadoEm: admin.firestore.FieldValue.serverTimestamp() });
   await evento("cancelada", `${cortar((p.respostas || {}).negocio || p.nome, 60)}: manutenção cancelada, ativa até ${fim ? dataPT(fim) : "ao fim do período pago"}`, pedidoId);
-  try { await avisar(`AW: manutenção cancelada ⚠️\n${cortar((p.respostas || {}).negocio, 60)} (${cortar(p.nome, 40)})\nFica ativa até ${fim ? dataPT(fim) : "ao fim do período pago"} e não volta a ser cobrada.\nhttps://joaoantunesss.github.io/aw/#gestao`); } catch (e) { console.error(e); }
+  try { await avisar(`AW: manutenção cancelada ⚠️\n${cortar((p.respostas || {}).negocio, 60)} (${cortar(p.nome, 40)})\nFica ativa até ${fim ? dataPT(fim) : "ao fim do período pago"} e não volta a ser cobrada.\nhttps://awdigital.pt/#gestao`); } catch (e) { console.error(e); }
   return { ok: true, fim: fim ? fim * 1000 : null };
 });
 
@@ -324,7 +324,7 @@ exports.lerLink = onRequest({ region: "europe-west1", maxInstances: 3, memory: "
     let r;
     for (let i = 0; i < 5; i++) {
       r = await fetch(alvo, { redirect: "manual", signal: ctl.signal, headers: {
-        "User-Agent": "Mozilla/5.0 (compatible; facebookexternalhit/1.1; +https://joaoantunesss.github.io/aw/)",
+        "User-Agent": "Mozilla/5.0 (compatible; facebookexternalhit/1.1; +https://awdigital.pt/)",
         "Accept": "text/html,application/xhtml+xml", "Accept-Language": "pt-PT,pt;q=0.9,en;q=0.6" } });
       if (r.status < 300 || r.status >= 400) break;
       const prox = r.headers.get("location");

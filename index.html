@@ -7,23 +7,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>AW, sites cuidados, rápidos e acessíveis</title>
 <meta name="description" content="Sites cuidados, rápidos e acessíveis para restaurantes, salões, fotógrafos, babysitters e explicadores. Tu propões o valor, eu monto e mantenho.">
-<link rel="canonical" href="https://joaoantunesss.github.io/aw/">
+<link rel="canonical" href="https://awdigital.pt/">
 <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="pt_PT">
 <meta property="og:site_name" content="AW">
 <meta property="og:title" content="AW, sites cuidados, rápidos e acessíveis">
 <meta property="og:description" content="Sites para restaurantes, salões, fotógrafos, babysitters e explicadores. Tu propões o valor, eu monto e mantenho.">
-<meta property="og:url" content="https://joaoantunesss.github.io/aw/">
-<meta property="og:image" content="https://joaoantunesss.github.io/aw/img/og.jpg">
+<meta property="og:url" content="https://awdigital.pt/">
+<meta property="og:image" content="https://awdigital.pt/img/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="AW, sites cuidados, rápidos e acessíveis, com camadas em azul cobalto">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="AW, sites cuidados, rápidos e acessíveis">
 <meta name="twitter:description" content="Sites para restaurantes, salões, fotógrafos, babysitters e explicadores. Tu propões o valor, eu monto e mantenho.">
-<meta name="twitter:image" content="https://joaoantunesss.github.io/aw/img/og.jpg">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"ProfessionalService","name":"AW","url":"https://joaoantunesss.github.io/aw/","image":"https://joaoantunesss.github.io/aw/img/og.jpg","description":"Sites cuidados, rápidos e acessíveis para restaurantes, salões, fotógrafos, babysitters e explicadores.","areaServed":"PT","founder":{"@type":"Person","name":"João Antunes"}}</script>
+<meta name="twitter:image" content="https://awdigital.pt/img/og.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"ProfessionalService","name":"AW","url":"https://awdigital.pt/","image":"https://awdigital.pt/img/og.jpg","description":"Sites cuidados, rápidos e acessíveis para restaurantes, salões, fotógrafos, babysitters e explicadores.","areaServed":"PT","founder":{"@type":"Person","name":"João Antunes"}}</script>
 <meta name="theme-color" content="#F5F7FA" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0B1220" media="(prefers-color-scheme: dark)">
 <link rel="preload" href="fonts/schibsted-grotesk-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -1801,7 +1801,7 @@ async function firebaseStore(cfg){
     async reset(email){ await A.sendPasswordResetEmail(auth,email); },
     async signOut(){ await A.signOut(auth); },
     async isAdmin(){ try{ return (await F.getDoc(F.doc(db,"admins",auth.currentUser.uid))).exists(); }catch(e){ return false; } },
-    async createPedido(d){ await F.addDoc(F.collection(db,"pedidos"),{...d,criadoEm:F.serverTimestamp(),atualizadoEm:F.serverTimestamp()}); avisarEmail("AW: novo orçamento",`${d.respostas?.negocio||""} (${d.template})\n${d.nome||""} · ${d.telefone||d.email||""}\nProposta: ${d.respostas?.budgetMontagem??"?"} € + ${d.respostas?.budgetMensal??"?"} €/mês\nhttps://joaoantunesss.github.io/aw/#gestao`); },
+    async createPedido(d){ await F.addDoc(F.collection(db,"pedidos"),{...d,criadoEm:F.serverTimestamp(),atualizadoEm:F.serverTimestamp()}); avisarEmail("AW: novo orçamento",`${d.respostas?.negocio||""} (${d.template})\n${d.nome||""} · ${d.telefone||d.email||""}\nProposta: ${d.respostas?.budgetMontagem??"?"} € + ${d.respostas?.budgetMensal??"?"} €/mês\nhttps://awdigital.pt/#gestao`); },
     async myPedidos(){ const q=F.query(F.collection(db,"pedidos"),F.where("uid","==",auth.currentUser.uid)); return (await F.getDocs(q)).docs.map(norm).sort(byDate); },
     async allPedidos(){ return (await F.getDocs(F.collection(db,"pedidos"))).docs.map(norm).sort(byDate); },
     async updatePedido(id,patch){ await F.updateDoc(F.doc(db,"pedidos",id),{...patch,atualizadoEm:F.serverTimestamp()}); },
@@ -1815,7 +1815,7 @@ async function firebaseStore(cfg){
     async eventos(){ try{ const q=F.query(F.collection(db,"eventos"),F.orderBy("criadoEm","desc"),F.limit(15)); return (await F.getDocs(q)).docs.map(norm); }catch(e){ return []; } },
     async cancelarManut(pedidoId){ const Fn=await import(base+"firebase-functions.js"); const fn=Fn.httpsCallable(Fn.getFunctions(app,"europe-west1"),"cancelarManutencao"); return (await fn({pedidoId})).data; },
     async pagConfirmar(sessionId){ const Fn=await import(base+"firebase-functions.js"); const fn=Fn.httpsCallable(Fn.getFunctions(app,"europe-west1"),"pagamentoConfirmar"); return (await fn({sessionId})).data; },
-    async createSuporte(d){ await F.addDoc(F.collection(db,"suporte"),{...d,estado:"aberto",criadoEm:F.serverTimestamp(),atualizadoEm:F.serverTimestamp()}); avisarEmail("AW: novo pedido de suporte",`${d.site}: ${d.tipo}\n${d.nome||""} · ${d.telefone||d.email||""}\n${d.descricao}\nhttps://joaoantunesss.github.io/aw/#gestao`); },
+    async createSuporte(d){ await F.addDoc(F.collection(db,"suporte"),{...d,estado:"aberto",criadoEm:F.serverTimestamp(),atualizadoEm:F.serverTimestamp()}); avisarEmail("AW: novo pedido de suporte",`${d.site}: ${d.tipo}\n${d.nome||""} · ${d.telefone||d.email||""}\n${d.descricao}\nhttps://awdigital.pt/#gestao`); },
     async mySuporte(){ const q=F.query(F.collection(db,"suporte"),F.where("uid","==",auth.currentUser.uid)); return (await F.getDocs(q)).docs.map(norm).sort(byDate); },
     async allSuporte(){ return (await F.getDocs(F.collection(db,"suporte"))).docs.map(norm).sort(byDate); },
     async updateSuporte(id,patch){ await F.updateDoc(F.doc(db,"suporte",id),{...patch,atualizadoEm:F.serverTimestamp()}); },
