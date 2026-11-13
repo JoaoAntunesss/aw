@@ -310,7 +310,7 @@ async function urlPublico(u) {
   if (!ips.length || ips.some(ipPrivado)) return null;
   return x;
 }
-const ORIGENS = ["https://joaoantunesss.github.io", "http://localhost:8912", "http://localhost:8080"];
+const ORIGENS = ["https://awdigital.pt", "https://www.awdigital.pt", "https://joaoantunesss.github.io", "http://localhost:8912", "http://localhost:8080"];
 exports.lerLink = onRequest({ region: "europe-west1", maxInstances: 3, memory: "256MiB", timeoutSeconds: 15 }, async (req, res) => {
   const o = req.get("origin") || "";
   res.set("Access-Control-Allow-Origin", ORIGENS.includes(o) ? o : ORIGENS[0]);
