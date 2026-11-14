@@ -232,7 +232,7 @@ exports.stripeWebhook = onRequest({ secrets: [STRIPE_SECRET, STRIPE_WEBHOOK_SECR
       // AntunesPlayer: liga a subscrição à conta da app e avisa-me
       else if (PLAYER_PLINKS.includes(o.payment_link) && pago(o) && o.client_reference_id) {
         await playerLigar(o.client_reference_id, o);
-        try { await avisar(`AntunesPlayer: nova subscrição 💶\n${cortar(o.customer_details?.email || o.customer_email, 80)}\n${((o.amount_total || 0) / 100).toFixed(2)} €${o.payment_link === PLAYER_PLINK ? "/mês" : "/ano"}`); } catch (e) { console.error(e); }
+        try { await avisar(`AWplayer: nova subscrição 💶\n${cortar(o.customer_details?.email || o.customer_email, 80)}\n${((o.amount_total || 0) / 100).toFixed(2)} €${o.payment_link === PLAYER_PLINK ? "/mês" : "/ano"}`); } catch (e) { console.error(e); }
       }
     } else if (ev.type === "customer.subscription.updated") {
       const f = await pedidoDaSubscricao(o); if (f) {
