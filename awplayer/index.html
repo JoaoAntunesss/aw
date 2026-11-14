@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; img-src 'self' data:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>AWplayer · leitor de IPTV para Android, Google TV e Windows</title>
+<meta name="description" content="Descarrega o AWplayer: TV em direto, guia, multiecrã, filmes e séries ao estilo Netflix e downloads para ver sem internet. 24 horas grátis, depois 1 € por mês.">
+<link rel="canonical" href="https://awdigital.pt/awplayer/">
+<link rel="icon" href="img/logo.png" type="image/png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="AWplayer · o leitor de IPTV para a tua lista">
+<meta property="og:description" content="Android, Google TV e Windows. 24 horas grátis, depois 1 € por mês.">
+<meta property="og:url" content="https://awdigital.pt/awplayer/">
+<meta property="og:image" content="https://awdigital.pt/awplayer/img/fs.webp">
+<meta name="theme-color" content="#070812">
+<style>
+@font-face{font-family:"Bricolage";src:url(../fonts/bricolage-grotesque-latin-wght-normal.woff2) format("woff2");font-weight:200 800;font-display:swap}
+@font-face{font-family:"Figtree";src:url(../fonts/figtree-latin-wght-normal.woff2) format("woff2");font-weight:300 900;font-display:swap}
+:root{
+  --night:#070812;--panel:#10121f;--panel2:#161a2c;--line:rgba(255,255,255,.1);
+  --ink:#f3f4ff;--muted:#a3a8c3;--blue:#5b7cff;--violet:#a45bff;--pink:#ff5ca8;
+  --grad:linear-gradient(100deg,var(--blue),var(--violet) 52%,var(--pink));
+  color-scheme:dark
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--night);color:var(--ink);font:400 1.06rem/1.6 Figtree,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--violet);outline-offset:3px;border-radius:8px}
+.wrap{max-width:72rem;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:Bricolage,Figtree,system-ui,sans-serif;letter-spacing:-.03em;line-height:1.02;text-wrap:balance;margin:0}
+.glow{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.glow i{position:absolute;border-radius:50%;filter:blur(110px);opacity:.42}
+
+/* top bar */
+.top{display:flex;align-items:center;justify-content:space-between;padding-block:18px;position:relative;z-index:2}
+.mark{display:flex;align-items:center;gap:10px;text-decoration:none;font:800 1.3rem Bricolage,sans-serif;letter-spacing:-.03em}
+.mark img{width:34px;height:34px}
+.top nav{display:flex;gap:22px;font-size:.95rem;color:var(--muted)}
+.top nav a{text-decoration:none}
+.top nav a:hover{color:var(--ink)}
+@media (max-width:640px){.top nav a:not(:last-child){display:none}}
+
+/* hero */
+.hero{position:relative;padding-block:clamp(1.5rem,5vw,4rem) clamp(3rem,7vw,6rem)}
+.hero .wrap{position:relative;z-index:1;display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(2rem,5vw,4rem);align-items:center}
+@media (max-width:880px){.hero .wrap{grid-template-columns:1fr}}
+.hero h1{font-size:clamp(2.7rem,7vw,5.2rem);font-weight:800}
+.hero h1 span{display:block;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;padding-bottom:.08em}
+.lede{font-size:clamp(1.1rem,2vw,1.3rem);color:#cfd2e6;max-width:34rem;margin:1.2rem 0 1.8rem}
+.dl{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-flex;align-items:center;gap:12px;padding:14px 20px;border-radius:16px;text-decoration:none;font-weight:700;background:var(--panel2);box-shadow:inset 0 0 0 1.5px var(--line);transition:transform .15s,box-shadow .15s}
+.btn:hover{transform:translateY(-2px);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.28)}
+.btn svg{width:26px;height:26px;flex:none}
+.btn small{display:block;font-weight:500;font-size:.8rem;color:var(--muted);line-height:1.2}
+.btn b{display:block;line-height:1.2}
+.btn.main{background:var(--grad);box-shadow:0 18px 50px rgba(150,90,255,.35)}
+.btn.main small{color:rgba(255,255,255,.85)}
+.also{margin-top:1rem;font-size:.95rem;color:var(--muted)}
+.also a{color:var(--ink)}
+.trial{display:inline-flex;gap:8px;align-items:center;margin-bottom:1.2rem;padding:6px 14px;border-radius:999px;background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px var(--line);font-size:.9rem;color:#dfe2f4}
+.trial i{width:8px;height:8px;border-radius:50%;background:#3ee08f;box-shadow:0 0 12px #3ee08f}
+
+.shots{position:relative;min-height:30rem}
+.phone{position:absolute;right:6%;top:0;width:min(56%,300px);aspect-ratio:9/16;border-radius:38px;padding:9px;background:#0c0e18;box-shadow:0 0 0 1.5px rgba(255,255,255,.14),0 40px 90px rgba(0,0,0,.7),0 0 120px rgba(110,90,255,.25)}
+.phone img{width:100%;height:100%;object-fit:cover;border-radius:30px}
+.land{position:absolute;left:0;bottom:0;width:min(78%,440px);aspect-ratio:16/9;border-radius:26px;padding:8px;background:#0c0e18;box-shadow:0 0 0 1.5px rgba(255,255,255,.14),0 40px 90px rgba(0,0,0,.75)}
+.land img{width:100%;height:100%;object-fit:cover;border-radius:19px}
+@media (max-width:880px){.shots{min-height:0;aspect-ratio:1/1.05;max-width:30rem;margin:0 auto;width:100%}}
+
+/* features */
+section{padding-block:clamp(3rem,7vw,5.5rem)}
+.kicker{color:var(--muted);font-size:1rem;margin:0 0 .6rem}
+.sec-h{font-size:clamp(2rem,5vw,3.2rem);font-weight:800;max-width:40rem}
+.feat{display:grid;grid-template-columns:1fr 1fr;gap:clamp(1.5rem,5vw,4rem);align-items:center;margin-top:clamp(2.5rem,6vw,4.5rem)}
+.feat:nth-of-type(even) .media{order:2}
+@media (max-width:820px){.feat{grid-template-columns:1fr}.feat:nth-of-type(even) .media{order:0}}
+.feat h3{font-size:clamp(1.6rem,3.5vw,2.2rem);font-weight:800;margin-bottom:.7rem}
+.feat p{color:#c8cbe0;margin:0 0 .9rem;max-width:32rem}
+.feat ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;color:#dfe2f4}
+.feat li{display:flex;gap:10px;align-items:baseline}
+.feat li:before{content:"";flex:none;width:7px;height:7px;border-radius:50%;background:var(--grad);transform:translateY(-2px)}
+.media{min-width:0}
+.media .pair{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.frame{border-radius:20px;overflow:hidden;background:#0c0e18;box-shadow:0 0 0 1.5px rgba(255,255,255,.1),0 30px 70px rgba(0,0,0,.55)}
+.frame img{width:100%;height:auto}
+.frame.tall{border-radius:28px;padding:7px}
+.frame.tall img{border-radius:22px}
+.cap{font-size:.86rem;color:var(--muted);margin-top:8px}
+
+/* price */
+.price{background:linear-gradient(180deg,transparent,rgba(91,124,255,.06) 30%,rgba(164,91,255,.07));border-block:1px solid var(--line)}
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:2.2rem}
+@media (max-width:820px){.plans{grid-template-columns:1fr}}
+.plan{border-radius:24px;padding:26px;background:var(--panel);box-shadow:inset 0 0 0 1.5px var(--line)}
+.plan.best{box-shadow:inset 0 0 0 2px transparent;background:linear-gradient(var(--panel),var(--panel)) padding-box,var(--grad) border-box;border:2px solid transparent}
+.plan h3{font-size:1.15rem;font-weight:700;letter-spacing:-.01em;color:#dfe2f4}
+.plan .amt{font:800 3.2rem/1 Bricolage,sans-serif;letter-spacing:-.04em;margin:.9rem 0 .2rem}
+.plan .amt small{font:500 1rem Figtree,sans-serif;color:var(--muted);letter-spacing:0}
+.plan p{color:var(--muted);margin:.3rem 0 0;font-size:.95rem}
+.rules{display:flex;flex-wrap:wrap;gap:10px 26px;margin-top:1.6rem;color:#c8cbe0;font-size:.97rem}
+
+/* install */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:2.2rem}
+@media (max-width:900px){.steps{grid-template-columns:1fr}}
+.step{border-radius:24px;padding:26px;background:var(--panel);box-shadow:inset 0 0 0 1.5px var(--line);min-width:0}
+.step h3{font-size:1.35rem;font-weight:800;display:flex;align-items:center;gap:10px}
+.step h3 svg{width:28px;height:28px}
+.step ol{margin:1rem 0 1.2rem;padding-left:1.2rem;display:grid;gap:8px;color:#c8cbe0}
+.step code{font-family:ui-monospace,Consolas,monospace;font-size:.95em;background:rgba(255,255,255,.08);padding:2px 7px;border-radius:6px;color:#fff;overflow-wrap:anywhere}
+.step .btn{width:100%;justify-content:center}
+.step .btn+.btn{margin-top:10px}
+
+/* faq */
+.faq{max-width:46rem}
+details{border-bottom:1px solid var(--line);padding-block:4px}
+summary{cursor:pointer;list-style:none;padding:18px 36px 18px 0;font-weight:700;font-size:1.1rem;position:relative}
+summary::-webkit-details-marker{display:none}
+summary:after{content:"+";position:absolute;right:4px;top:12px;font:400 1.8rem/1 Figtree,sans-serif;color:var(--muted);transition:transform .2s}
+details[open] summary:after{transform:rotate(45deg)}
+details p{margin:0 0 18px;color:#c8cbe0}
+
+footer{padding-block:2.5rem 3rem;color:var(--muted);font-size:.92rem;border-top:1px solid var(--line)}
+footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between}
+footer a{text-decoration:none;color:#dfe2f4}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="glow" aria-hidden="true"><i style="width:620px;height:620px;background:#3d4bff;left:-220px;top:-220px"></i><i style="width:560px;height:560px;background:#8a2ff2;right:-200px;top:120px"></i><i style="width:420px;height:420px;background:#ff3d8b;left:35%;bottom:-260px;opacity:.25"></i></div>
+  <div class="wrap top">
+    <a class="mark" href="./"><img src="img/logo.png" alt="" width="34" height="34">AWplayer</a>
+    <nav aria-label="Secções"><a href="#funcoes">Funções</a><a href="#preco">Preço</a><a href="#perguntas">Perguntas</a><a href="#instalar">Instalar</a></nav>
+  </div>
+  <div class="wrap">
+    <div>
+      <p class="trial"><i></i>24 horas grátis, sem cartão</p>
+      <h1>A tua lista de IPTV, <span>finalmente arrumada.</span></h1>
+      <p class="lede">TV em direto com guia e multiecrã, filmes e séries ao estilo Netflix e episódios para ver sem internet. No telemóvel, na Google TV e no PC.</p>
+      <div class="dl">
+        <a class="btn main" href="https://github.com/JoaoAntunesss/AntunesPlayer/releases/download/latest/AntunesPlayer.apk">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 9.48l1.84-3.18a.38.38 0 0 0-.66-.38l-1.86 3.22a11.4 11.4 0 0 0-9.84 0L5.22 5.92a.38.38 0 0 0-.66.38L6.4 9.48A10.8 10.8 0 0 0 1 18h22a10.8 10.8 0 0 0-5.4-8.52zM7 15.25A1.25 1.25 0 1 1 8.25 14 1.25 1.25 0 0 1 7 15.25zm10 0A1.25 1.25 0 1 1 18.25 14 1.25 1.25 0 0 1 17 15.25z"/></svg>
+          <span><small>Android e Google TV</small><b>Descarregar APK</b></span></a>
+        <a class="btn" href="https://github.com/JoaoAntunesss/AntunesPlayer/releases/download/latest/AntunesPlayer-instalador.exe">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.5 10.4 4.5v7H3zm0 13L10.4 19.5v-7H3zM11.3 4.4 21 3v8.5h-9.7zm0 15.2L21 21v-8.5h-9.7z"/></svg>
+          <span><small>Windows 10 e 11</small><b>Descarregar para PC</b></span></a>
+      </div>
+      <p class="also">Ou abre <a href="https://joaoantunesss.github.io/AntunesPlayer/">a versão web</a> no navegador, sem instalar nada.</p>
+    </div>
+    <div class="shots" aria-hidden="true">
+      <div class="phone"><img src="img/live.webp" alt="" width="540" height="960"></div>
+      <div class="land"><img src="img/fs.webp" alt="" width="1280" height="720"></div>
+    </div>
+  </div>
+</header>
+
+<main>
+<section id="funcoes">
+  <div class="wrap">
+    <p class="kicker">O que faz</p>
+    <h2 class="sec-h">Tudo o que a tua lista tem, num sítio só.</h2>
+
+    <div class="feat">
+      <div class="media"><div class="pair">
+        <figure class="frame tall" style="margin:0"><img src="img/home.webp" alt="Ecrã inicial do AWplayer com TV em direto, AWflix e atalhos" width="540" height="960" loading="lazy"></figure>
+        <figure class="frame tall" style="margin:0"><img src="img/live.webp" alt="Lista de canais com pré-visualização e o programa que está a dar" width="540" height="960" loading="lazy"></figure>
+      </div></div>
+      <div>
+        <h3>TV em direto</h3>
+        <p>Juntas a tua lista (Xtream ou M3U) e os canais aparecem por categorias, com o programa que está a dar e quanto falta para acabar.</p>
+        <ul><li>Pré-visualização antes de abrir o canal</li><li>Em ecrã inteiro mudas de canal pelo número, como na televisão</li><li>Se a ligação falhar, o canal volta sozinho</li><li>Favoritos e últimos canais vistos</li></ul>
+      </div>
+    </div>
+
+    <div class="feat">
+      <div class="media">
+        <figure class="frame" style="margin:0"><img src="img/multi.webp" alt="Multiecrã com quatro canais em simultâneo" width="1280" height="720" loading="lazy"></figure>
+        <p class="cap">Multiecrã na Google TV</p>
+      </div>
+      <div>
+        <h3>Guia de TV e multiecrã</h3>
+        <p>O guia mostra o que está a dar em todos os canais e o que vem a seguir. Em dia de jogos, vês até quatro canais ao mesmo tempo e escolhes de qual sai o som.</p>
+        <ul><li>Guia com a programação das próximas horas</li><li>Até 4 canais no mesmo ecrã</li><li>Funciona com o comando da Google TV</li></ul>
+      </div>
+    </div>
+
+    <div class="feat">
+      <div class="media"><div class="pair">
+        <figure class="frame tall" style="margin:0"><img src="img/flix.webp" alt="AWflix com destaques e filas de filmes e séries" width="540" height="960" loading="lazy"></figure>
+        <figure class="frame tall" style="margin:0"><img src="img/detail.webp" alt="Página de uma série com episódios e sinopse" width="540" height="960" loading="lazy"></figure>
+      </div></div>
+      <div>
+        <h3>AWflix: filmes e séries ao estilo Netflix</h3>
+        <p>Os filmes e as séries da tua lista ficam com capas, sinopse, classificação e episódios por temporada, em vez de uma lista de nomes.</p>
+        <ul><li>Continuar a ver, onde quer que tenhas parado</li><li>A minha lista e o Top 10 de hoje</li><li>“Surpreende-me” para quando não sabes o que ver</li></ul>
+      </div>
+    </div>
+
+    <div class="feat">
+      <div class="media">
+        <figure class="frame" style="margin:0"><img src="img/next.webp" alt="Aviso de próximo episódio com contagem decrescente" width="1280" height="720" loading="lazy"></figure>
+      </div>
+      <div>
+        <h3>Saltar intro e próximo episódio</h3>
+        <p>O botão “Saltar intro” aparece na altura certa de cada série, e no fim o episódio seguinte começa sozinho. Ou carregas em “Ver créditos” se quiseres ficar.</p>
+        <ul><li>Intro e resumo detetados por série</li><li>Legendas automáticas na tua língua</li><li>Som Dolby e DTS quando o aparelho suporta</li></ul>
+      </div>
+    </div>
+
+    <div class="feat">
+      <div class="media"><div class="pair">
+        <figure class="frame tall" style="margin:0"><img src="img/profiles.webp" alt="Escolha de perfil: quem está a ver" width="540" height="960" loading="lazy"></figure>
+        <figure class="frame" style="margin:0;align-self:center"><img src="img/flixtv.webp" alt="AWflix no ecrã grande" width="1280" height="720" loading="lazy"></figure>
+      </div></div>
+      <div>
+        <h3>Perfis, downloads e todos os aparelhos</h3>
+        <p>Cada pessoa da casa tem o seu perfil, com a sua lista e o seu progresso. Antes de uma viagem, descarregas episódios ou séries inteiras, com as legendas que escolheres, e vês sem internet.</p>
+        <ul><li>Telemóvel, Google TV e Windows com a mesma conta</li><li>Progresso sincronizado entre aparelhos</li><li>Downloads por episódio, temporada ou série</li></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="price" id="preco">
+  <div class="wrap">
+    <p class="kicker">Preço</p>
+    <h2 class="sec-h">Experimenta um dia inteiro. Depois decides.</h2>
+    <div class="plans">
+      <div class="plan"><h3>Experimentar</h3><div class="amt">0 €<small> 24 horas</small></div><p>Todas as funções, sem cartão. Só precisas de entrar com a conta Google.</p></div>
+      <div class="plan"><h3>Mensal</h3><div class="amt">1 €<small> por mês</small></div><p>Cancelas quando quiseres, na própria app.</p></div>
+      <div class="plan best"><h3>Anual</h3><div class="amt">10 €<small> por ano</small></div><p>Dois meses de oferta face ao plano mensal.</p></div>
+    </div>
+    <div class="rules"><span>Até 3 aparelhos por conta</span><span>2 a ver ao mesmo tempo</span><span>Pagamento seguro com Stripe</span></div>
+  </div>
+</section>
+
+<section id="instalar">
+  <div class="wrap">
+    <p class="kicker">Instalar</p>
+    <h2 class="sec-h">Escolhe onde vais ver.</h2>
+    <div class="steps">
+      <div class="step">
+        <h3><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 9.48l1.84-3.18a.38.38 0 0 0-.66-.38l-1.86 3.22a11.4 11.4 0 0 0-9.84 0L5.22 5.92a.38.38 0 0 0-.66.38L6.4 9.48A10.8 10.8 0 0 0 1 18h22a10.8 10.8 0 0 0-5.4-8.52zM7 15.25A1.25 1.25 0 1 1 8.25 14 1.25 1.25 0 0 1 7 15.25zm10 0A1.25 1.25 0 1 1 18.25 14 1.25 1.25 0 0 1 17 15.25z"/></svg>Telemóvel Android</h3>
+        <ol><li>Descarrega o APK (8,4 MB).</li><li>Abre o ficheiro. Se o Android pedir, autoriza instalar apps desta origem.</li><li>Entra com a conta Google e junta a tua lista.</li></ol>
+        <a class="btn main" href="https://github.com/JoaoAntunesss/AntunesPlayer/releases/download/latest/AntunesPlayer.apk"><span><b>Descarregar APK</b></span></a>
+      </div>
+      <div class="step">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Google TV e Android TV</h3>
+        <ol><li>Na TV, instala a app <b>Downloader</b> a partir da Play Store.</li><li>No Downloader escreve <code>awdigital.pt/tv</code> e carrega em <b>Go</b>.</li><li>Quando o download acabar, carrega em <b>Instalar</b>.</li></ol>
+        <p class="cap" style="margin:0">Se a TV pedir, autoriza o Downloader a instalar apps desconhecidas nas definições.</p>
+      </div>
+      <div class="step">
+        <h3><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.5 10.4 4.5v7H3zm0 13L10.4 19.5v-7H3zM11.3 4.4 21 3v8.5h-9.7zm0 15.2L21 21v-8.5h-9.7z"/></svg>Windows</h3>
+        <ol><li>Descarrega o instalador (72 MB) e abre-o.</li><li>Se aparecer “O Windows protegeu o PC”, carrega em <b>Mais informações</b> e depois em <b>Executar mesmo assim</b>.</li><li>O AWplayer fica no menu Iniciar.</li></ol>
+        <a class="btn main" href="https://github.com/JoaoAntunesss/AntunesPlayer/releases/download/latest/AntunesPlayer-instalador.exe"><span><b>Instalador</b></span></a>
+        <a class="btn" href="https://github.com/JoaoAntunesss/AntunesPlayer/releases/download/latest/AntunesPlayer-portatil.exe"><span><b>Versão portátil</b><small>Não instala, abre logo</small></span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="perguntas">
+  <div class="wrap faq">
+    <p class="kicker">Perguntas</p>
+    <h2 class="sec-h">Antes de descarregares</h2>
+    <details><summary>O AWplayer traz canais?</summary><p>Não. O AWplayer é um leitor: não vende nem inclui canais, filmes ou séries. Usas a lista IPTV que já tens, de um fornecedor legal, em formato Xtream ou M3U.</p></details>
+    <details><summary>Porque preciso de entrar com a conta Google?</summary><p>É a tua conta no AWplayer: guarda a subscrição, os perfis e o progresso, e sincroniza tudo entre o telemóvel, a TV e o PC. As tuas listas e logins de IPTV ficam no aparelho.</p></details>
+    <details><summary>Em quantos aparelhos posso usar?</summary><p>Até 3 aparelhos por conta, com 2 a ver ao mesmo tempo. Podes trocar de aparelho nas definições da conta, dentro da app.</p></details>
+    <details><summary>Como cancelo a subscrição?</summary><p>Na app, em Definições, Conta, Gerir subscrição. O acesso continua até ao fim do período que já pagaste.</p></details>
+    <details><summary>Dá para ver sem internet?</summary><p>Sim, nos filmes e séries. No Android descarregas um episódio, uma temporada ou a série toda, e escolhes as legendas que vão junto. Os canais em direto precisam sempre de internet.</p></details>
+    <details><summary>Encontrei um problema. Como aviso?</summary><p>Em Definições há o botão “Reportar um problema”. A mensagem chega-me diretamente, com a versão da app e o aparelho, para eu resolver depressa. Nunca são enviados os links ou os logins das tuas listas.</p></details>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>AWplayer é feito por <a href="../">AW · João Antunes</a></span>
+    <span><a href="../privacidade.html">Privacidade</a> · <a href="../termos.html">Termos</a></span>
+    <span>Imagens: Sintel, Big Buck Bunny e Tears of Steel © Blender Foundation, CC BY 3.0</span>
+  </div>
+</footer>
+</body>
+</html>
