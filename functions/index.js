@@ -539,7 +539,7 @@ exports.playerGerir = onRequest({ region: "europe-west1", maxInstances: 5, secre
   const c = s.exists && s.data().cliente;
   if (!c) { res.status(404).json({ erro: "Ainda não tens nenhuma subscrição." }); return; }
   try {
-    const p = await stripeDe().billingPortal.sessions.create({ customer: c, locale: "pt", return_url: "https://joaoantunesss.github.io/AntunesPlayer/" });
+    const p = await stripeDe().billingPortal.sessions.create({ customer: c, locale: "pt", return_url: "https://player.awdigital.pt/" });
     res.json({ url: p.url });
   } catch (e) { console.error("playerGerir", e); res.status(500).json({ erro: "Não foi possível abrir a gestão da subscrição." }); }
 });
