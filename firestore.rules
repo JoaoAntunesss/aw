@@ -83,5 +83,10 @@ service cloud.firestore {
       allow read: if isAdmin();
       allow write: if false;
     }
+    // problemas reportados na app AWplayer: só tu lês e marcas como resolvidos
+    match /suporte_player/{id} {
+      allow read: if isAdmin();
+      allow update: if isAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['estado']);
+    }
   }
 }

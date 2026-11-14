@@ -1783,6 +1783,8 @@ function demoStore(){
     async playerGratis(){ return [...(mem.playerGratis||[])]; },
     async setPlayerGratis(l){ mem.playerGratis=l; save(); },
     async playerContas(){ return []; },
+    async playerReportes(){ return []; },
+    async playerReporteFeito(){},
     async saveCliente(id,d){ mem.clientes=mem.clientes||[]; if(id){ const c=mem.clientes.find(x=>x.id===id); if(c) Object.assign(c,d,{atualizadoEm:Date.now()}); } else mem.clientes.push({...d,id:"c"+Date.now(),criadoEm:Date.now(),atualizadoEm:Date.now()}); save(); }
   };
 }
@@ -1830,6 +1832,8 @@ async function firebaseStore(cfg){
     async playerGratis(){ const s=await F.getDoc(F.doc(db,"config","player")); return (s.exists()&&s.data().gratis)||[]; },
     async setPlayerGratis(l){ await F.setDoc(F.doc(db,"config","player"),{gratis:l}); },
     async playerContas(){ return (await F.getDocs(F.collection(db,"player"))).docs.map(d=>({id:d.id,...d.data()})); },
+    async playerReportes(){ return (await F.getDocs(F.collection(db,"suporte_player"))).docs.map(norm).sort(byDate); },
+    async playerReporteFeito(id){ await F.updateDoc(F.doc(db,"suporte_player",id),{estado:"resolvido"}); },
     async saveCliente(id,d){ if(id) await F.updateDoc(F.doc(db,"clientes",id),{...d,atualizadoEm:F.serverTimestamp()}); else await F.addDoc(F.collection(db,"clientes"),{...d,criadoEm:F.serverTimestamp(),atualizadoEm:F.serverTimestamp()}); }
   };
 }
@@ -2346,12 +2350,15 @@ async function renderGestao(root){
 /* AntunesPlayer: quem usa a app sem pagar, e as contas da app (24 h grátis, depois 1 €/mês) */
 async function renderPlayer(area){
   area.innerHTML=`<p class="muted">A carregar…</p>`;
-  let G,A;
-  try{ [G,A]=await Promise.all([store.playerGratis(),store.playerContas().catch(()=>null)]); }
+  let G,A,R;
+  try{ [G,A,R]=await Promise.all([store.playerGratis(),store.playerContas().catch(()=>null),store.playerReportes().catch(()=>[])]); }
   catch(e){ area.innerHTML=`<p class="err">${esc(errMsg(e))}. Confirma que as regras do Firestore estão publicadas (ficheiro firestore.rules).</p>`; return; }
   const now=Date.now(), pagos=(A||[]).filter(a=>a.sub&&["active","trialing","past_due"].includes(a.subEstado)&&(a.ate||0)>now);
   const teste=(A||[]).filter(a=>!a.sub&&now-(a.inicio||0)<864e5);
-  area.innerHTML=`<div class="kpis">${[[pagos.length,"A pagar"],[teste.length,"No dia grátis"],[(A||[]).length,"Contas"]].map(([n,l])=>`<div class="kpi"><b>${n}</b><span>${l}</span></div>`).join("")}</div>
+  const abertos=R.filter(r=>r.estado!=="resolvido");
+  area.innerHTML=`<div class="kpis">${[[pagos.length,"A pagar"],[teste.length,"No dia grátis"],[(A||[]).length,"Contas"],[abertos.length,"Problemas por ver"]].map(([n,l])=>`<div class="kpi"><b>${n}</b><span>${l}</span></div>`).join("")}</div>
+    <h3>Problemas reportados na app</h3>
+    <ul class="pg-list">${abertos.length?abertos.map(r=>`<li style="align-items:flex-start"><span><b>${esc(r.email||r.contacto||"Anónimo")}</b> <span class="muted">${r.criadoEm?new Date(r.criadoEm).toLocaleString("pt-PT"):""}</span><br>${esc(r.texto)}<br><small class="muted">${esc(Object.entries(r.diag||{}).map(([k,v])=>k+": "+v).join(" · "))}</small></span><button class="btn small" type="button" data-pgok="${esc(r.id)}">Resolvido</button></li>`).join(""):`<li class="muted">Nada por ver.</li>`}</ul>
     <h3>Usam sem pagar</h3><p class="muted">Emails Gmail da conta com que a pessoa entra na app. A tua conta nunca paga.</p>
     <form id="pgAdd" class="tools" style="gap:.5rem"><label class="f" style="margin:0;flex:1;min-width:14rem"><span class="sr-only">Email</span><input type="email" id="pgEmail" required placeholder="nome@gmail.com" autocomplete="off"></label><button class="btn solid small" type="submit">Adicionar</button></form>
     <ul class="pg-list">${G.length?G.map(e=>`<li><span>${esc(e)}</span><button class="btn small" type="button" data-pgdel="${esc(e)}">Tirar</button></li>`).join(""):`<li class="muted">Ainda ninguém.</li>`}</ul>
@@ -2359,6 +2366,7 @@ async function renderPlayer(area){
   const guardar=async l=>{ try{ await store.setPlayerGratis(l); renderPlayer(area); }catch(e){ alert(errMsg(e)); } };
   $("pgAdd").addEventListener("submit",e=>{ e.preventDefault(); const v=$("pgEmail").value.trim().toLowerCase(); if(v&&!G.includes(v)) guardar([...G,v]); });
   area.querySelectorAll("[data-pgdel]").forEach(b=>b.addEventListener("click",()=>guardar(G.filter(x=>x!==b.dataset.pgdel))));
+  area.querySelectorAll("[data-pgok]").forEach(b=>b.addEventListener("click",async()=>{ b.disabled=true; try{ await store.playerReporteFeito(b.dataset.pgok); renderPlayer(area); }catch(e){ b.disabled=false; alert(errMsg(e)); } }));
 }
 function clienteForm(c,id){
   const v=k=>esc(c?.[k]??"");

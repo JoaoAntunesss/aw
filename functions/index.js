@@ -434,10 +434,29 @@ async function playerProcurar(uid) {
   }
   return null;
 }
-exports.playerEstado = onRequest({ region: "europe-west1", maxInstances: 10, secrets: [STRIPE_SECRET], cors: true }, async (req, res) => {
+/* Resposta assinada (ECDSA P-256): a app só aceita o estado com esta assinatura, ligada à conta e ao aparelho, e só até
+   "x" (a data até onde pode ver sem voltar a perguntar). A chave privada está no Secret Manager (PLAYER_SIGN);
+   a pública está na app (src/34-plano.js). */
+const PLAYER_SIGN = defineSecret("PLAYER_SIGN");
+const b64u = (b) => Buffer.from(b).toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+function playerAssinar(p) {
+  const corpo = b64u(JSON.stringify(p));
+  const sig = require("crypto").sign("sha256", Buffer.from(corpo), { key: PLAYER_SIGN.value(), dsaEncoding: "ieee-p1363" });
+  return corpo + "." + b64u(sig);
+}
+exports.playerEstado = onRequest({ region: "europe-west1", maxInstances: 10, secrets: [STRIPE_SECRET, PLAYER_SIGN], cors: true }, async (req, res0) => {
   const u = await playerConta(req);
-  if (!u) { res.status(401).json({ erro: "Entra com a tua conta Google." }); return; }
+  if (!u) { res0.status(401).json({ erro: "Entra com a tua conta Google." }); return; }
   const email = String(u.email || "").toLowerCase(), uid = u.uid, now = Date.now();
+  // cada resposta leva o token assinado: até quando este aparelho pode ver sem perguntar outra vez (no máximo 3 dias)
+  const res = { json: (o) => {
+    let x = 0;
+    if (o.estado === "gratis") x = now + 3 * 86400e3;
+    else if (o.estado === "pago") x = Math.min(now + 3 * 86400e3, (o.ate || 0) + 3 * 86400e3);
+    else if (o.estado === "teste") x = o.fimTeste;
+    o.token = playerAssinar({ u: uid, d: devId(req.query.dev), e: o.estado, x, t: now });
+    res0.json(o);
+  } };
   const ref = admin.firestore().collection("player").doc(uid);
   const snap = await ref.get();
   let d = snap.exists ? snap.data() : null;
@@ -523,4 +542,30 @@ exports.playerGerir = onRequest({ region: "europe-west1", maxInstances: 5, secre
     const p = await stripeDe().billingPortal.sessions.create({ customer: c, locale: "pt", return_url: "https://joaoantunesss.github.io/AntunesPlayer/" });
     res.json({ url: p.url });
   } catch (e) { console.error("playerGerir", e); res.status(500).json({ erro: "Não foi possível abrir a gestão da subscrição." }); }
+});
+
+/* AWplayer: "Reportar um problema" dentro da app. Guarda em suporte_player (vês no painel de gestão → AWplayer)
+   e avisa-me no Telegram. Leva o que a pessoa escreveu e um diagnóstico da app (sem links nem logins das listas). */
+exports.playerSuporte = onRequest({ region: "europe-west1", maxInstances: 5, secrets: [TG_TOKEN, TG_CHAT], cors: true }, async (req, res) => {
+  if (req.method !== "POST") { res.status(405).json({ erro: "Usa POST." }); return; }
+  const u = await playerConta(req);
+  const b = typeof req.body === "object" && req.body ? req.body : {};
+  const texto = cortar(b.texto, 3000).trim();
+  if (texto.length < 5) { res.status(400).json({ erro: "Descreve o problema." }); return; }
+  const dev = devId(b.dev) || "sem-id";
+  // no máximo um relato por minuto e 20 por dia por aparelho
+  const lim = admin.firestore().collection("suporte_player_lim").doc(dev), now = Date.now();
+  const ok = await admin.firestore().runTransaction(async (t) => {
+    const s = await t.get(lim), d = s.exists ? s.data() : { dia: 0, n: 0, ult: 0 };
+    const dia = Math.floor(now / 864e5), n = d.dia === dia ? d.n : 0;
+    if (now - (d.ult || 0) < 60e3 || n >= 20) return false;
+    t.set(lim, { dia, n: n + 1, ult: now }); return true;
+  });
+  if (!ok) { res.status(429).json({ erro: "Espera um minuto antes de enviar outro." }); return; }
+  const diag = {};
+  for (const [k, v] of Object.entries(b.diag || {}).slice(0, 30)) diag[cortar(k, 40)] = cortar(typeof v === "string" ? v : JSON.stringify(v), 300);
+  const doc = { texto, contacto: cortar(b.contacto, 120), email: u ? String(u.email || "") : "", uid: u ? u.uid : "", dev, diag, estado: "aberto", criadoEm: admin.firestore.FieldValue.serverTimestamp() };
+  const r = await admin.firestore().collection("suporte_player").add(doc);
+  try { await avisar(`AWplayer: problema reportado 🐞\n${cortar(doc.email || doc.contacto || "anónimo", 80)}\n${cortar(texto, 500)}\n${cortar(diag.app || "", 80)} · ${cortar(diag.aparelho || "", 80)}${diag.erro ? "\nErro: " + cortar(diag.erro, 200) : ""}`); } catch (e) { console.error(e); }
+  res.json({ ok: true, id: r.id });
 });
