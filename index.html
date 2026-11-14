@@ -373,7 +373,7 @@ p.intro{color:var(--muted);max-width:52ch;margin:0;font-size:1.1rem}
 .eu-ui{position:absolute;inset:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center;padding:calc(env(safe-area-inset-top,0px) + 5.5rem) clamp(1.2rem,5vw,4rem) 2.5rem;pointer-events:none}
 .eu-term{max-width:34rem;pointer-events:auto}
 .eu-id{display:flex;align-items:center;gap:.9rem;margin:0 0 2.4rem}
-.eu-id img{width:3.4rem;height:3.4rem;border-radius:50%;object-fit:cover;filter:grayscale(1) contrast(1.05) sepia(.25)}
+.eu-mono{flex:none;width:3.4rem;height:3.4rem;border-radius:50%;display:grid;place-items:center;background:#2547F5;color:#fff;font:800 1.05rem/1 "Schibsted Grotesk",system-ui,sans-serif;font-style:normal;letter-spacing:-.04em}
 .eu-id b{display:block;font:600 1rem/1.2 "Schibsted Grotesk",system-ui,sans-serif;color:#0B1220}
 .eu-id span{font:500 .78rem/1.3 ui-monospace,Menlo,Consolas,monospace;color:#56627A;letter-spacing:.04em}
 .eu-idx{font:600 .78rem/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.16em;text-transform:uppercase;color:#2547F5;margin:0 0 1rem;display:flex;gap:.8rem;align-items:center}
@@ -1382,7 +1382,7 @@ details summary{cursor:pointer;color:var(--brand);font-weight:600;min-height:32p
         <div id="euLabs" aria-hidden="true"></div>
         <div class="eu-ui">
           <div class="eu-term">
-            <div class="eu-id"><img src="img/joao.jpg" alt="João Antunes" width="54" height="54"><div><b>João Antunes</b><span>Freelancer · Engenharia Informática</span></div></div>
+            <div class="eu-id"><i class="eu-mono" aria-hidden="true">AW</i><div><b>João Antunes</b><span>Freelancer · Engenharia Informática</span></div></div>
             <div class="eu-steps" id="euSteps">
               <div class="eu-step"><p class="eu-idx">Quem sou</p><h2 class="eu-big">Faço sites que poupam tempo ao teu negócio.</h2><p class="eu-txt">Sou o João Antunes. Faço sites para salões, restaurantes, fotógrafos, explicadores e babysitters, e trato deles depois de estarem online. Estudo Engenharia Informática. O AT Beauty Studio já recebe marcações com um site meu.</p></div>
               <div class="eu-step"><p class="eu-idx">01 Análise</p><h2 class="eu-big">Começo por perceber como trabalhas.</h2><p class="eu-txt">Vejo onde se perde tempo hoje, como marcações por mensagem, menus em PDF ou horários desatualizados, e o que o site pode resolver.</p></div>
