@@ -1844,7 +1844,7 @@ let gtab="resumo", supSite="todos", cliQ="", cliDraft=null, fichaId=null;
 const CLI_ESTADOS={"ativo":"Ativo","pausado":"Pausado","terminado":"Terminado"}, PLANOS=["Essencial","Cuidado","Completo","Sem manutenção"];
 const ESTADOS={"recebido":"Recebido","em-analise":"Em análise","orcamento-enviado":"Contraproposta","aceite":"Aceite","recusado":"Recusado"};
 const FASES=[["conteudos","À espera dos teus conteúdos"],["a-fazer","A fazer o teu site"],["revisao","Em revisão contigo"],["publicado","Publicado"]];
-const C_LOGO={k:"logotipo",t:"Logótipo",tipo:"ficheiros",h:"Em boa qualidade (PNG ou SVG). Se ainda não tens, diz-me na nota."};
+const C_LOGO={k:"logotipo",t:"Logótipo",tipo:"ficheiros",h:"Em boa qualidade (PNG ou SVG). Se ainda não tens, diz-nos na nota."};
 const C_HORAS={k:"horarios",t:"Horário",tipo:"lista",h:"Um dia por linha. Se fechas, escreve «Fechado».",cols:["Dia","Abre","Fecha"],ex:["Segunda","09:00","19:00"]};
 const C_CONT={k:"contactos",t:"Contactos",tipo:"campos",h:"Aparecem no site e no Google.",campos:["Morada","Telefone","Email","Instagram","Facebook"]};
 const C_SOBRE={k:"sobre",t:"Quem és",tipo:"texto",h:"Um ou dois parágrafos sobre ti e o teu trabalho. Nós ajustamos o texto se for preciso."};
@@ -1931,7 +1931,7 @@ async function renderApp(){
 function authHTML(){
   const c=authMode==="criar", t=pendingTpl!==null?TEMPLATES[pendingTpl]:null;
   return `<div class="narrow">
-    ${isSupport()?`<p>Para abrir um pedido de suporte, cria a tua conta ou entra. Respondemos em 1 dia útil.</p>`:t?`<p>Vais fazer uma proposta para o modelo <strong>${t.nome}</strong>. Primeiro, cria a tua conta ou entra.</p>`:`<p class="muted">Com a conta fazes propostas e recebes a minha resposta.</p>`}
+    ${isSupport()?`<p>Para abrir um pedido de suporte, cria a tua conta ou entra. Respondemos em 1 dia útil.</p>`:t?`<p>Vais fazer uma proposta para o modelo <strong>${t.nome}</strong>. Primeiro, cria a tua conta ou entra.</p>`:`<p class="muted">Com a conta fazes propostas e recebes a nossa resposta.</p>`}
     <div class="seg" role="group" aria-label="Conta"><button type="button" data-m="criar" aria-pressed="${c}">Criar conta</button><button type="button" data-m="entrar" aria-pressed="${!c}">Entrar</button></div>
     <form id="authForm" novalidate>
       ${c?`<label class="f"><span>Nome</span><input type="text" name="nome" autocomplete="name" required></label>
@@ -2119,7 +2119,7 @@ function projetoHTML(p){
   const opc=dc.opcao||"";
   return `<div class="proj">
     <section><h4>O meu site</h4>${fasesHTML(p)}<div style="margin-top:.8rem">${site}<p class="muted">${manut}</p></div></section>
-    <section><h4>O que preciso de ti <span class="muted" style="font-weight:500">${feitos} de ${itens.length}</span></h4>
+    <section><h4>O que precisamos de ti <span class="muted" style="font-weight:500">${feitos} de ${itens.length}</span></h4>
       <p class="muted">Para o teu site ${esc(tplOf(p.template).nome)}. Vai preenchendo; fica guardado e nós vemos logo no nosso painel.</p>
       <ul class="chk">${itens.map(it=>itemHTML(p,it,true)).join("")}</ul>
       <p class="muted" data-upmsg="${esc(p.id)}" role="status"></p></section>
@@ -2197,7 +2197,7 @@ function renderMine(list){
       ${pagHTML(p)}
       ${projetoHTML(p)}
       <details><summary>Ver as minhas respostas</summary>${answersHTML(p)}</details>
-    </article>`).join(""):`<p class="empty">Ainda não fizeste nenhum pedido. Escolhe um modelo e conta-me como é o teu negócio.</p>`);
+    </article>`).join(""):`<p class="empty">Ainda não fizeste nenhum pedido. Escolhe um modelo e conta-nos como é o teu negócio.</p>`);
   $("newReq").addEventListener("click",()=>{ pendingTpl=PANELS[current].t; renderApp(); });
   a.querySelectorAll("[data-cancel]").forEach(b=>b.addEventListener("click",async()=>{
     if(!confirm("Cancelar a manutenção? Fica ativa até ao fim do mês que já pagaste e depois deixa de ser cobrada.")) return;
