@@ -100,7 +100,23 @@ nav .apps:hover .apps-menu,nav .apps:focus-within .apps-menu{opacity:1;visibilit
 .apps-menu a:hover{background:rgba(0,0,0,.06)}
 nav a{text-decoration:none;color:var(--muted);font-weight:500;font-size:.98rem}
 @media (hover:hover){nav a:hover{color:var(--ink)}}
-@media (max-width:860px){nav{display:none}}
+.navtoggle{display:none;place-items:center;width:44px;height:44px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+.navtoggle svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round}
+.only-mobile{display:none}
+@media (max-width:860px){
+  .navtoggle{display:grid}
+  .bar-right>.btn.small{display:none}
+  nav{position:absolute;top:100%;left:0;right:0;display:none;background:var(--paper);border-top:1px solid var(--line);box-shadow:0 22px 50px rgba(0,0,0,.22)}
+  nav.open{display:block}
+  nav>ul{flex-direction:column;gap:0;padding:.4rem clamp(1.2rem,4.5vw,3rem) 1rem}
+  nav>ul>li{border-bottom:1px solid var(--line)}
+  nav>ul>li:last-child{border-bottom:0}
+  nav>ul>li>a,.apps-btn{display:block;width:100%;padding:.95rem 0;font-size:1.06rem;color:var(--ink)}
+  nav .apps{position:static}
+  .apps-menu{position:static;transform:none;opacity:1;visibility:visible;box-shadow:none;border:0;background:transparent;padding:0 0 .5rem .9rem;min-width:0}
+  .apps-menu a{padding:.5rem 0;color:var(--muted)}
+  .only-mobile{display:list-item}
+}
 
 .btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 1.35rem;border-radius:10px;font:inherit;font-weight:600;text-decoration:none;cursor:pointer;
   border:1px solid var(--line);background:transparent;color:var(--ink);transition-property:transform,background-color,border-color;transition-duration:.18s}
@@ -1014,7 +1030,7 @@ details summary{cursor:pointer;color:var(--brand);font-weight:600;min-height:32p
   <div class="wrap bar">
     <a class="logo" href="#topo" aria-label="AW, início" translate="no">AW</a>
     <div class="bar-right">
-      <nav aria-label="Principal">
+      <nav aria-label="Principal" id="mainnav">
         <ul>
           <li><a href="#templates">Modelos</a></li>
           <li><a href="#como">Como funciona</a></li>
@@ -1031,8 +1047,10 @@ details summary{cursor:pointer;color:var(--brand);font-weight:600;min-height:32p
             </ul>
           </li>
           <li><a href="#contacto">Contacto</a></li>
+          <li class="only-mobile"><a href="#conta">Área de cliente</a></li>
         </ul>
       </nav>
+      <button class="navtoggle" type="button" id="navToggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="mainnav"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
       <button class="theme" type="button" id="themeBtn" aria-label="Mudar para o tema escuro"><svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg><svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg></button>
       <a class="btn small" href="#conta">Área de cliente</a>
     </div>
@@ -3688,6 +3706,16 @@ else try{
       setType(order[(order.indexOf(st.t) + 1) % order.length], true);
     }, 4800);
   setType('salao', true);
+})();
+</script>
+<script>
+(function(){
+  var t=document.getElementById('navToggle'), n=document.getElementById('mainnav');
+  if(!t||!n)return;
+  function set(o){n.classList.toggle('open',o);t.setAttribute('aria-expanded',o?'true':'false');t.setAttribute('aria-label',o?'Fechar menu':'Abrir menu');}
+  t.addEventListener('click',function(){set(!n.classList.contains('open'));});
+  n.addEventListener('click',function(e){if(e.target.closest('a'))set(false);});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')set(false);});
 })();
 </script>
 </body>
