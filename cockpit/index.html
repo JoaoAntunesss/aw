@@ -2,7 +2,7 @@
 <html lang="pt-PT">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; img-src 'self' data:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; img-src 'self' data:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' https://raw.githubusercontent.com; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Cockpit · o diário de bordo do teu carro</title>
@@ -132,6 +132,7 @@ footer a{text-decoration:none;color:#dfe2f4}
 .btn.main{color:#04181a}.btn.main small{color:rgba(4,24,26,.75)}
 .shots .phone{right:4%}
 @media (max-width:640px){.top nav{display:none}}
+.dlc{margin:0 0 .4rem;color:#dfe2f4;font-weight:600}
 </style>
 </head>
 <body>
@@ -151,6 +152,7 @@ footer a{text-decoration:none;color:#dfe2f4}
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 9.48l1.84-3.18a.38.38 0 0 0-.66-.38l-1.86 3.22a11.4 11.4 0 0 0-9.84 0L5.22 5.92a.38.38 0 0 0-.66.38L6.4 9.48A10.8 10.8 0 0 0 1 18h22a10.8 10.8 0 0 0-5.4-8.52zM7 15.25A1.25 1.25 0 1 1 8.25 14 1.25 1.25 0 0 1 7 15.25zm10 0A1.25 1.25 0 1 1 18.25 14 1.25 1.25 0 0 1 17 15.25z"/></svg>
           <span><small>Android 8 ou superior</small><b>Descarregar APK</b></span></a>
       </div>
+      <p class="also dlc" id="dlc" hidden></p>
       <p class="also">Português e inglês · entras com a tua conta Google</p>
     </div>
     <div class="shots" aria-hidden="true">
@@ -222,5 +224,18 @@ footer a{text-decoration:none;color:#dfe2f4}
     <span>Preços dos combustíveis: DGEG · Mapas © OpenStreetMap</span>
   </div>
 </footer>
+<script>
+/* Contador de downloads: vem de fb-pulse/downloads/totals.json (atualizado de 2 em 2 horas). Só aparece a partir de 50. */
+(async () => {
+  try {
+    const r = await fetch("https://raw.githubusercontent.com/JoaoAntunesss/fb-pulse/main/downloads/totals.json", { cache: "no-store" });
+    const n = ((await r.json()).apps || {})["Cockpit"]?.total || 0;
+    if (n < 50) return;
+    const e = document.getElementById("dlc");
+    e.textContent = "Já descarregado " + n.toLocaleString("pt-PT") + " vezes";
+    e.hidden = false;
+  } catch (e) {}
+})();
+</script>
 </body>
 </html>

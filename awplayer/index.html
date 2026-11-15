@@ -2,7 +2,7 @@
 <html lang="pt-PT">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; img-src 'self' data:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; img-src 'self' data:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' https://raw.githubusercontent.com; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>AWplayer · leitor de IPTV para Android, Google TV e Windows</title>
@@ -127,6 +127,7 @@ details p{margin:0 0 18px;color:#c8cbe0}
 footer{padding-block:2.5rem 3rem;color:var(--muted);font-size:.92rem;border-top:1px solid var(--line)}
 footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between}
 footer a{text-decoration:none;color:#dfe2f4}
+.dlc{margin:0 0 .4rem;color:#dfe2f4;font-weight:600}
 </style>
 </head>
 <body>
@@ -149,6 +150,7 @@ footer a{text-decoration:none;color:#dfe2f4}
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.5 10.4 4.5v7H3zm0 13L10.4 19.5v-7H3zM11.3 4.4 21 3v8.5h-9.7zm0 15.2L21 21v-8.5h-9.7z"/></svg>
           <span><small>Windows 10 e 11</small><b>Descarregar para PC</b></span></a>
       </div>
+      <p class="also dlc" id="dlc" hidden></p>
       <p class="also">Ou abre <a href="https://player.awdigital.pt/">a versão web</a> no navegador, sem instalar nada.</p>
     </div>
     <div class="shots" aria-hidden="true">
@@ -285,5 +287,18 @@ footer a{text-decoration:none;color:#dfe2f4}
     <span>Imagens: Sintel, Big Buck Bunny e Tears of Steel © Blender Foundation, CC BY 3.0</span>
   </div>
 </footer>
+<script>
+/* Contador de downloads: vem de fb-pulse/downloads/totals.json (atualizado de 2 em 2 horas). Só aparece a partir de 50. */
+(async () => {
+  try {
+    const r = await fetch("https://raw.githubusercontent.com/JoaoAntunesss/fb-pulse/main/downloads/totals.json", { cache: "no-store" });
+    const n = ((await r.json()).apps || {})["AWplayer"]?.total || 0;
+    if (n < 50) return;
+    const e = document.getElementById("dlc");
+    e.textContent = "Já descarregado " + n.toLocaleString("pt-PT") + " vezes";
+    e.hidden = false;
+  } catch (e) {}
+})();
+</script>
 </body>
 </html>
