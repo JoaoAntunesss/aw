@@ -203,13 +203,10 @@ footer a{text-decoration:none;color:#dbe4f2}
   const PROJ="aw-sites-e31c3", KEY="AIzaSyBERdxp6p3bx_ADEOeoBgx80A-r4pZcnco", APP="tv-remote";
   const base="https://firestore.googleapis.com/v1/projects/"+PROJ+"/databases/(default)/documents";
   const path=base+"/downloads/"+APP, name="projects/"+PROJ+"/databases/(default)/documents/downloads/"+APP;
-  fetch(path+"?key="+KEY,{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{
-    const n=j&&j.fields&&j.fields.count?+j.fields.count.integerValue:0;
-    if(n<1) return;
-    const e=document.getElementById("dlc");
-    e.textContent="Ja descarregado "+n.toLocaleString("pt-PT")+(n===1?" vez":" vezes")+" pelo site";
-    e.hidden=false;
-  }).catch(()=>{});
+  const e=document.getElementById("dlc");
+  const show=n=>{e.textContent=n<1?"Ainda sem transferências pelo site":("Já descarregado "+n.toLocaleString("pt-PT")+(n===1?" vez":" vezes")+" pelo site");e.hidden=false;};
+  show(0);
+  fetch(path+"?key="+KEY,{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{show(j&&j.fields&&j.fields.count?+j.fields.count.integerValue:0);}).catch(()=>{});
   const body=JSON.stringify({writes:[{transform:{document:name,fieldTransforms:[{fieldPath:"count",increment:{integerValue:"1"}}]}}]});
   const inc=()=>{try{
     if(navigator.sendBeacon) navigator.sendBeacon(base+":commit?key="+KEY, new Blob([body],{type:"application/json"}));
