@@ -91,6 +91,13 @@ header.scrolled{box-shadow:0 1px 0 var(--line)}
 .theme .moon{fill:currentColor;stroke:none;display:none}
 .theme.is-dark .sun{display:none}.theme.is-dark .moon{display:block}
 nav ul{display:flex;gap:1.8rem;list-style:none;margin:0;padding:0}
+nav .apps{position:relative}
+.apps-btn{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0;display:inline-flex;align-items:center;gap:.3em}
+.apps-menu{position:absolute;top:calc(100% + .7rem);left:50%;transform:translateX(-50%) translateY(-6px);min-width:11rem;background:var(--paper,#faf7f2);border:1px solid rgba(0,0,0,.12);border-radius:14px;box-shadow:0 18px 50px rgba(0,0,0,.18);padding:.5rem;display:grid;gap:2px;opacity:0;visibility:hidden;transition:opacity .18s,transform .18s;z-index:30}
+nav .apps:hover .apps-menu,nav .apps:focus-within .apps-menu{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
+.apps-menu li{display:block}
+.apps-menu a{display:block;padding:.55rem .85rem;border-radius:9px;text-decoration:none;white-space:nowrap}
+.apps-menu a:hover{background:rgba(0,0,0,.06)}
 nav a{text-decoration:none;color:var(--muted);font-weight:500;font-size:.98rem}
 @media (hover:hover){nav a:hover{color:var(--ink)}}
 @media (max-width:860px){nav{display:none}}
@@ -1014,9 +1021,14 @@ details summary{cursor:pointer;color:var(--brand);font-weight:600;min-height:32p
           <li><a href="#planos">Manutenção</a></li>
           <li><a href="#duvidas">Dúvidas</a></li>
           <li><a href="#eu">Sobre nós</a></li>
-          <li><a href="awplayer/">AWplayer</a></li>
-          <li><a href="cockpit/">Cockpit</a></li>
-          <li><a href="freezer/">Freezer</a></li>
+          <li class="apps">
+            <button type="button" class="apps-btn" aria-haspopup="true">Apps <span aria-hidden="true">▾</span></button>
+            <ul class="apps-menu">
+              <li><a href="awplayer/">AWplayer</a></li>
+              <li><a href="cockpit/">Cockpit</a></li>
+              <li><a href="freezer/">Freezer</a></li>
+            </ul>
+          </li>
           <li><a href="#contacto">Contacto</a></li>
         </ul>
       </nav>

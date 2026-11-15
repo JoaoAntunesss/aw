@@ -88,5 +88,12 @@ service cloud.firestore {
       allow read: if isAdmin();
       allow update: if isAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['estado']);
     }
+
+    // Contador de downloads pelo site: qualquer um lê; cada clique no botão incrementa 1 (sem conta)
+    match /downloads/{app} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasOnly(['count']) && request.resource.data.count == 1;
+      allow update: if request.resource.data.keys().hasOnly(['count']) && request.resource.data.count == resource.data.count + 1;
+    }
   }
 }

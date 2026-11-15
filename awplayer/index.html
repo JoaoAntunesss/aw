@@ -2,7 +2,7 @@
 <html lang="pt-PT">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; img-src 'self' data:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' https://raw.githubusercontent.com; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; img-src 'self' data:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' https://raw.githubusercontent.com; upgrade-insecure-requests https://firestore.googleapis.com">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>AWplayer · leitor de IPTV para Android, Google TV e Windows</title>
@@ -288,16 +288,24 @@ footer a{text-decoration:none;color:#dfe2f4}
   </div>
 </footer>
 <script>
-/* Contador de downloads: vem de fb-pulse/downloads/totals.json (atualizado de 2 em 2 horas). Só aparece a partir de 50. */
-(async () => {
-  try {
-    const r = await fetch("https://raw.githubusercontent.com/JoaoAntunesss/fb-pulse/main/downloads/totals.json", { cache: "no-store" });
-    const n = ((await r.json()).apps || {})["AWplayer"]?.total || 0;
-    if (n < 50) return;
-    const e = document.getElementById("dlc");
-    e.textContent = "Já descarregado " + n.toLocaleString("pt-PT") + " vezes";
-    e.hidden = false;
-  } catch (e) {}
+/* Contador de downloads: conta so os cliques no botao de descarregar deste site (Firestore), e mostra sempre. */
+(() => {
+  const PROJ="aw-sites-e31c3", KEY="AIzaSyBERdxp6p3bx_ADEOeoBgx80A-r4pZcnco", APP="awplayer";
+  const base="https://firestore.googleapis.com/v1/projects/"+PROJ+"/databases/(default)/documents";
+  const path=base+"/downloads/"+APP, name="projects/"+PROJ+"/databases/(default)/documents/downloads/"+APP;
+  fetch(path+"?key="+KEY,{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{
+    const n=j&&j.fields&&j.fields.count?+j.fields.count.integerValue:0;
+    if(n<1) return;
+    const e=document.getElementById("dlc");
+    e.textContent="Ja descarregado "+n.toLocaleString("pt-PT")+(n===1?" vez":" vezes")+" pelo site";
+    e.hidden=false;
+  }).catch(()=>{});
+  const body=JSON.stringify({writes:[{transform:{document:name,fieldTransforms:[{fieldPath:"count",increment:{integerValue:"1"}}]}}]});
+  const inc=()=>{try{
+    if(navigator.sendBeacon) navigator.sendBeacon(base+":commit?key="+KEY, new Blob([body],{type:"application/json"}));
+    else fetch(base+":commit?key="+KEY,{method:"POST",body:body,keepalive:true});
+  }catch(e){}};
+  document.querySelectorAll('a[href*="releases/latest/download"]').forEach(a=>a.addEventListener("click",inc));
 })();
 </script>
 </body>
