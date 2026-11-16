@@ -234,6 +234,12 @@ exports.stripeWebhook = onRequest({ secrets: [STRIPE_SECRET, STRIPE_WEBHOOK_SECR
         await playerLigar(o.client_reference_id, o);
         try { await avisar(`AWplayer: nova subscrição 💶\n${cortar(o.customer_details?.email || o.customer_email, 80)}\n${((o.amount_total || 0) / 100).toFixed(2)} €${o.payment_link === PLAYER_PLINK ? "/mês" : "/ano"}`); } catch (e) { console.error(e); }
       }
+      // Cockpit / Freezer: o mesmo, cada um na sua coleção
+      else if (appDoLink(o.payment_link) && pago(o) && o.client_reference_id && o.subscription) {
+        const k = appDoLink(o.payment_link);
+        await admin.firestore().collection("app_" + k).doc(o.client_reference_id).set({ sub: String(o.subscription), cliente: String(o.customer || ""), subVisto: 0 }, { merge: true });
+        try { await avisar(`${APPS[k].nome}: nova subscrição 💶\n${cortar(o.customer_details?.email || o.customer_email, 80)}\n${((o.amount_total || 0) / 100).toFixed(2)} €${o.payment_link === APPS[k].mes.plink ? "/mês" : "/ano"}`); } catch (e) { console.error(e); }
+      }
     } else if (ev.type === "customer.subscription.updated") {
       const f = await pedidoDaSubscricao(o); if (f) {
         const g = f.p.pagamento || {}, cancelada = !!(o.cancel_at_period_end || o.cancel_at);
@@ -542,6 +548,106 @@ exports.playerGerir = onRequest({ region: "europe-west1", maxInstances: 5, secre
     const p = await stripeDe().billingPortal.sessions.create({ customer: c, locale: "pt", return_url: "https://player.awdigital.pt/" });
     res.json({ url: p.url });
   } catch (e) { console.error("playerGerir", e); res.status(500).json({ erro: "Não foi possível abrir a gestão da subscrição." }); }
+});
+
+/* ---- Cockpit e Freezer: 24 horas grátis, depois 1 €/mês ou 10 €/ano (links de pagamento do Stripe) ----
+   Igual ao AWplayer, mais simples (sem limite de aparelhos). Cada app manda o token da conta Google do seu projeto
+   Firebase; o pagamento faz-se no link com client_reference_id = uid; a subscrição fica em app_<app>/<uid>. */
+const APPS = {
+  cockpit: {
+    nome: "Cockpit", proj: "app-dashboardcarros", pagina: "https://awdigital.pt/cockpit/",
+    mes: { url: "https://buy.stripe.com/28EaEP4cP3cz2G8aPT93y02", plink: "plink_1UcDAE1B8fzyW0R2U9IqGknB" },
+    ano: { url: "https://buy.stripe.com/4gMeV5aBd9AX5Sk9LP93y03", plink: "plink_1UcDG81B8fzyW0R2udiYCvJd" }
+  },
+  freezer: {
+    nome: "Freezer", proj: "congelador-bdba6", pagina: "https://awdigital.pt/freezer/",
+    mes: { url: "https://buy.stripe.com/00wcMX9x928v3Kc4rv93y04", plink: "plink_1UcDIF1B8fzyW0R2OE8Ij42F" },
+    ano: { url: "https://buy.stripe.com/14A28jfVxcN95Sk1fj93y05", plink: "plink_1UcDMk1B8fzyW0R2o3Fz5nvv" }
+  }
+};
+const APP_TESTE = 24 * 3600e3;
+const appDoLink = (plink) => Object.keys(APPS).find(k => APPS[k].mes.plink === plink || APPS[k].ano.plink === plink);
+const appAuths = {};
+const appAuth = (k) => appAuths[k] || (appAuths[k] = admin.initializeApp({ projectId: APPS[k].proj }, "app-" + k).auth());
+async function appConta(req, k) {
+  const tok = String(req.get("authorization") || "").replace(/^Bearer\s+/i, "");
+  if (!tok) return null;
+  try { return await appAuth(k).verifyIdToken(tok); } catch (e) { return null; }
+}
+// sempre grátis: o dono e a família; o resto da lista fica em config/<app>.gratis
+async function appGratis(k, email) {
+  if (!email) return false;
+  if (PLAYER_DONO.includes(email)) return true;
+  try {
+    const s = await admin.firestore().collection("config").doc(k).get();
+    return ((s.exists && s.data().gratis) || []).map(x => String(x).toLowerCase().trim()).includes(email);
+  } catch (e) { return false; }
+}
+async function appProcurar(k, uid) {
+  for (const plink of [APPS[k].mes.plink, APPS[k].ano.plink]) {
+    let ini;
+    for (let p = 0; p < 5; p++) {
+      const l = await stripeDe().checkout.sessions.list({ payment_link: plink, limit: 100, ...(ini ? { starting_after: ini } : {}) });
+      const s = l.data.find(x => x.client_reference_id === uid && x.status === "complete" && x.subscription);
+      if (s) return s;
+      if (!l.has_more) break;
+      ini = l.data[l.data.length - 1].id;
+    }
+  }
+  return null;
+}
+// estado da conta numa app: gratis | pago | teste | pagar (com os links já ligados à conta)
+exports.appEstado = onRequest({ region: "europe-west1", maxInstances: 10, secrets: [STRIPE_SECRET], cors: true }, async (req, res) => {
+  const k = String(req.query.app || "");
+  if (!APPS[k]) { res.status(400).json({ erro: "App desconhecida." }); return; }
+  const u = await appConta(req, k);
+  if (!u) { res.status(401).json({ erro: "Entra com a tua conta Google." }); return; }
+  const email = String(u.email || "").toLowerCase(), uid = u.uid, now = Date.now();
+  const ref = admin.firestore().collection("app_" + k).doc(uid);
+  const snap = await ref.get();
+  let d = snap.exists ? snap.data() : null;
+  if (!d) {
+    // o período grátis conta desde a primeira vez que a app abriu neste aparelho (nunca depois de agora)
+    const ini = Math.min(now, Math.max(now - 30 * 86400e3, Number(req.query.inicio) || now));
+    d = { email, inicio: ini };
+    await ref.set({ ...d, criadoEm: admin.firestore.FieldValue.serverTimestamp() });
+  }
+  if (await appGratis(k, email)) { res.json({ estado: "gratis" }); return; }
+  try {
+    const pediu = req.query.pago === "1";
+    if (!d.sub && (pediu || !d.procurado || now - d.procurado > 10 * 60e3) && now > d.inicio + APP_TESTE - 3600e3) {
+      const s = await appProcurar(k, uid);
+      d.procurado = now;
+      if (s) { d.sub = String(s.subscription); d.cliente = String(s.customer || ""); d.subVisto = 0; }
+      await ref.set({ procurado: now, ...(s ? { sub: d.sub, cliente: d.cliente, subVisto: 0 } : {}) }, { merge: true });
+    }
+    if (d.sub && (pediu || !d.subVisto || now - d.subVisto > 6 * 3600e3)) {
+      const sub = await stripeDe().subscriptions.retrieve(d.sub);
+      const fim = fimPeriodo(sub);
+      Object.assign(d, { subEstado: sub.status, ate: fim ? fim * 1000 : 0, cancelada: !!sub.cancel_at_period_end, subVisto: now });
+      await ref.set({ subEstado: d.subEstado, ate: d.ate, cancelada: d.cancelada, subVisto: now }, { merge: true });
+    }
+  } catch (e) { console.error("appEstado", k, e); }
+  if (d.sub && subAtiva(d, now)) { res.json({ estado: "pago", ate: d.ate, cancelada: !!d.cancelada }); return; }
+  const fimTeste = d.inicio + APP_TESTE;
+  const qs = `?client_reference_id=${encodeURIComponent(uid)}${email ? "&prefilled_email=" + encodeURIComponent(email) : ""}&locale=pt`;
+  const link = APPS[k].mes.url + qs, linkAno = APPS[k].ano.url + qs;
+  if (now < fimTeste) { res.json({ estado: "teste", fimTeste, link, linkAno }); return; }
+  res.json({ estado: "pagar", link, linkAno });
+});
+// gerir ou cancelar a subscrição de uma app (portal do cliente do Stripe)
+exports.appGerir = onRequest({ region: "europe-west1", maxInstances: 5, secrets: [STRIPE_SECRET], cors: true }, async (req, res) => {
+  const k = String(req.query.app || "");
+  if (!APPS[k]) { res.status(400).json({ erro: "App desconhecida." }); return; }
+  const u = await appConta(req, k);
+  if (!u) { res.status(401).json({ erro: "Entra com a tua conta Google." }); return; }
+  const s = await admin.firestore().collection("app_" + k).doc(u.uid).get();
+  const c = s.exists && s.data().cliente;
+  if (!c) { res.status(404).json({ erro: "Ainda não tens nenhuma subscrição." }); return; }
+  try {
+    const p = await stripeDe().billingPortal.sessions.create({ customer: c, locale: "pt", return_url: APPS[k].pagina });
+    res.json({ url: p.url });
+  } catch (e) { console.error("appGerir", k, e); res.status(500).json({ erro: "Não foi possível abrir a gestão da subscrição." }); }
 });
 
 /* AWplayer: "Reportar um problema" dentro da app. Guarda em suporte_player (vês no painel de gestão → AWplayer)
