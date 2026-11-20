@@ -675,3 +675,32 @@ exports.playerSuporte = onRequest({ region: "europe-west1", maxInstances: 5, sec
   try { await avisar(`AWplayer: problema reportado 🐞\n${cortar(doc.email || doc.contacto || "anónimo", 80)}\n${cortar(texto, 500)}\n${cortar(diag.app || "", 80)} · ${cortar(diag.aparelho || "", 80)}${diag.erro ? "\nErro: " + cortar(diag.erro, 200) : ""}`); } catch (e) { console.error(e); }
   res.json({ ok: true, id: r.id });
 });
+
+// ---------------------------------------------------------------- ReelPick: TMDB proxy (one shared key, kept server-side)
+const TMDB_KEY = defineSecret("TMDB_KEY");
+const TMDB_PATHS = /^\/(search\/multi|search\/movie|search\/tv|(movie|tv)\/\d{1,9}(\/(images|videos|credits|watch\/providers|recommendations))?|genre\/(movie|tv)\/list|watch\/providers\/(movie|tv)|discover\/(movie|tv)|trending\/(all|movie|tv)\/(day|week))$/;
+const TMDB_PARAMS = /^(query|language|page|region|watch_region|include_adult|append_to_response|include_image_language|sort_by|with_genres|without_genres|with_watch_providers|with_watch_monetization_types|with_runtime\.(gte|lte)|vote_average\.(gte|lte)|vote_count\.(gte|lte)|primary_release_date\.(gte|lte)|first_air_date\.(gte|lte)|release_date\.(gte|lte)|with_original_language)$/;
+const TMDB_ORIGINS = /^https:\/\/(joaoantunesss\.github\.io|reelpick\.awdigital\.pt)$|^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
+const tmdbHits = new Map();
+exports.tmdb = onRequest({ region: "europe-west1", maxInstances: 5, memory: "256MiB", timeoutSeconds: 15, secrets: [TMDB_KEY] }, async (req, res) => {
+  const origin = req.get("origin") || "";
+  if (TMDB_ORIGINS.test(origin)) { res.set("Access-Control-Allow-Origin", origin); res.set("Vary", "Origin"); }
+  if (req.method === "OPTIONS") { res.set("Access-Control-Allow-Methods", "GET"); res.status(204).send(""); return; }
+  if (req.method !== "GET") { res.status(405).json({ error: "method" }); return; }
+  // light per-IP limit: 300 requests per 5 minutes per instance
+  const ip = String(req.get("x-forwarded-for") || req.ip || "").split(",")[0].trim(), now = Date.now(), h = tmdbHits.get(ip) || { n: 0, t: now };
+  if (now - h.t > 300e3) { h.n = 0; h.t = now; } h.n++; tmdbHits.set(ip, h); if (tmdbHits.size > 5000) tmdbHits.clear();
+  if (h.n > 300) { res.status(429).json({ error: "slow down" }); return; }
+  const path = String(req.query.path || "");
+  if (!TMDB_PATHS.test(path)) { res.status(400).json({ error: "path" }); return; }
+  const q = new URLSearchParams();
+  for (const [k, v] of Object.entries(req.query)) { if (k !== "path" && TMDB_PARAMS.test(k) && typeof v === "string" && v.length <= 200) q.set(k, v); }
+  const key = TMDB_KEY.value().trim(), headers = { accept: "application/json" };
+  if (key.length > 40) headers.Authorization = "Bearer " + key; else q.set("api_key", key);
+  try {
+    const r = await fetch("https://api.themoviedb.org/3" + path + "?" + q, { headers });
+    const body = await r.text();
+    res.set("Cache-Control", r.ok ? "public, max-age=3600, s-maxage=21600" : "no-store");
+    res.status(r.status === 401 ? 502 : r.status).type("application/json").send(body);
+  } catch (e) { res.status(502).json({ error: "tmdb unreachable" }); }
+});
