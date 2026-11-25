@@ -27,7 +27,8 @@ window.LOJA = {
   fontesLocais: ["Playfair Display", "Lato"], // se mudares as fontes, para outra que não esteja aqui, o site volta a pedir à Google Fonts
 
   hero: {
-    imagem: "img/hero.svg",
+    imagem: "https://images.unsplash.com/photo-1790244342917-b08f24662dde?auto=format&fit=crop&w=1800&q=80",
+    reserva: "img/hero.svg", // se a foto não abrir
     titulo: "Sobrancelhas *perfeitas*, à linha", // *palavra* fica em itálico de destaque
     subtitulo: "Na Avenida Menéres, em Matosinhos. Escolha o serviço, o dia e a hora, e receba a confirmação no WhatsApp."
   },
@@ -39,18 +40,20 @@ window.LOJA = {
   telefone: "914439465", // aparece no site e no botão WhatsApp
   indicativo: "351",
   redes: [],
-  fotoLoja: "img/loja.svg",
+  fotoLoja: "https://images.unsplash.com/photo-1763048208932-cbe149724374?auto=format&fit=crop&w=1200&q=80",
+  fotoLojaReserva: "img/loja.svg",
 
   galeria: [
-    { src: "img/g1.svg", alt: "Unhas de gel" },
-    { src: "img/g2.svg", alt: "Lifting de pestanas" },
-    { src: "img/g3.svg", alt: "Massagem" },
-    { src: "img/g4.svg", alt: "Design de sobrancelhas" },
-    { src: "img/g5.svg", alt: "Limpeza de pele" },
-    { src: "img/g6.svg", alt: "Verniz gel" }
+    { src: "https://images.unsplash.com/photo-1790244342917-b08f24662dde?auto=format&fit=crop&w=900&q=80", reserva: "img/g4.svg", alt: "Sobrancelhas com linha" },
+    { src: "https://images.unsplash.com/photo-1783013951101-2d9ed3eac234?auto=format&fit=crop&w=900&q=80", reserva: "img/g1.svg", alt: "Design de sobrancelhas" },
+    { src: "https://images.unsplash.com/photo-1772236617396-2f8460293c07?auto=format&fit=crop&w=900&q=80", reserva: "img/g2.svg", alt: "Pestanas" },
+    { src: "https://images.unsplash.com/photo-1773688189414-7637b9b138e1?auto=format&fit=crop&w=900&q=80", reserva: "img/g3.svg", alt: "Maquilhagem" },
+    { src: "https://images.unsplash.com/photo-1519415387722-a1c3bbef716c?auto=format&fit=crop&w=900&q=80", reserva: "img/g5.svg", alt: "Resultado natural" },
+    { src: "https://images.unsplash.com/photo-1677738812114-2aba99f22b98?auto=format&fit=crop&w=900&q=80", reserva: "img/g6.svg", alt: "O espaço" }
   ],
   // Descrição curta opcional por serviço: acrescente desc: "..." a cada serviço.
 
+  // Fotografias de demonstração: Unsplash (licença livre, uso comercial). Trocar pelas do salão.
   // ---------- Avaliações (copie as REAIS do Google; nunca invente) ----------
   // nota/total: null para esconder o cartão. lista: [] para esconder a secção.
   avaliacoes: { nota: null, total: null, link: "", lista: [] },

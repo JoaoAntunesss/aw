@@ -507,7 +507,7 @@ footer a{text-decoration:none}
   // Logótipo claro opcional (loja.logoClaro) para o topo transparente; sem ele, o logo vai numa pastilha branca
   if (L.logoClaro) { const lg = $('logo'); const swap = () => lg.src = nav.classList.contains('solid') ? L.logo : L.logoClaro; new MutationObserver(swap).observe(document.getElementById('nav'), { attributes: true }); swap(); }
   else document.querySelector('.brand').classList.add('pill');
-  $('hero-bg').style.backgroundImage = `url('${L.hero.imagem}')`;
+  $('hero-bg').style.backgroundImage = `url('${L.hero.imagem}')` + (L.hero.reserva ? `, url('${L.hero.reserva}')` : '');
   $('hero-sl').textContent = L.slogan;
   // Título em duas linhas animadas; *palavra* = itálico de destaque
   (function () {
@@ -520,7 +520,7 @@ footer a{text-decoration:none}
   const telFmt = L.telefone.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
   $('telefone').textContent = telFmt; $('telefone').href = 'tel:' + L.telefone;
   $('redes').innerHTML = L.redes.map(r => `<a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.nome)}</a>`).join('');
-  $('foto-loja').style.backgroundImage = `url('${L.fotoLoja}')`;
+  $('foto-loja').style.backgroundImage = `url('${L.fotoLoja}')` + (L.fotoLojaReserva ? `, url('${L.fotoLojaReserva}')` : '');
   $('wa-float').href = 'https://wa.me/' + A.telInt(L.telefone);
   $('admin-link').textContent = 'Área reservada';
   $('ano-footer').textContent = new Date().getFullYear();
@@ -533,9 +533,9 @@ footer a{text-decoration:none}
   if (A.DEMO) $('demo-bar').style.display = 'block';
 
   // Galeria + lightbox
-  $('mosaic').innerHTML = L.galeria.slice(0, 5).map((g, i) => `<button type="button" data-g="${i}" aria-label="Ver foto: ${esc(g.alt)}"><img src="${esc(g.src)}" alt="${esc(g.alt)}" loading="lazy"><span>${esc(g.alt)}</span></button>`).join('');
+  $('mosaic').innerHTML = L.galeria.slice(0, 5).map((g, i) => `<button type="button" data-g="${i}" aria-label="Ver foto: ${esc(g.alt)}"><img src="${esc(g.src)}" alt="${esc(g.alt)}" loading="lazy"${g.reserva ? ` onerror="this.onerror=null;this.src='${esc(g.reserva)}'"` : ''}><span>${esc(g.alt)}</span></button>`).join('');
   let gi = 0;
-  const lb = $('lightbox'), showLb = i => { gi = (i + L.galeria.length) % L.galeria.length; $('lb-img').src = L.galeria[gi].src; $('lb-img').alt = L.galeria[gi].alt; };
+  const lb = $('lightbox'), showLb = i => { gi = (i + L.galeria.length) % L.galeria.length; $('lb-img').onerror = () => { $('lb-img').onerror = null; if (L.galeria[gi].reserva) $('lb-img').src = L.galeria[gi].reserva; }; $('lb-img').src = L.galeria[gi].src; $('lb-img').alt = L.galeria[gi].alt; };
   $('mosaic').onclick = e => { const b = e.target.closest('[data-g]'); if (b) { showLb(+b.dataset.g); lb.classList.add('on'); lb.querySelector('.x').focus(); } };
   lb.onclick = e => { const b = e.target.closest('[data-lb]'); if (e.target === lb || (b && b.dataset.lb === '0')) lb.classList.remove('on'); else if (b) showLb(gi + +b.dataset.lb); };
 
