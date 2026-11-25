@@ -83,6 +83,20 @@ service cloud.firestore {
       allow read: if isAdmin();
       allow write: if false;
     }
+    // Cockpit e Freezer: lista de contas grátis e contas das apps (só tu lês; quem escreve as contas são as funções)
+    match /config/{app} {
+      allow read: if isAdmin() && app in ['cockpit', 'freezer'];
+      allow write: if isAdmin() && app in ['cockpit', 'freezer'] && request.resource.data.keys().hasOnly(['gratis'])
+        && request.resource.data.gratis is list && request.resource.data.gratis.size() <= 200;
+    }
+    match /app_cockpit/{uid} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+    match /app_freezer/{uid} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
     // problemas reportados na app AWplayer: só tu lês e marcas como resolvidos
     match /suporte_player/{id} {
       allow read: if isAdmin();

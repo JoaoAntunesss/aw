@@ -498,8 +498,9 @@ exports.playerEstado = onRequest({ region: "europe-west1", maxInstances: 10, sec
     if (d.sub && (pediu || !d.subVisto || now - d.subVisto > 6 * 3600e3)) {
       const sub = await stripeDe().subscriptions.retrieve(d.sub);
       const fim = fimPeriodo(sub);
-      Object.assign(d, { subEstado: sub.status, ate: fim ? fim * 1000 : 0, cancelada: !!sub.cancel_at_period_end, subVisto: now });
-      await ref.set({ subEstado: d.subEstado, ate: d.ate, cancelada: d.cancelada, subVisto: now }, { merge: true });
+      const intervalo = (((sub.items || {}).data || [])[0] || {}).price?.recurring?.interval || "";
+      Object.assign(d, { subEstado: sub.status, ate: fim ? fim * 1000 : 0, cancelada: !!sub.cancel_at_period_end, subVisto: now, intervalo });
+      await ref.set({ subEstado: d.subEstado, ate: d.ate, cancelada: d.cancelada, subVisto: now, intervalo }, { merge: true });
     }
   } catch (e) { console.error("playerEstado", e); }
   if (d.sub && subAtiva(d, now)) { res.json({ estado: "pago", ate: d.ate, cancelada: !!d.cancelada }); return; }
@@ -624,8 +625,9 @@ exports.appEstado = onRequest({ region: "europe-west1", maxInstances: 10, secret
     if (d.sub && (pediu || !d.subVisto || now - d.subVisto > 6 * 3600e3)) {
       const sub = await stripeDe().subscriptions.retrieve(d.sub);
       const fim = fimPeriodo(sub);
-      Object.assign(d, { subEstado: sub.status, ate: fim ? fim * 1000 : 0, cancelada: !!sub.cancel_at_period_end, subVisto: now });
-      await ref.set({ subEstado: d.subEstado, ate: d.ate, cancelada: d.cancelada, subVisto: now }, { merge: true });
+      const intervalo = (((sub.items || {}).data || [])[0] || {}).price?.recurring?.interval || "";
+      Object.assign(d, { subEstado: sub.status, ate: fim ? fim * 1000 : 0, cancelada: !!sub.cancel_at_period_end, subVisto: now, intervalo });
+      await ref.set({ subEstado: d.subEstado, ate: d.ate, cancelada: d.cancelada, subVisto: now, intervalo }, { merge: true });
     }
   } catch (e) { console.error("appEstado", k, e); }
   if (d.sub && subAtiva(d, now)) { res.json({ estado: "pago", ate: d.ate, cancelada: !!d.cancelada }); return; }

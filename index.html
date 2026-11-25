@@ -679,6 +679,17 @@ form h3:first-of-type{border-top:0;padding-top:0}
 .kpi span{font-size:.82rem;color:var(--muted)}
 .kpi.hot{border-color:var(--brand)}.kpi.hot b{color:var(--brand)}
 .tabs .n{display:inline-block;min-width:1.35rem;margin-left:.4rem;padding:.05rem .4rem;border-radius:999px;background:var(--brand);color:var(--brand-ink);font-size:.74rem;text-align:center}
+.apps-sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));gap:.8rem;margin:0 0 1.6rem}
+.appcard{display:flex;flex-direction:column;align-items:flex-start;gap:.25rem;text-align:left;border:1px solid var(--line);border-radius:14px;padding:.9rem 1rem;background:var(--surface);cursor:pointer;font:inherit;color:inherit}
+.appcard b{font-size:1.05rem}.appcard span{font-size:.85rem;opacity:.75}.appcard.on{outline:2px solid currentColor;outline-offset:-2px}
+.tbl-wrap{overflow-x:auto;margin:0 0 1.6rem;border:1px solid var(--line);border-radius:12px}
+.tbl{width:100%;border-collapse:collapse;font-size:.92rem;min-width:46rem}
+.tbl th{text-align:left;font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;opacity:.7;padding:.7rem .8rem;border-bottom:1px solid var(--line)}
+.tbl td{padding:.65rem .8rem;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl tr:last-child td{border-bottom:0}.tbl td.acts{white-space:nowrap;text-align:right}.tbl td.acts .btn{margin-left:.3rem}
+@media (max-width:640px){.tbl{min-width:0}.tbl thead{display:none}.tbl,.tbl tbody,.tbl tr,.tbl td{display:block;width:100%}.tbl tr{padding:.6rem .8rem;border-bottom:1px solid var(--line)}.tbl td{border:0;padding:.2rem 0;display:flex;gap:.8rem;justify-content:space-between;text-align:right}.tbl td::before{content:attr(data-l);font-size:.78rem;opacity:.65;text-align:left}.tbl td[data-l="Conta"]{display:block;text-align:left}.tbl td[data-l="Conta"]::before{content:none}.tbl td.acts{justify-content:flex-end;padding-top:.5rem}.tbl td.acts::before{content:none}}
+.st{display:inline-block;font-size:.8rem;font-weight:600;padding:.15rem .55rem;border-radius:99px;white-space:nowrap}
+.st-b{background:#e3efff;color:#1d4f9a}.st-g{background:#e2f6ea;color:#1c6b3c}.st-y{background:#fff3d6;color:#8a5a00}.st-r{background:#fde4e4;color:#a0262c}.st-m{background:#eef0f3;color:#555d68}
 .tools{display:flex;flex-wrap:wrap;gap:.8rem;align-items:end;margin-bottom:1rem}
 .who a.btn{margin-right:.5rem}
 .list-head{display:flex;flex-wrap:wrap;gap:1rem;align-items:center;justify-content:space-between;margin-bottom:.6rem}
@@ -1822,6 +1833,9 @@ function demoStore(){
     async playerContas(){ return []; },
     async playerReportes(){ return []; },
     async playerReporteFeito(){},
+    async appGratis(k){ return [...((mem.appGratis||{})[k]||[])]; },
+    async setAppGratis(k,l){ mem.appGratis=mem.appGratis||{}; mem.appGratis[k]=l; save(); },
+    async appContas(){ return []; },
     async saveCliente(id,d){ mem.clientes=mem.clientes||[]; if(id){ const c=mem.clientes.find(x=>x.id===id); if(c) Object.assign(c,d,{atualizadoEm:Date.now()}); } else mem.clientes.push({...d,id:"c"+Date.now(),criadoEm:Date.now(),atualizadoEm:Date.now()}); save(); }
   };
 }
@@ -1871,6 +1885,10 @@ async function firebaseStore(cfg){
     async playerContas(){ return (await F.getDocs(F.collection(db,"player"))).docs.map(d=>({id:d.id,...d.data()})); },
     async playerReportes(){ return (await F.getDocs(F.collection(db,"suporte_player"))).docs.map(norm).sort(byDate); },
     async playerReporteFeito(id){ await F.updateDoc(F.doc(db,"suporte_player",id),{estado:"resolvido"}); },
+    // Cockpit e Freezer: lista de acesso grátis (config/<app>) e contas (app_<app>, só leitura)
+    async appGratis(k){ if(k==="player") return this.playerGratis(); const s=await F.getDoc(F.doc(db,"config",k)); return (s.exists()&&s.data().gratis)||[]; },
+    async setAppGratis(k,l){ if(k==="player") return this.setPlayerGratis(l); await F.setDoc(F.doc(db,"config",k),{gratis:l}); },
+    async appContas(k){ if(k==="player") return this.playerContas(); return (await F.getDocs(F.collection(db,"app_"+k))).docs.map(d=>({id:d.id,...d.data()})); },
     async saveCliente(id,d){ if(id) await F.updateDoc(F.doc(db,"clientes",id),{...d,atualizadoEm:F.serverTimestamp()}); else await F.addDoc(F.collection(db,"clientes"),{...d,criadoEm:F.serverTimestamp(),atualizadoEm:F.serverTimestamp()}); }
   };
 }
@@ -2364,7 +2382,7 @@ async function renderGestao(root){
   const tb=(k,l,n)=>`<button type="button" data-g="${k}" aria-pressed="${gtab===k}">${l}${n?`<span class="n">${n}</span>`:""}</button>`;
   root.innerHTML=`<div class="list-head"><h2>Gestão</h2></div>
     <div class="kpis">${kpi(novos,"Orçamentos novos",1)}${kpi(andamento,"Orçamentos em curso")}${kpi(sup,"Suporte por abrir",1)}${kpi(curso,"Suporte em curso")}${kpi(ativos.length,"Clientes ativos")}${kpi(eur(mrr).replace(",00",""),"Receita mensal")}${ren?kpi(ren,"Renovações em 30 dias",1):""}</div>
-    <div class="tabs" role="group" aria-label="Vistas">${tb("resumo","Resumo",0)}${tb("pedidos","Orçamentos",novos)}${tb("suporte","Suporte",sup)}${tb("clientes","Clientes",0)}${tb("player","AWplayer",0)}<button type="button" data-g="meus" aria-pressed="${gtab==="meus"}">Os meus pedidos</button></div>
+    <div class="tabs" role="group" aria-label="Vistas">${tb("resumo","Resumo",0)}${tb("pedidos","Orçamentos",novos)}${tb("suporte","Suporte",sup)}${tb("clientes","Clientes",0)}${tb("player","Apps e contas",0)}<button type="button" data-g="meus" aria-pressed="${gtab==="meus"}">Os meus pedidos</button></div>
     <div id="listArea"></div>`;
   root.querySelectorAll("[data-g]").forEach(b=>b.addEventListener("click",()=>{gtab=b.dataset.g;renderApp();}));
   const area=$("listArea");
@@ -2381,8 +2399,88 @@ async function renderGestao(root){
     $("sfilt").addEventListener("change",e=>{supSite=e.target.value;renderApp();});
   }
   else if(gtab==="clientes"){ if(C===null) area.innerHTML=`<p class="err">Não foi possível ler os clientes. Confirma que as regras do Firestore incluem a coleção "clientes" (ficheiro firestore.rules).</p>`; else renderClientes(C,S,P); }
-  else if(gtab==="player") await renderPlayer(area);
+  else if(gtab==="player") await renderApps(area);
   else renderMine(await store.myPedidos());
+}
+/* Apps e contas: AWplayer, Cockpit e Freezer. Quem usa, em que estado está, quando renova, e o acesso grátis. */
+const APPS_ADM=[{k:"player",n:"AWplayer",teste:864e5},{k:"cockpit",n:"Cockpit",teste:864e5},{k:"freezer",n:"Freezer",teste:864e5}];
+const DONOS=["j.p.r.n.antunes@gmail.com","firmino.antunes@gmail.com"];
+let appsF={app:"todas",estado:"todos",q:"",ord:"recente"};
+function estadoConta(a,app,gratis,now){
+  const em=String(a.email||"").toLowerCase();
+  if(DONOS.includes(em)) return {e:"dono",t:"Dono",c:"g"};
+  if(gratis.includes(em)) return {e:"gratis",t:"Acesso grátis",c:"g"};
+  const ativa=a.sub&&["active","trialing","past_due"].includes(a.subEstado)&&(a.ate||0)>now-3*864e5;
+  if(ativa&&a.subEstado==="past_due") return {e:"atraso",t:"Pagamento em atraso",c:"r"};
+  if(ativa&&a.cancelada) return {e:"termina",t:"Cancelou (termina)",c:"y"};
+  if(ativa) return {e:"pago",t:"Subscrito",c:"b"};
+  if(a.sub) return {e:"expirou",t:"Subscrição terminou",c:"m"};
+  if(now<(a.inicio||0)+app.teste) return {e:"teste",t:"Em período grátis",c:"y"};
+  return {e:"sem",t:"Sem subscrição",c:"m"};
+}
+async function renderApps(area){
+  area.innerHTML=`<p class="muted">A carregar contas…</p>`;
+  const now=Date.now(), D={};
+  try{
+    await Promise.all(APPS_ADM.map(async app=>{
+      const [G,A]=await Promise.all([store.appGratis(app.k).catch(()=>[]),store.appContas(app.k).catch(e=>{ console.warn(app.k,e); return null; })]);
+      D[app.k]={app,G:G.map(x=>String(x).toLowerCase()),A};
+    }));
+  }catch(e){ area.innerHTML=`<p class="err">${esc(errMsg(e))}</p>`; return; }
+  let R=[]; try{ R=await store.playerReportes(); }catch(e){}
+  const rows=[];
+  APPS_ADM.forEach(app=>{ const d=D[app.k]; (d.A||[]).forEach(a=>{ const st=estadoConta(a,app,d.G,now); const visto=Math.max(0,...Object.values(a.devs||{}).map(x=>x.visto||0));
+    rows.push({...a,app,st,visto,aparelhos:Object.keys(a.devs||{}).length}); }); });
+  const semLer=APPS_ADM.filter(a=>D[a.k].A===null).map(a=>a.n);
+  const pagos=rows.filter(r=>["pago","termina","atraso"].includes(r.st.e));
+  const mrr=pagos.filter(r=>r.st.e!=="termina").reduce((t,r)=>t+(r.intervalo==="year"?10/12:1),0);   // 1 €/mês; 10 €/ano conta como 0,83 €/mês
+  const ren7=pagos.filter(r=>!r.cancelada&&(r.ate||0)-now<7*864e5&&(r.ate||0)>now).length;
+  const teste=rows.filter(r=>r.st.e==="teste").length, atraso=rows.filter(r=>r.st.e==="atraso").length;
+  const abertos=R.filter(r=>r.estado!=="resolvido");
+  const kpi=(n,l,hot)=>`<div class="kpi${hot&&n>0?" hot":""}"><b>${n}</b><span>${l}</span></div>`;
+  const fd=t=>t?new Date(t).toLocaleDateString("pt-PT",{day:"numeric",month:"short",year:"numeric"}):"—";
+  let list=rows.filter(r=>(appsF.app==="todas"||r.app.k===appsF.app)&&(appsF.estado==="todos"||r.st.e===appsF.estado||(appsF.estado==="pagantes"&&["pago","termina","atraso"].includes(r.st.e)))
+    &&(!appsF.q||String(r.email||r.id).toLowerCase().includes(appsF.q)));
+  const ts=r=>r.criadoEm?(r.criadoEm.seconds?r.criadoEm.seconds*1000:+new Date(r.criadoEm)):(r.inicio||0);
+  list.sort(appsF.ord==="renova"?(a,b)=>((a.ate||9e15)-(b.ate||9e15)):appsF.ord==="email"?(a,b)=>String(a.email).localeCompare(String(b.email)):(a,b)=>ts(b)-ts(a));
+  const quando=r=>r.st.e==="atraso"?`Pagamento falhou (${fd(r.ate)}). O Stripe volta a tentar.`:r.st.e==="pago"?`Renova a ${fd(r.ate)}`:r.st.e==="termina"?`Termina a ${fd(r.ate)}`:r.st.e==="teste"?`Grátis até ${new Date((r.inicio||0)+r.app.teste).toLocaleString("pt-PT",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}`:r.st.e==="expirou"?`Terminou a ${fd(r.ate)}`:"—";
+  const opt=(v,l,cur)=>`<option value="${v}"${cur===v?" selected":""}>${l}</option>`;
+  area.innerHTML=`<div class="kpis">${kpi(pagos.length,"Subscritores")}${kpi(eur(Math.round(mrr*100)/100).replace(",00",""),"Receita mensal (aprox.)")}${kpi(teste,"Em período grátis")}${kpi(ren7,"Renovam em 7 dias")}${kpi(atraso,"Pagamentos em atraso",1)}${kpi(rows.length,"Contas")}${kpi(abertos.length,"Problemas por ver",1)}</div>
+    ${semLer.length?`<p class="err">Não foi possível ler as contas de ${semLer.join(", ")}. Publica as regras novas do Firestore (ficheiro firestore.rules).</p>`:""}
+    <div class="apps-sum">${APPS_ADM.map(app=>{ const r=rows.filter(x=>x.app.k===app.k); const p=r.filter(x=>["pago","termina","atraso"].includes(x.st.e)).length;
+      return `<button type="button" class="appcard${appsF.app===app.k?" on":""}" data-appf="${app.k}"><b>${app.n}</b><span>${r.length} contas · ${p} subscritos · ${r.filter(x=>x.st.e==="teste").length} em teste</span></button>`; }).join("")}</div>
+    <h3>Contas</h3>
+    <div class="tools">
+      <label class="f" style="margin:0;flex:1;min-width:12rem"><span class="muted" style="font-weight:500">Procurar</span><input id="apQ" type="text" inputmode="email" placeholder="email" value="${esc(appsF.q)}" autocomplete="off"></label>
+      <label class="f" style="margin:0"><span class="muted" style="font-weight:500">App</span><select id="apApp">${opt("todas","Todas",appsF.app)}${APPS_ADM.map(a=>opt(a.k,a.n,appsF.app)).join("")}</select></label>
+      <label class="f" style="margin:0"><span class="muted" style="font-weight:500">Estado</span><select id="apEst">${[["todos","Todos"],["pagantes","A pagar"],["pago","Subscritos"],["termina","Cancelaram"],["atraso","Em atraso"],["teste","Em período grátis"],["sem","Sem subscrição"],["expirou","Subscrição terminou"],["gratis","Acesso grátis"]].map(([v,l])=>opt(v,l,appsF.estado)).join("")}</select></label>
+      <label class="f" style="margin:0"><span class="muted" style="font-weight:500">Ordenar</span><select id="apOrd">${opt("recente","Mais recentes",appsF.ord)}${opt("renova","Próxima renovação",appsF.ord)}${opt("email","Email",appsF.ord)}</select></label>
+    </div>
+    <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Conta</th><th>App</th><th>Estado</th><th>Renovação</th><th>Desde</th><th>Aparelhos</th><th></th></tr></thead><tbody>
+    ${list.length?list.map(r=>{ const em=String(r.email||"").toLowerCase(), g=D[r.app.k].G.includes(em), dono=DONOS.includes(em);
+      return `<tr><td data-l="Conta"><b>${esc(r.email||"(sem email)")}</b>${r.visto?`<br><small class="muted">visto ${fd(r.visto)}</small>`:""}</td><td data-l="App">${r.app.n}</td><td data-l="Estado"><span class="st st-${r.st.c}">${r.st.t}</span>${r.intervalo?`<br><small class="muted">${r.intervalo==="year"?"Anual · 10 €":"Mensal · 1 €"}</small>`:""}</td><td data-l="Renovação">${quando(r)}</td><td data-l="Desde">${fd(ts(r))}</td><td data-l="Aparelhos">${r.app.k==="player"?r.aparelhos:"—"}</td>
+      <td class="acts">${dono?"":`<button class="btn small" type="button" data-gt="${r.app.k}" data-em="${esc(em)}" data-on="${g?0:1}">${g?"Tirar acesso grátis":"Dar acesso grátis"}</button>`}${r.cliente?`<a class="btn small" href="https://dashboard.stripe.com/customers/${encodeURIComponent(r.cliente)}" target="_blank" rel="noopener">Stripe</a>`:""}</td></tr>`; }).join(""):`<tr><td colspan="7" class="muted">Nenhuma conta com estes filtros.</td></tr>`}
+    </tbody></table></div>
+    <h3>Dar acesso grátis</h3>
+    <p class="muted">Com o email Gmail com que a pessoa entra na app. Fica com acesso completo sem pagar até o tirares. As contas de dono nunca pagam.</p>
+    <form id="agAdd" class="tools" style="gap:.5rem"><label class="f" style="margin:0;flex:1;min-width:14rem"><span class="sr-only">Email</span><input type="email" id="agEmail" required placeholder="nome@gmail.com" autocomplete="off"></label>
+      <label class="f" style="margin:0"><span class="sr-only">App</span><select id="agApp"><option value="todas">Todas as apps</option>${APPS_ADM.map(a=>`<option value="${a.k}">${a.n}</option>`).join("")}</select></label>
+      <button class="btn solid small" type="submit">Dar acesso</button></form>
+    ${APPS_ADM.map(app=>`<h4>${app.n} <span class="muted">(${D[app.k].G.length})</span></h4><ul class="pg-list">${D[app.k].G.length?D[app.k].G.map(e=>`<li><span>${esc(e)}</span><button class="btn small" type="button" data-gt="${app.k}" data-em="${esc(e)}" data-on="0">Tirar</button></li>`).join(""):`<li class="muted">Ninguém.</li>`}</ul>`).join("")}
+    <h3>Problemas reportados no AWplayer</h3>
+    <ul class="pg-list">${abertos.length?abertos.map(r=>`<li style="align-items:flex-start"><span><b>${esc(r.email||r.contacto||"Anónimo")}</b> <span class="muted">${r.criadoEm?new Date(r.criadoEm).toLocaleString("pt-PT"):""}</span><br>${esc(r.texto)}<br><small class="muted">${esc(Object.entries(r.diag||{}).map(([k,v])=>k+": "+v).join(" · "))}</small></span><button class="btn small" type="button" data-pgok="${esc(r.id)}">Resolvido</button></li>`).join(""):`<li class="muted">Nada por ver.</li>`}</ul>`;
+  const again=()=>renderApps(area);
+  const setF=(k,v)=>{ appsF[k]=v; again(); };
+  $("apApp").addEventListener("change",e=>setF("app",e.target.value));
+  $("apEst").addEventListener("change",e=>setF("estado",e.target.value));
+  $("apOrd").addEventListener("change",e=>setF("ord",e.target.value));
+  let qt=0; $("apQ").addEventListener("input",e=>{ clearTimeout(qt); qt=setTimeout(()=>{ appsF.q=e.target.value.trim().toLowerCase(); again().then(()=>{ const q=$("apQ"); if(q){ q.focus(); q.setSelectionRange(q.value.length,q.value.length); } }); },350); });
+  area.querySelectorAll("[data-appf]").forEach(b=>b.addEventListener("click",()=>setF("app",appsF.app===b.dataset.appf?"todas":b.dataset.appf)));
+  const mudar=async(k,em,on)=>{ const cur=D[k].G; const l=on?[...new Set([...cur,em])]:cur.filter(x=>x!==em); await store.setAppGratis(k,l); };
+  area.querySelectorAll("[data-gt]").forEach(b=>b.addEventListener("click",async()=>{ b.disabled=true; try{ await mudar(b.dataset.gt,b.dataset.em,b.dataset.on==="1"); again(); }catch(e){ b.disabled=false; alert(errMsg(e)); } }));
+  $("agAdd").addEventListener("submit",async e=>{ e.preventDefault(); const v=$("agEmail").value.trim().toLowerCase(); if(!v) return; const k=$("agApp").value;
+    try{ for(const app of APPS_ADM) if(k==="todas"||k===app.k) await mudar(app.k,v,true); again(); }catch(err){ alert(errMsg(err)); } });
+  area.querySelectorAll("[data-pgok]").forEach(b=>b.addEventListener("click",async()=>{ b.disabled=true; try{ await store.playerReporteFeito(b.dataset.pgok); again(); }catch(e){ b.disabled=false; alert(errMsg(e)); } }));
 }
 /* AntunesPlayer: quem usa a app sem pagar, e as contas da app (24 h grátis, depois 1 €/mês) */
 async function renderPlayer(area){
