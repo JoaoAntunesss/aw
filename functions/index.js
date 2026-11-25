@@ -680,8 +680,8 @@ exports.playerSuporte = onRequest({ region: "europe-west1", maxInstances: 5, sec
 
 // ---------------------------------------------------------------- ReelPick: TMDB proxy (one shared key, kept server-side)
 const TMDB_KEY = defineSecret("TMDB_KEY");
-const TMDB_PATHS = /^\/(search\/multi|search\/movie|search\/tv|(movie|tv)\/\d{1,9}(\/(images|videos|credits|watch\/providers|recommendations))?|genre\/(movie|tv)\/list|watch\/providers\/(movie|tv)|discover\/(movie|tv)|trending\/(all|movie|tv)\/(day|week))$/;
-const TMDB_PARAMS = /^(query|language|page|region|watch_region|include_adult|append_to_response|include_image_language|sort_by|with_genres|without_genres|with_watch_providers|with_watch_monetization_types|with_runtime\.(gte|lte)|vote_average\.(gte|lte)|vote_count\.(gte|lte)|primary_release_date\.(gte|lte)|first_air_date\.(gte|lte)|release_date\.(gte|lte)|with_original_language)$/;
+const TMDB_PATHS = /^\/(search\/multi|search\/movie|search\/tv|(movie|tv)\/\d{1,9}(\/(images|videos|credits|watch\/providers|recommendations))?|genre\/(movie|tv)\/list|watch\/providers\/(movie|tv)|discover\/(movie|tv)|trending\/(all|movie|tv)\/(day|week)|movie\/(now_playing|upcoming|popular)|tv\/(popular|on_the_air))$/;
+const TMDB_PARAMS = /^(query|language|page|region|watch_region|include_adult|append_to_response|include_image_language|sort_by|with_genres|without_genres|with_watch_providers|with_watch_monetization_types|with_runtime\.(gte|lte)|vote_average\.(gte|lte)|vote_count\.(gte|lte)|primary_release_date\.(gte|lte)|first_air_date\.(gte|lte)|release_date\.(gte|lte)|with_original_language|primary_release_year)$/;
 const TMDB_ORIGINS = /^https:\/\/(joaoantunesss\.github\.io|reelpick\.awdigital\.pt)$|^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
 const tmdbHits = new Map();
 exports.tmdb = onRequest({ region: "europe-west1", maxInstances: 5, memory: "256MiB", timeoutSeconds: 15, secrets: [TMDB_KEY] }, async (req, res) => {
@@ -705,4 +705,51 @@ exports.tmdb = onRequest({ region: "europe-west1", maxInstances: 5, memory: "256
     res.set("Cache-Control", r.ok ? "public, max-age=3600, s-maxage=21600" : "no-store");
     res.status(r.status === 401 ? 502 : r.status).type("application/json").send(body);
   } catch (e) { res.status(502).json({ error: "tmdb unreachable" }); }
+});
+
+// ---------------------------------------------------------------- ReelPick: film and TV headlines (RSS of Portuguese sites), cached 30 min
+// Only headline, link, source and date are returned; the article opens on the original site.
+const NEWS_FEEDS = [
+  { src: "Magazine.HD", url: "https://www.magazine-hd.com/apps/wp/feed/", all: false },
+  { src: "Espalha-Factos", url: "https://espalhafactos.com/feed/", all: false },
+];
+const NEWS_TOPIC = /cinema|\btv\b|televisão|filme|série|series|streaming|netflix|hbo|max|disney|prime video|skyshowtime|apple tv|óscar|oscar|emmy|estreia|trailer|realizador|ator|atriz|temporada/i;
+let newsCache = { at: 0, items: [] };
+const unent = (s) => String(s || "").replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1").replace(/<[^>]+>/g, "").replace(/&#(\d+);/g, (m, n) => String.fromCodePoint(+n)).replace(/&#x([0-9a-f]+);/gi, (m, n) => String.fromCodePoint(parseInt(n, 16)))
+  .replace(/&quot;/g, '"').replace(/&apos;|&#039;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
+const tag = (x, t) => { const m = x.match(new RegExp("<" + t + "(?:\\s[^>]*)?>([\\s\\S]*?)</" + t + ">", "i")); return m ? m[1] : ""; };
+function parseFeed(xml, f) {
+  const out = [];
+  const blocks = xml.match(/<item[\s>][\s\S]*?<\/item>/gi) || xml.match(/<entry[\s>][\s\S]*?<\/entry>/gi) || [];
+  for (const b of blocks.slice(0, 40)) {
+    const title = unent(tag(b, "title")).slice(0, 200);
+    let link = unent(tag(b, "link")); if (!link) { const m = b.match(/<link[^>]+href="([^"]+)"/i); link = m ? m[1] : ""; }
+    const cats = (b.match(/<category[^>]*>([\s\S]*?)<\/category>/gi) || []).map((c) => unent(c)).join(" ");
+    const at = Date.parse(unent(tag(b, "pubDate") || tag(b, "published") || tag(b, "updated") || tag(b, "dc:date"))) || 0;
+    if (!title || !/^https:\/\//.test(link)) continue;
+    if (!f.all && !NEWS_TOPIC.test(title + " " + cats)) continue;
+    out.push({ title, link: link.slice(0, 500), source: f.src, at });
+  }
+  return out;
+}
+exports.noticias = onRequest({ region: "europe-west1", maxInstances: 3, memory: "256MiB", timeoutSeconds: 20 }, async (req, res) => {
+  const origin = req.get("origin") || "";
+  if (TMDB_ORIGINS.test(origin)) { res.set("Access-Control-Allow-Origin", origin); res.set("Vary", "Origin"); }
+  if (req.method === "OPTIONS") { res.set("Access-Control-Allow-Methods", "GET"); res.status(204).send(""); return; }
+  if (req.method !== "GET") { res.status(405).json({ error: "method" }); return; }
+  if (Date.now() - newsCache.at > 30 * 60e3 || !newsCache.items.length) {
+    const lists = await Promise.all(NEWS_FEEDS.map(async (f) => {
+      try {
+        const c = new AbortController(), t = setTimeout(() => c.abort(), 8000);
+        const r = await fetch(f.url, { signal: c.signal, headers: { "user-agent": "ReelPick news (+https://joaoantunesss.github.io/reelpick/)", accept: "application/rss+xml, application/xml, text/xml" } });
+        clearTimeout(t); if (!r.ok) return [];
+        return parseFeed((await r.text()).slice(0, 2e6), f);
+      } catch (e) { console.warn("news feed", f.src, e.message); return []; }
+    }));
+    const seenLinks = new Set(), weekAgo = Date.now() - 7 * 864e5;
+    const items = lists.flat().filter((x) => (!x.at || x.at > weekAgo) && !seenLinks.has(x.link) && seenLinks.add(x.link)).sort((a, b) => b.at - a.at).slice(0, 40);
+    if (items.length) newsCache = { at: Date.now(), items };
+  }
+  res.set("Cache-Control", "public, max-age=900, s-maxage=1800");
+  res.json({ items: newsCache.items, at: newsCache.at });
 });
