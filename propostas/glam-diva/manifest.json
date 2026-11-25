@@ -1,0 +1,17 @@
+{
+  "name": "Glam Diva",
+  "short_name": "Glam Diva",
+  "description": "Sobrancelhas e estética em Matosinhos — marcações online",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#fbf8f6",
+  "theme_color": "#9c3d5c",
+  "icons": [
+    {
+      "src": "img/icone.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

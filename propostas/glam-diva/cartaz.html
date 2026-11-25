@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Cartaz com QR</title>
+<script src="loja.js"></script>
+<script src="vendor/qrcode.js"></script>
+<style>
+:root{--d:#333;--dd:#222;--f:#faf8f6;--t:#222}
+*{box-sizing:border-box;margin:0}
+body{font-family:var(--ft,system-ui),sans-serif;background:#e9e6e3;color:var(--t);padding:24px 16px 60px}
+.barra{max-width:820px;margin:0 auto 20px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;background:#fff;border-radius:14px;padding:14px 16px;box-shadow:0 4px 18px #0001}
+.barra h1{font-size:1.05rem}.barra p{font-size:.85rem;color:#666}
+.barra .op{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.barra select,.barra button,.barra a{font:inherit;font-size:.9rem;border-radius:999px;border:1px solid #ccc;padding:8px 14px;background:#fff;color:#222;text-decoration:none;cursor:pointer}
+.barra .imp{background:var(--d);border-color:var(--d);color:#fff;font-weight:600}
+.folhas{display:flex;justify-content:center}
+.folha{background:var(--f);width:148mm;height:210mm;box-shadow:0 10px 40px #0002;display:grid;overflow:hidden}
+.folha.a4{width:210mm;height:297mm}
+.folha.cartoes{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;width:210mm;height:297mm;background:#fff;gap:0}
+.cartaz{display:flex;flex-direction:column;align-items:center;justify-content:space-between;text-align:center;padding:14mm 12mm 11mm;background:var(--f);border-top:6mm solid var(--d);height:100%}
+.cartoes .cartaz{padding:8mm 7mm 6mm;border-top-width:3.5mm;outline:.2mm dashed #bbb;outline-offset:-.1mm}
+.logo{width:20mm;height:20mm;object-fit:contain;border-radius:4mm;margin-bottom:4mm}
+.cartoes .logo{width:11mm;height:11mm;margin-bottom:2mm}
+.nome{font-family:var(--fh,Georgia),serif;font-size:13mm;line-height:1.05;color:var(--dd)}
+.a4 .nome{font-size:17mm}.cartoes .nome{font-size:7.5mm}
+.slogan{font-size:4.2mm;color:#666;margin-top:2mm}.cartoes .slogan{font-size:3mm}
+.chamada{font-family:var(--fh,Georgia),serif;font-size:8mm;line-height:1.15;color:var(--t);margin:4mm 0 3mm}
+.a4 .chamada{font-size:10.5mm}.cartoes .chamada{font-size:4.6mm;margin:2mm 0}
+.qr{background:#fff;padding:3mm;border-radius:4mm;box-shadow:0 0 0 .4mm #0001}
+.qr svg{display:block;width:62mm;height:62mm}
+.a4 .qr svg{width:88mm;height:88mm}.cartoes .qr svg{width:40mm;height:40mm}.cartoes .qr{padding:2mm}
+.passos{display:flex;gap:4mm;justify-content:center;margin-top:5mm;font-size:3.6mm;color:#444}
+.passos span{display:flex;flex-direction:column;align-items:center;gap:1.2mm;width:30mm}
+.passos b{display:flex;align-items:center;justify-content:center;width:7mm;height:7mm;border-radius:50%;background:var(--d);color:#fff;font-size:3.6mm}
+.a4 .passos{font-size:4.6mm}.a4 .passos span{width:42mm}.a4 .passos b{width:9mm;height:9mm;font-size:4.6mm}
+.cartoes .passos{display:none}
+.url{font-size:3.6mm;color:#666;margin-top:4mm;word-break:break-all}.cartoes .url{font-size:2.6mm;margin-top:2mm}
+@media print{
+  @page{size:A5;margin:0}
+  body.a4 @page{size:A4}
+  body{background:none;padding:0}
+  .barra{display:none}
+  .folha{box-shadow:none}
+}
+</style>
+</head>
+<body>
+<div class="barra">
+  <div><h1>Cartaz com QR para o balcão</h1><p>Quem lê o código abre o site e vê logo como instalar a app.</p></div>
+  <div class="op">
+    <select id="tam" aria-label="Tamanho">
+      <option value="a5">A5 (balcão ou espelho)</option>
+      <option value="a4">A4 (montra ou porta)</option>
+      <option value="cartoes">4 cartões numa folha A4</option>
+    </select>
+    <button type="button" id="png">QR em imagem</button>
+    <button type="button" class="imp" id="imp">Imprimir</button>
+    <a href="admin.html">Voltar ao painel</a>
+  </div>
+</div>
+<div class="folhas"><div class="folha" id="folha"></div></div>
+<script>
+(function () {
+  const L = window.LOJA, $ = (i) => document.getElementById(i);
+  const esc = (s) => String(s || '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+  const r = document.documentElement.style;
+  r.setProperty('--d', L.cores.destaque); r.setProperty('--dd', L.cores.destaqueEscuro || L.cores.texto); r.setProperty('--f', L.cores.fundo); r.setProperty('--t', L.cores.texto);
+  r.setProperty('--fh', `'${L.fontes.titulo}'`); r.setProperty('--ft', `'${L.fontes.texto}'`);
+  if ((L.fontesLocais || []).includes(L.fontes.titulo)) { const f = document.createElement('link'); f.rel = 'stylesheet'; f.href = 'fonts/fonts.css'; document.head.appendChild(f); }
+  const base = (L.site || (location.origin + location.pathname.replace(/[^/]*$/, ''))).replace(/\/?$/, '/');
+  const url = base + '?instalar=1';
+  const qrSvg = () => { const q = qrcode(0, 'M'); q.addData(url); q.make(); return q.createSvgTag({ cellSize: 4, margin: 0, scalable: true }); };
+  const um = () => `<div class="cartaz">
+      <div>${L.icone ? `<img class="logo" src="${esc(L.icone)}" alt="">` : ''}<div class="nome">${esc(L.nome)}</div>${L.slogan ? `<div class="slogan">${esc(L.slogan)}</div>` : ''}</div>
+      <div><div class="chamada">Marque online<br>e instale a nossa app</div><div class="qr">${qrSvg()}</div></div>
+      <div><div class="passos"><span><b>1</b>Aponte a câmara ao código</span><span><b>2</b>Toque em «Instalar»</span><span><b>3</b>Marque em segundos</span></div>
+      <div class="url">${esc(base.replace(/^https?:\/\//, '').replace(/\/$/, ''))}</div></div>
+    </div>`;
+  function desenhar() {
+    const t = $('tam').value, f = $('folha');
+    f.className = 'folha' + (t === 'a5' ? '' : ' ' + t);
+    f.innerHTML = t === 'cartoes' ? um() + um() + um() + um() : um();
+    document.body.className = t === 'a5' ? '' : 'a4';
+    let pg = document.getElementById('pg'); if (!pg) { pg = document.createElement('style'); pg.id = 'pg'; document.head.appendChild(pg); }
+    pg.textContent = `@media print{@page{size:${t === 'a5' ? 'A5' : 'A4'};margin:0}}`;
+  }
+  $('tam').onchange = desenhar; $('imp').onclick = () => window.print();
+  $('png').onclick = () => {
+    const q = qrcode(0, 'M'); q.addData(url); q.make();
+    const n = q.getModuleCount(), cell = 24, m = 4, c = document.createElement('canvas'); c.width = c.height = (n + m * 2) * cell;
+    const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.fillStyle = '#000';
+    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) if (q.isDark(i, j)) x.fillRect((j + m) * cell, (i + m) * cell, cell, cell);
+    const a = document.createElement('a'); a.href = c.toDataURL('image/png'); a.download = 'qr-' + (L.id || 'site') + '.png'; a.click();
+  };
+  desenhar();
+})();
+</script>
+</body>
+</html>

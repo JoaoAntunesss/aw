@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; img-src 'self' data:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; connect-src 'self' https://*.googleapis.com https://*.firebaseapp.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebasedatabase.app wss://*.firebasedatabase.app https://api.emailjs.com; upgrade-insecure-requests">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de gestão</title>
+    <meta name="robots" content="noindex">
+    <link rel="manifest" href="admin-manifest.json">
+    <meta name="theme-color" content="#2f2a33">
+    <script src="loja.js"></script>
+    <script src="core.js"></script>
+    <style>
+        :root { --bg-color: #f6f2f4; --text-color: #2f2a33; --accent-color: #b07a8c; --accent-dark: #8a5a6b; --white: #ffffff; --border: #efe8ea; --font-title: 'Playfair Display', serif; --font-text: 'Lato', sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-text); background-color: var(--bg-color); color: var(--text-color); line-height: 1.6; }
+        h1, h2, h3 { font-family: var(--font-title); font-weight: 400; }
+        #demo-bar { display: none; background: #2f2a33; color: #fff; text-align: center; font-size: .8rem; padding: 6px 12px; }
+        #demo-bar a, #demo-bar button { color: #ffd9e4; background: none; border: 0; text-decoration: underline; cursor: pointer; font: inherit; }
+        #login-overlay { position: fixed; inset: 0; background: rgba(40, 30, 35, 0.85); backdrop-filter: blur(5px); z-index: 2000; display: flex; justify-content: center; align-items: center; padding: 15px; }
+        .login-box { background: var(--white); padding: 2rem; border-radius: 12px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .login-box h3 { color: var(--accent-dark); font-size: 1.8rem; margin-bottom: 15px; }
+        .login-box input { width: 100%; padding: 12px; margin: 6px 0; border: 1px solid var(--border); border-radius: 6px; font-size: 1rem; }
+        .login-box button { width: 100%; padding: 12px; background: var(--accent-color); color: white; border: none; border-radius: 6px; font-weight: bold; text-transform: uppercase; cursor: pointer; margin-top: 10px; }
+        .login-box .btn-google { background: #fff; color: #333; border: 1px solid #ddd; text-transform: none; }
+        #login-erro { color: #d9534f; font-size: .85rem; margin-top: 10px; min-height: 1em; word-break: break-all; }
+        #admin-container { display: none; padding: 2rem 3%; max-width: 1400px; margin: 0 auto; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; background: var(--white); padding: 15px 20px; border-radius: 20px; flex-wrap: wrap; gap: 15px; }
+        .admin-header .acoes { display: flex; gap: 8px; flex-wrap: wrap; }
+        .admin-header .acoes a, .admin-header .acoes button { background: #eee; color: var(--text-color); padding: 10px 16px; border-radius: 6px; text-decoration: none; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; border: 0; cursor: pointer; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .metric-card { background: var(--white); padding: 20px; border-radius: 20px; border: 1px solid var(--border); text-align: center; }
+        .metric-card h4 { font-size: 0.8rem; text-transform: uppercase; color: #777; letter-spacing: 1px; margin-bottom: 6px; }
+        .metric-card .valor { font-size: 1.8rem; font-family: var(--font-title); color: var(--accent-dark); font-weight: bold; }
+        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 25px; }
+        .chart-card { background: var(--white); padding: 20px; border-radius: 20px; border: 1px solid var(--border); }
+        .chart-card h3, .sec-titulo { color: var(--accent-dark); margin-bottom: 15px; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; }
+        .admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+        .admin-card { background: var(--white); padding: 20px; border-radius: 20px; border: 1px solid var(--border); min-width: 0; }
+        .admin-card > h3 { margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+        .admin-list-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #eee; align-items: center; gap: 10px; text-align: left; }
+        .btn-small { background: #d9534f; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; flex-shrink: 0; font-weight: bold; }
+        .btn-small:hover { opacity: 0.85; }
+        .btn-nav { background: var(--accent-color); padding: 8px 12px; font-size: 0.85rem; }
+        .btn-add { background: var(--accent-color); color: white; width: 100%; padding: 12px; border: none; border-radius: 6px; cursor: pointer; margin-top: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-family: inherit; font-size: 0.95rem; margin-bottom: 10px; background: #fff; color: inherit; }
+        label { font-size: 0.8rem; font-weight: bold; color: #555; display: block; }
+        .agenda-admin-box { background: var(--white); padding: 20px; border-radius: 20px; border: 1px solid var(--border); margin-bottom: 25px; }
+        .linha-titulo { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; }
+        .linha-titulo h3 { margin: 0; }
+        .tabela-container-admin { overflow-x: auto; margin-top: 15px; }
+        table.tabela-admin { width: 100%; border-collapse: collapse; min-width: 750px; font-size: 0.85rem; }
+        table.tabela-admin th, table.tabela-admin td { border: 1px solid var(--border); text-align: center; padding: 10px 6px; }
+        table.tabela-admin th { background: var(--bg-color); color: var(--accent-dark); text-transform: uppercase; font-size: 0.75rem; }
+        .th-sortable { cursor: pointer; user-select: none; }
+        .th-sortable:hover { background: #ebe6e8 !important; }
+        .search-bar { width: 250px; max-width: 100%; padding: 10px; border: 1px solid var(--accent-color); border-radius: 6px; font-size: 0.9rem; margin: 0; }
+        .bloco-admin-reservado { background: #ebe6e8; color: #968f92; font-weight: bold; }
+        .bloco-admin-descanso { background: #f9f1f1; color: #c28282; font-weight: bold; }
+        .item-pendente { display: flex; justify-content: space-between; align-items: center; background: #fff8f9; border: 1px dashed var(--accent-color); padding: 10px; border-radius: 6px; font-size: 0.85rem; margin-bottom: 8px; gap: 8px; }
+        .badge { color: white; font-size: 0.65rem; padding: 3px 6px; border-radius: 4px; text-transform: uppercase; font-weight: bold; margin-left: 5px; white-space: nowrap; }
+        .b-pago { background: #5cb85c; } .b-apagar { background: #999; } .b-voucher { background: #8e44ad; }
+        .btn-whatsapp { display: inline-flex; align-items: center; background: #25D366; color: white; padding: 6px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-decoration: none; margin-top: 6px; border: 0; cursor: pointer; }
+        .paginacao { display: flex; justify-content: center; align-items: center; gap: 5px; margin-top: 15px; flex-wrap: wrap; }
+        .paginacao-btn { background: #eee; color: #333; border: 1px solid #ddd; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.85rem; }
+        .paginacao-btn.active { background: var(--accent-color); color: white; border-color: var(--accent-color); }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+        .sub-box { background: #fff; padding: 15px; border-radius: 20px; border: 1px solid var(--border); }
+        .sub-box h4 { margin-bottom: 10px; font-size: 0.9rem; color: var(--accent-color); text-transform: uppercase; }
+        .vazio { font-size: 0.9rem; color: #888; text-align: center; padding: 15px 0; }
+        footer { text-align: center; padding: 2rem; font-size: 0.9rem; color: #888; border-top: 1px solid var(--border); margin-top: 3rem; }
+        @media (max-width: 768px) { #admin-container { padding: 1rem 3%; } .admin-header { flex-direction: column; align-items: stretch; text-align: center; } .search-bar { width: 100%; } }
+    
+        body.colaboradora .so-dona{display:none!important}
+        body:not(.equipa) .so-equipa{display:none!important}
+        .pill-prof{display:inline-block;font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:999px;color:#fff;margin-left:6px;vertical-align:middle}
+        .cel-res{display:block;text-align:left;border-left:4px solid var(--accent-color);background:#fff;border-radius:8px;padding:4px 6px;margin:2px 0;font-size:.78rem;line-height:1.3}
+        .acesso{display:grid;grid-template-columns:140px 1fr auto auto;gap:10px;align-items:center;margin-bottom:8px}
+        .acesso input{margin:0}
+        @media(max-width:640px){.acesso{grid-template-columns:1fr 1fr}}
+        /* Visual alinhado com o site novo */
+        body{background:color-mix(in srgb,var(--accent-color) 6%,#fbf8f9)}
+        .admin-header{background:var(--text-color);color:#fff;border-radius:24px;padding:22px 26px}
+        .admin-header p{color:rgba(255,255,255,.7)!important}
+        .admin-header .acoes a,.admin-header .acoes button{border-radius:999px;background:rgba(255,255,255,.12);color:#fff}
+        .metric-card,.chart-card,.admin-card,.agenda-admin-box{border:0;box-shadow:0 18px 50px -24px color-mix(in srgb,var(--text-color) 35%,transparent)}
+        .metric-card .valor{font-size:2.2rem}
+        .btn-add,.btn-small{border-radius:999px}
+        input,select,textarea{border-radius:12px;border:1.5px solid color-mix(in srgb,var(--text-color) 10%,transparent)}
+        .search-bar{border-radius:999px}
+        table.tabela-admin{border-radius:14px;overflow:hidden}
+        .item-pendente{border-radius:14px}
+        .login-box{border-radius:28px}
+        #login-overlay{background:color-mix(in srgb,var(--text-color) 88%,transparent)}
+        /* Acabamento igual ao painel mais recente: títulos sem maiúsculas, métricas em destaque, faixas de cor, pílulas e entrada animada */
+        :root{--ink:var(--text-color);--muted:color-mix(in srgb,var(--text-color) 55%,#fff);--line:color-mix(in srgb,var(--text-color) 10%,transparent);--soft:color-mix(in srgb,var(--accent-color) 12%,#fff);--sh:0 18px 44px -22px color-mix(in srgb,var(--text-color) 38%,transparent);--ease:cubic-bezier(.2,.8,.2,1)}
+        .sec-titulo,.chart-card h3,.admin-card>h3,.agenda-admin-box h3{font-family:var(--font-title);text-transform:none!important;letter-spacing:0!important;font-size:1.45rem!important;color:var(--ink)!important;border-bottom:0!important}
+        .sub-box h4{color:var(--accent-dark)!important;letter-spacing:.06em;font-size:.78rem}
+        label{color:var(--muted)}
+        .login-box{padding:2.4rem 2rem 1.8rem;box-shadow:0 40px 80px -30px rgba(0,0,0,.6);animation:subir .6s var(--ease) both}
+        .login-box h3{color:var(--ink);font-size:2rem}
+        .login-box input{border-radius:999px;padding:15px 18px;background:#fbf9fa;text-align:center;border:1.5px solid var(--line)}
+        .login-box button{border-radius:999px;padding:15px;text-transform:none;font-size:1rem;background:var(--accent-dark);box-shadow:0 12px 26px -12px var(--accent-dark)}
+        .login-box .btn-google{background:#fff;box-shadow:none;border:1.5px solid var(--line)}
+        .admin-header{box-shadow:var(--sh);animation:subir .6s var(--ease) both}.admin-header h2{color:#fff;font-size:1.7rem}
+        .admin-header .acoes a,.admin-header .acoes button{text-transform:none;font-size:.9rem;padding:11px 18px;transition:transform .2s var(--ease)}
+        .admin-header .acoes a:hover,.admin-header .acoes button:hover{transform:translateY(-2px)}
+        .admin-header .acoes{align-items:center}.admin-header .acoes a,.admin-header .acoes button{display:inline-flex;align-items:center;justify-content:center;line-height:1;height:44px;padding-top:0!important;padding-bottom:0!important;margin:0;font-family:var(--font-text)}
+        .metric-card,.chart-card,.admin-card:not([style*="dashed"]),.agenda-admin-box,.sub-box{background:#fff!important;border:0!important;border-radius:24px;box-shadow:0 1px 0 var(--line),var(--sh);animation:subir .7s var(--ease) both}
+        .sub-box{background:#fbf9fa!important;box-shadow:none;border-radius:16px}
+        .admin-card,.agenda-admin-box,.chart-card{padding:24px}
+        .metric-card{text-align:left;padding:22px 24px;position:relative;overflow:hidden;transition:transform .3s var(--ease)}
+        .metric-card:hover{transform:translateY(-4px)}
+        .metric-card::after{content:'';position:absolute;right:-30px;top:-30px;width:110px;height:110px;border-radius:50%;background:var(--soft)}
+        .metric-card h4,.metric-card .valor{position:relative;z-index:1}.metric-card h4{color:var(--muted);letter-spacing:.08em;margin-bottom:8px}
+        .metric-card .valor{color:var(--ink);font-weight:400;line-height:1.15}
+        .metrics-grid .metric-card:nth-child(1){background:var(--ink)!important}.metrics-grid .metric-card:nth-child(1) h4{color:rgba(255,255,255,.65)}
+        .metrics-grid .metric-card:nth-child(1) .valor{color:color-mix(in srgb,var(--accent-color) 55%,#fff)}.metrics-grid .metric-card:nth-child(1)::after{background:rgba(255,255,255,.06)}
+        .metrics-grid .metric-card:nth-child(2){animation-delay:.06s}.metrics-grid .metric-card:nth-child(3){animation-delay:.12s}
+        .admin-card[style*="#25D366"]{box-shadow:inset 5px 0 0 #25D366,0 1px 0 var(--line),var(--sh)}
+        .admin-card[style*="#8e44ad"]{box-shadow:inset 5px 0 0 #8e44ad,0 1px 0 var(--line),var(--sh)}
+        .admin-card[style*="#d9534f"]{box-shadow:inset 5px 0 0 #d9534f,0 1px 0 var(--line),var(--sh)}
+        .admin-card[style*="var(--accent-color)"]{box-shadow:inset 5px 0 0 var(--accent-color),0 1px 0 var(--line),var(--sh)}
+        .btn-add{text-transform:none;letter-spacing:0;font-size:.95rem;padding:13px;background:var(--accent-dark);transition:transform .2s var(--ease),filter .2s}
+        .btn-small{padding:8px 14px;font-size:.82rem;transition:transform .2s var(--ease),filter .2s}.btn-small:hover,.btn-add:hover{filter:brightness(.93);opacity:1}
+        .btn-add:active,.btn-small:active{transform:scale(.97)}
+        .btn-whatsapp{border-radius:999px;padding:7px 12px}
+        .paginacao-btn{border-radius:999px;background:#fff;border:1.5px solid var(--line);color:var(--ink)}.paginacao-btn.active{background:var(--ink);border-color:var(--ink)}
+        .badge{border-radius:999px;text-transform:none;padding:3px 9px;font-size:.68rem}
+        input,select,textarea{background:#fbf9fa;padding:12px 14px}input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent-color);background:#fff}
+        .search-bar{border:1.5px solid var(--line);background:#fbf9fa;padding:11px 16px}
+        .tabela-container-admin{border-radius:16px;border:1px solid var(--line)}
+        table.tabela-admin{border-radius:0}
+        table.tabela-admin th,table.tabela-admin td{border:0;border-bottom:1px solid var(--line);padding:11px 8px}
+        table.tabela-admin th{background:color-mix(in srgb,var(--accent-color) 8%,#fff);letter-spacing:.06em;font-size:.72rem}
+        table.tabela-admin tbody tr:hover{background:color-mix(in srgb,var(--accent-color) 4%,#fff)}
+        .item-pendente{border:0;background:color-mix(in srgb,var(--accent-color) 8%,#fff);padding:12px 14px}
+        .admin-list-item{border-bottom:1px solid var(--line);border-radius:10px;padding:12px 6px}
+        footer{border-top:0;color:var(--muted)}
+        @keyframes subir{from{opacity:0;transform:translateY(18px)}}
+        @media (max-width:768px){.admin-header h2{font-size:1.35rem}.admin-header .acoes a,.admin-header .acoes button{flex:1 1 auto;padding:10px 12px;font-size:.82rem;border-radius:14px}
+          .metrics-grid{grid-template-columns:1fr 1fr;gap:12px}.metrics-grid .metric-card:nth-child(1){grid-column:1/-1}.metric-card{padding:18px}.metric-card .valor{font-size:1.7rem}
+          .admin-card,.agenda-admin-box,.chart-card{padding:18px}}
+        @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+    </style>
+</head>
+<body>
+    <div id="demo-bar">Painel em modo demonstração (clientes fictícios). <button id="demo-reset">Repor dados de exemplo</button> · <a href="index.html">Ver o site</a></div>
+
+    <div id="login-overlay">
+        <div class="login-box">
+            <h3 id="login-titulo"></h3>
+            <p style="color:#666; margin-bottom:15px; font-size:0.9rem;" id="login-texto">Entre com a sua conta para aceder ao painel.</p>
+            <input type="email" id="login-email" placeholder="Email" autocomplete="username">
+            <input type="password" id="login-pass" placeholder="Palavra-passe" autocomplete="current-password">
+            <button id="btn-login">Entrar no Painel</button>
+            <button id="btn-google" class="btn-google">Entrar com Google</button>
+            <div id="login-erro"></div>
+            <br><a href="index.html" style="color:var(--accent-dark); text-decoration:none; font-size:0.85rem;"> Voltar ao site principal</a>
+        </div>
+    </div>
+
+    <div id="admin-container">
+        <div class="admin-header">
+            <div>
+                <h2 id="painel-titulo"></h2>
+                <p style="font-size:0.85rem; color:#666;">Estatísticas, clientes, agenda, bloqueios e campanhas</p>
+            </div>
+            <div class="acoes">
+                <a href="index.html">Ver Site</a>
+                <button id="btn-sair">Sair</button>
+            </div>
+        </div>
+
+        <div class="linha-titulo so-dona">
+            <h3 class="sec-titulo" style="margin:0"> Resumo Financeiro</h3>
+            <div>
+                <button class="btn-small btn-nav" data-mes="-1">&#8592; Mês Anterior</button>
+                <span id="faturacao-mes-ano-texto" style="margin:0 15px; font-weight:bold; text-transform:uppercase;"></span>
+                <button class="btn-small btn-nav" data-mes="1">Próximo Mês &#8594;</button>
+            </div>
+        </div>
+        <div class="metrics-grid so-dona">
+            <div class="metric-card"><h4>Faturação (Limpa)</h4><div class="valor" id="stat-faturacao">0,00 €</div></div>
+            <div class="metric-card"><h4>Marcações do Mês</h4><div class="valor" id="stat-marcacoes">0</div></div>
+            <div class="metric-card"><h4>Serviço Mais Popular</h4><div class="valor" id="stat-popular" style="font-size:1rem; margin-top:6px;">Nenhum</div></div>
+        </div>
+
+        <div class="agenda-admin-box so-dona">
+            <div class="linha-titulo">
+                <h3 class="sec-titulo" style="margin:0"> Gestão de Clientes (CRM)</h3>
+                <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                    <input type="text" id="pesquisa-crm" class="search-bar" placeholder=" Pesquisar nome ou tel...">
+                    <button class="btn-small" style="background:#28a745; padding:10px 14px;" id="btn-export"> Exportar Lista (Excel)</button>
+                </div>
+            </div>
+            <div class="tabela-container-admin">
+                <table class="tabela-admin">
+                    <thead><tr>
+                        <th class="th-sortable" data-sort="nome">Nome </th>
+                        <th class="th-sortable" data-sort="tel">Telemóvel </th>
+                        <th class="th-sortable" data-sort="total">Total Marcações </th>
+                        <th class="th-sortable" data-sort="faltas">Faltas </th>
+                        <th class="th-sortable" data-sort="ultima">Última Visita </th>
+                        <th class="th-sortable" data-sort="gasto">Total Gasto </th>
+                    </tr></thead>
+                    <tbody id="lista-clientes-body"></tbody>
+                </table>
+                <div id="paginacao-crm"></div>
+            </div>
+        </div>
+
+        <div class="agenda-admin-box">
+            <div class="linha-titulo">
+                <h3 class="sec-titulo" style="margin:0"> Visão Geral da Agenda</h3>
+                <div>
+                    <select id="agenda-prof" class="so-equipa so-dona" style="width:auto;margin:0 10px 0 0;padding:8px 12px"></select>
+                    <button class="btn-small btn-nav" data-sem="-1">&#8592; Semana Anterior</button>
+                    <span id="admin-mes-ano-texto" style="margin:0 15px; font-weight:bold;"></span>
+                    <button class="btn-small btn-nav" data-sem="1">Próxima Semana &#8594;</button>
+                </div>
+            </div>
+            <div class="tabela-container-admin">
+                <table class="tabela-admin"><thead><tr id="agenda-admin-thead-tr"></tr></thead><tbody id="agenda-admin-body"></tbody></table>
+            </div>
+        </div>
+
+        <div class="agenda-admin-box so-equipa so-dona" id="box-equipa">
+            <h3 class="sec-titulo"> Por colaboradora (mês selecionado)</h3>
+            <div class="tabela-container-admin" style="margin-top:0"><table class="tabela-admin" style="min-width:520px"><thead><tr><th>Colaboradora</th><th>Marcações</th><th>Faltas</th><th>Faturação</th><th>Acesso ao painel</th></tr></thead><tbody id="equipa-body"></tbody></table></div>
+            <h3 class="sec-titulo" style="margin-top:22px"> Acessos da equipa</h3>
+            <p style="font-size:.85rem;color:#666;margin-bottom:10px">Escreva o email (Google) de cada colaboradora. Quando ela entrar no painel com esse email, vê só a agenda e as marcações dela, sem faturação nem definições do salão.</p>
+            <div id="acessos"></div>
+        </div>
+
+        <div class="charts-grid so-dona">
+            <div class="chart-card"><h3>Faturação Mensal (€)</h3><canvas id="graficoMensal"></canvas></div>
+            <div class="chart-card"><h3>Faturação Semanal (€)</h3><canvas id="graficoSemanal"></canvas></div>
+        </div>
+
+        <div class="admin-grid">
+            <div class="admin-card" style="background:#f0fff4; border:1px solid #25D366; grid-column:1 / -1;">
+                <div class="linha-titulo" style="border-bottom:1px solid #c3e6cb; padding-bottom:8px;">
+                    <h3 style="color:#1ebe5d;"> Aguardam Confirmação (WhatsApp)</h3>
+                    <button class="btn-small" style="background:#25D366;" id="btn-todos-enviados">Marcar todos como enviados </button>
+                </div>
+                <p style="font-size:0.85rem; color:#666; margin-bottom:15px;">Clientes que marcaram e ainda não receberam a mensagem de confirmação (de hoje em diante).</p>
+                <div id="lista-pendentes-whatsapp" style="max-height:250px; overflow-y:auto; background:#fff; border-radius:6px; padding:10px; border:1px solid #e2e8f0;"></div>
+            </div>
+
+            <div class="admin-card" style="border:1px solid var(--accent-color); grid-column:1 / -1;">
+                <h3 style="color:var(--accent-dark);"> Inserir Várias Marcações Manuais</h3>
+                <p style="font-size:0.85rem; color:#666; margin-bottom:15px;">Preencha a cliente e vá adicionando os serviços à lista. No fim, clique em "Gravar Tudo".</p>
+                <div class="grid-3">
+                    <div class="sub-box">
+                        <h4>1. Dados da Cliente</h4>
+                        <label>Telemóvel (pesquisa automática)</label>
+                        <input type="tel" id="manual-telemovel" placeholder="912345678">
+                        <label>Nome</label>
+                        <input type="text" id="manual-nome" placeholder="Ex: Maria Silva">
+                    </div>
+                    <div class="sub-box">
+                        <h4>2. Escolher Serviço</h4>
+                        <div class="so-equipa so-dona"><label>Profissional</label><select id="manual-prof"></select></div>
+                        <label>Serviço</label>
+                        <select id="manual-servico"></select>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                            <div><label>Data</label><input type="date" id="manual-data"></div>
+                            <div><label>Hora</label><select id="manual-hora"></select></div>
+                        </div>
+                        <div id="box-voucher" style="background:#faf5fc; padding:10px; border:1px dashed #8e44ad; border-radius:6px;">
+                            <label style="font-size:0.85rem; color:#8e44ad; display:flex; align-items:center; gap:8px; cursor:pointer;">
+                                <input type="checkbox" id="manual-is-voucher" style="width:18px; height:18px; margin:0;">
+                                <span id="lbl-voucher"></span>
+                            </label>
+                        </div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
+                            <div><label style="color:var(--accent-dark)">Repetição</label>
+                                <select id="manual-repeticao" style="border:2px solid var(--accent-color);">
+                                    <option value="1">Apenas esta vez</option>
+                                    <option value="semanal-4">Semanalmente (4 semanas)</option>
+                                    <option value="semanal-8">Semanalmente (8 semanas)</option>
+                                    <option value="quinzenal-4">Quinzenalmente (4 sessões)</option>
+                                    <option value="mensal-3">Mensalmente (3 meses)</option>
+                                </select></div>
+                            <div><label style="color:var(--accent-dark)">Pagamento</label>
+                                <select id="manual-estado-pagamento" style="border:2px solid var(--accent-color);">
+                                    <option value="A Pagar no Dia">⏳ A Pagar no Dia</option>
+                                    <option value="Já Pago">Já Pago (Antecipado)</option>
+                                </select></div>
+                        </div>
+                        <button class="btn-add" style="background:var(--text-color); font-size:0.8rem;" id="btn-add-lista">+ Adicionar Serviço à Lista</button>
+                    </div>
+                    <div class="sub-box">
+                        <h4>3. Lista a Gravar</h4>
+                        <div id="lista-pendentes-container"></div>
+                        <button id="btn-gravar-tudo" class="btn-add" style="display:none; background:#5cb85c;"></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-card so-dona" id="card-vouchers" style="border:1px solid #8e44ad;">
+                <h3 style="color:#8e44ad;" id="titulo-vouchers"></h3>
+                <p style="font-size:0.8rem; color:#666; margin-bottom:10px;">Insira o valor LIMPO que recebeu da plataforma para entrar nos gráficos de faturação.</p>
+                <div id="admin-lista-vouchers" style="max-height:250px; overflow-y:auto;"></div>
+            </div>
+
+            <div class="admin-card so-dona">
+                <h3 style="color:var(--accent-dark);"> Alterar Preço Fixo</h3>
+                <label>Serviço a alterar</label>
+                <select id="admin-select-servico"></select>
+                <label>Novo preço base (€)</label>
+                <input type="number" id="admin-novo-preco" placeholder="Ex: 20.00" step="0.5" min="0">
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-add" style="margin-top:0; background:var(--accent-dark)" id="btn-preco">Guardar Preço</button>
+                    <button class="btn-add" style="margin-top:0; background:#999" id="btn-preco-repor" title="Volta ao preço de loja.js">Repor</button>
+                </div>
+            </div>
+
+            <div class="admin-card" style="background:#fff8f8; border:1px solid #d9534f;">
+                <h3 style="color:#d9534f;"> Bloquear Agenda</h3>
+                <label>Data a bloquear</label>
+                <input type="date" id="admin-bloqueio-data">
+                <div class="so-equipa so-dona"><label>Quem</label><select id="admin-bloqueio-prof"></select></div>
+                <label>Hora</label>
+                <select id="admin-bloqueio-hora"></select>
+                <label>Motivo</label>
+                <input type="text" id="admin-bloqueio-motivo" placeholder="Ex: Férias, Fechado" maxlength="40">
+                <button class="btn-add" style="margin-top:5px; background:#d9534f;" id="btn-bloquear">Bloquear na Agenda</button>
+            </div>
+
+            <div class="admin-card so-dona" style="border:1px solid var(--accent-color);">
+                <h3 style="color:var(--accent-dark);"> App e QR para o balcão</h3>
+                <p style="font-size:0.85rem; color:#666; margin-bottom:10px;">Imprima um cartaz com o código QR. Quem o lê abre o site e vê logo como instalar a app no telemóvel.</p>
+                <a class="btn-add" style="margin-top:0; display:inline-block; text-align:center; text-decoration:none;" href="cartaz.html">Abrir o cartaz para imprimir</a>
+            </div>
+
+            <div class="admin-card so-dona" style="border:1px solid var(--accent-color);">
+                <h3 style="color:var(--accent-dark);"> Barra de Notícias</h3>
+                <textarea id="admin-noticias-texto" placeholder="Mensagem em destaque no topo do site" rows="3" style="resize:vertical;"></textarea>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-add" style="margin-top:0;" id="btn-noticia">Atualizar</button>
+                    <button class="btn-add" style="margin-top:0; background:#999;" id="btn-noticia-off">Desativar</button>
+                </div>
+            </div>
+
+            <div class="admin-card so-dona" style="border:1px solid var(--accent-color);">
+                <h3 style="color:var(--accent-dark);">Campanhas & Descontos</h3>
+                <input type="text" id="admin-campanha-texto" placeholder="Título da promoção">
+                <select id="admin-campanha-servico"></select>
+                <input type="number" id="admin-desconto-percentual" placeholder="Desconto (%)" min="0" max="100">
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-add" style="margin-top:0;" id="btn-campanha">Publicar</button>
+                    <button class="btn-add" style="margin-top:0; background:#999;" id="btn-campanha-off">Remover</button>
+                </div>
+            </div>
+
+            <div class="admin-card">
+                <h3 style="color:#d9534f;">Dias Fechados / Férias</h3>
+                <div id="admin-lista-bloqueios" style="max-height:200px; overflow-y:auto;"></div>
+            </div>
+
+            <div class="admin-card" style="grid-column:1 / -1;">
+                <div class="linha-titulo">
+                    <h3 style="color:var(--accent-dark);">Lista de Marcações e Ações</h3>
+                    <input type="text" id="pesquisa-reservas" class="search-bar" placeholder=" Pesquisar nome, serviço, data ou tel...">
+                </div>
+                <div id="admin-lista-reservas"></div>
+                <div id="paginacao-reservas"></div>
+            </div>
+
+            <div class="admin-card so-dona" style="grid-column:1 / -1; background:transparent; border:1px dashed #ccc;">
+                <h3 style="color:#888; font-size:1rem;"> Manutenção</h3>
+                <p style="font-size:0.8rem; color:#777; margin-bottom:8px;">Reconstrói a agenda pública (horários ocupados) a partir das marcações. Útil depois de importar dados antigos.</p>
+                <button class="btn-small" style="background:#777;" id="btn-reconstruir">Reconstruir ocupação</button>
+            </div>
+        </div>
+
+        <footer>
+            &copy; <span id="ano-footer"></span> <span class="nome-loja"></span>. Todos os direitos reservados.
+            <div style="font-size:0.75rem; color:#aaa; margin-top:8px;" id="creditos"></div>
+        </footer>
+    </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+(function () {
+    const A = APP, L = A.L, $ = id => document.getElementById(id), esc = A.esc;
+    A.aplicarTema(true);
+    const EQ = A.EQUIPA, TEAM = A.MODO_EQUIPA;
+    if (TEAM) document.body.classList.add('equipa');
+
+    // ---------- Textos a partir de loja.js ----------
+    document.title = `Painel ${L.admin.nome} | ${L.nome}`;
+    $('login-titulo').textContent = L.admin.titulo;
+    $('painel-titulo').textContent = `Painel de Gestão ${L.nome} `;
+    document.querySelectorAll('.nome-loja').forEach(e => e.textContent = L.nome);
+    $('ano-footer').textContent = new Date().getFullYear();
+    if (L.suporteUrl) { const c = $('creditos'); c.insertAdjacentHTML('beforebegin', `<div style="margin-top:8px"><a href="${esc(L.suporteUrl)}" target="_blank" rel="noopener" style="color:inherit">Precisa de ajuda? Pedir suporte</a></div>`); }
+    $('creditos').innerHTML = L.creditos ? `${esc(L.creditos.texto)}${L.creditos.email ? ` — <a href="mailto:${esc(L.creditos.email)}" style="color:inherit;text-decoration:none">${esc(L.creditos.email)}</a>` : ''}` : '';
+    const VN = L.vouchers.nome || 'Voucher';
+    $('lbl-voucher').textContent = ` É um voucher ${VN}?`;
+    $('titulo-vouchers').textContent = ` Vouchers ${VN} Pendentes`;
+    if (!L.vouchers.ativo) { $('box-voucher').style.display = 'none'; $('card-vouchers').style.display = 'none'; }
+    $('manual-hora').innerHTML = A.HORAS.map(h => `<option>${h}</option>`).join('');
+    $('admin-bloqueio-hora').innerHTML = '<option value="Todas">O Dia Todo (Fechado/Férias)</option>' + A.HORAS.map(h => `<option>${h}</option>`).join('');
+    if (A.DEMO) {
+        $('demo-bar').style.display = 'block';
+        $('login-texto').innerHTML = TEAM ? 'Modo demonstração: clique em "Entrar" para ver como a dona.<br>Para ver como colaboradora, escreva <b>' + esc(EQ[0].id) + '@exemplo.pt</b> no email.' : 'Modo demonstração: clique em "Entrar" (não precisa de dados).';
+        $('demo-reset').onclick = () => { if (confirm('Apagar as alterações e repor os dados de exemplo?')) A.db.reset(); };
+    }
+
+    // Estados de pagamento (aceita os nomes antigos "Odisseias" para dados importados)
+    const isVoucher = e => e === 'Voucher' || e === 'Odisseias';
+    const isVoucherPago = e => e === 'Voucher Pago' || e === 'Odisseias Pago';
+    const chavePreco = n => encodeURIComponent(n).replace(/\./g, '%2E');
+
+    // ---------- Estado ----------
+    let precosDB = {}, reservasDB = [], bloqueiosDB = [], bloqueiosMapa = {}, campanha = { texto: '', desconto: 0, servicoAlvo: 'Todos' };
+    let gMensal = null, gSemanal = null, listaAInserir = [];
+    let clientesRaw = [], reservasRaw = [], clientesProc = [], reservasProc = [];
+    let pagCRM = 1, pagRes = 1; const POR_PAG = 20;
+    let termoCRM = '', termoRes = '', sortCol = 'gasto', sortDir = -1;
+    let mesFat = new Date(); mesFat.setDate(1);
+    let semanaAdmin = A.segunda(new Date());
+    // Papel de quem entrou: dona (admin) ou colaboradora (só a sua agenda)
+    let PAPEL = { admin: false, prof: null }, staffDB = {}, convitesDB = {};
+    const nomeProf = id => { const p = A.prof(id); return p ? p.nome : ''; };
+    const corProf = id => { const p = A.prof(id); return (p && p.cor) || 'var(--accent-color)'; };
+    const pillProf = id => id && TEAM ? `<span class="pill-prof" style="background:${corProf(id)}">${esc(nomeProf(id))}</span>` : '';
+    const chaveEmail = e => String(e || '').trim().toLowerCase().replace(/\./g, ',');
+    const precoAtual = s => precosDB[s.nome] !== undefined ? precosDB[s.nome] : s.preco;
+    const servPorNome = n => L.servicos.find(s => s.nome === n);
+
+    // ---------- Login (Firebase Auth) ----------
+    let iniciado = false;
+    function erroLogin(t) { $('login-erro').textContent = t; }
+    // Descobre o papel: admins/<uid> = dona; staff/<uid> = colaboradora; convite pelo email = liga a conta à colaboradora
+    async function descobrirPapel(user) {
+        const db = A.db;
+        try { if ((await db.ref('admins/' + user.uid).once('value')).val() === true) return { admin: true, prof: null }; } catch (e) {}
+        if (!TEAM) return null;
+        try { const st = (await db.ref('staff/' + user.uid).once('value')).val(); if (st && A.prof(st.id)) return { admin: false, prof: st.id }; } catch (e) {}
+        if (user.email) {
+            try {
+                const id = (await db.ref('convites/' + chaveEmail(user.email)).once('value')).val();
+                if (id && A.prof(id)) { await db.ref('staff/' + user.uid).set({ id, email: user.email.toLowerCase() }); return { admin: false, prof: id }; }
+            } catch (e) {}
+        }
+        return null;
+    }
+    A.iniciar(true).then(() => {
+        A.auth.onAuthStateChanged(async user => {
+            if (!user) { $('login-overlay').style.display = 'flex'; $('admin-container').style.display = 'none'; return; }
+            const p = await descobrirPapel(user);
+            if (!p) {
+                erroLogin(`Esta conta (${user.email}) não tem acesso ao painel. ${TEAM ? 'Peça à dona para adicionar o seu email em "Acessos da equipa".' : 'Para a autorizar, adicione na base de dados: admins/' + user.uid + ' = true'}`);
+                A.auth.signOut(); return;
+            }
+            PAPEL = p;
+            if (!p.admin) {
+                document.body.classList.add('colaboradora');
+                $('painel-titulo').textContent = `Olá, ${nomeProf(p.prof)}`;
+                document.querySelector('.admin-header p').textContent = 'A sua agenda e as suas marcações';
+            }
+            $('login-overlay').style.display = 'none'; $('admin-container').style.display = 'block';
+            if (!iniciado) { iniciado = true; carregarDados(); }
+        });
+    }).catch(() => erroLogin('Não foi possível ligar ao servidor.'));
+    $('btn-login').onclick = () => {
+        erroLogin('');
+        A.auth.signInWithEmailAndPassword($('login-email').value.trim(), $('login-pass').value)
+            .catch(() => erroLogin('Email ou palavra-passe incorretos.'));
+    };
+    $('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') $('btn-login').click(); });
+    $('btn-google').onclick = () => {
+        erroLogin('');
+        const prov = A.DEMO ? null : new firebase.auth.GoogleAuthProvider();
+        A.auth.signInWithPopup(prov).catch(e => erroLogin('Não foi possível entrar com Google.'));
+    };
+    $('btn-sair').onclick = () => A.auth.signOut().then(() => location.reload());
+
+    function carregarDados() {
+        preencherSelects();
+        const db = A.db;
+        db.ref('precos').on('value', s => { precosDB = {}; const v = s.val() || {}; Object.keys(v).forEach(k => precosDB[decodeURIComponent(k)] = v[k]); preencherSelects(); });
+        // A colaboradora só lê as marcações dela (as regras da base de dados também o garantem)
+        const qRes = PAPEL.admin ? db.ref('reservas') : db.ref('reservas').orderByChild('prof').equalTo(PAPEL.prof);
+        qRes.on('value', s => {
+            const v = s.val() || {}; reservasDB = Object.keys(v).map(id => ({ id, ...v[id] }));
+            reservasDB.sort((a, b) => ((a.dataExata || '') + a.hora).localeCompare((b.dataExata || '') + b.hora));
+            atualizarDashboard(); renderAgenda(); renderPendentesWA(); renderEquipa();
+        });
+        if (TEAM && PAPEL.admin) {
+            db.ref('staff').on('value', s => { staffDB = s.val() || {}; renderEquipa(); });
+            db.ref('convites').on('value', s => { convitesDB = s.val() || {}; renderAcessos(); renderEquipa(); });
+        }
+        db.ref('bloqueios').on('value', s => {
+            const v = s.val() || {};
+            bloqueiosDB = Object.keys(v).map(id => ({ id, ...v[id] }));
+            bloqueiosMapa = A.mapaBloqueios(bloqueiosDB);
+            bloqueiosDB.sort((a, b) => a.data.localeCompare(b.data));
+            renderBloqueios(); renderAgenda();
+        });
+        db.ref('config/campanha').on('value', s => {
+            campanha = s.val() || { texto: '', desconto: 0, servicoAlvo: 'Todos' };
+            $('admin-campanha-texto').value = campanha.texto || ''; $('admin-desconto-percentual').value = campanha.desconto || '';
+            $('admin-campanha-servico').value = campanha.servicoAlvo || 'Todos';
+        });
+        db.ref('config/noticiasBarra').on('value', s => { $('admin-noticias-texto').value = s.val() || ''; });
+    }
+
+    function preencherSelects() {
+        const ms = $('manual-servico'), sp = $('admin-select-servico'), sc = $('admin-campanha-servico');
+        const v1 = ms.value, v2 = sp.value;
+        ms.innerHTML = L.servicos.map((s, i) => `<option value="${i}">${esc(s.nome)} (${A.eur(precoAtual(s))})</option>`).join('');
+        sp.innerHTML = ms.innerHTML;
+        sc.innerHTML = '<option value="Todos">Todos os Serviços</option>' + L.servicos.map(s => `<option value="${esc(s.nome)}">${esc(s.nome)}</option>`).join('');
+        if (v1) ms.value = v1; if (v2) sp.value = v2;
+        sc.value = campanha.servicoAlvo || 'Todos';
+        if (TEAM) {
+            const ops = EQ.map(p => `<option value="${esc(p.id)}">${esc(p.nome)}</option>`).join('');
+            const mp = $('manual-prof'), ap = $('agenda-prof'), bp = $('admin-bloqueio-prof'), a1 = mp.value, a2 = ap.value, a3 = bp.value;
+            mp.innerHTML = ops; ap.innerHTML = '<option value="*">Todas</option>' + ops; bp.innerHTML = '<option value="">O salão inteiro</option>' + ops;
+            if (a1) mp.value = a1; if (a2) ap.value = a2; if (a3) bp.value = a3;
+            if (!PAPEL.admin) { mp.value = PAPEL.prof; bp.value = PAPEL.prof; ap.value = PAPEL.prof; }
+        }
+    }
+    const profManual = () => TEAM ? (PAPEL.admin ? $('manual-prof').value : PAPEL.prof) : null;
+
+    // ---------- Marcações manuais ----------
+    $('manual-telemovel').addEventListener('input', () => {
+        const tel = $('manual-telemovel').value.trim();
+        if (tel.length >= 9) { const r = reservasDB.slice().reverse().find(r => r.clienteTelemovel === tel && r.clienteNome); if (r) $('manual-nome').value = r.clienteNome; }
+    });
+
+    $('btn-add-lista').onclick = () => {
+        const dIso = $('manual-data').value, hora = $('manual-hora').value, rep = $('manual-repeticao').value;
+        const s = L.servicos[$('manual-servico').value];
+        const estado = $('manual-is-voucher').checked ? 'Voucher' : $('manual-estado-pagamento').value;
+        if (!dIso) { alert('Por favor, preencha a data primeiro.'); return; }
+        const base = A.isoParaData(dIso), datas = [];
+        const passo = { '1': [1, 0], 'semanal-4': [4, 7], 'semanal-8': [8, 7], 'quinzenal-4': [4, 14], 'mensal-3': [3, 'm'] }[rep];
+        for (let i = 0; i < passo[0]; i++) { const d = new Date(base); if (passo[1] === 'm') d.setMonth(d.getMonth() + i); else d.setDate(d.getDate() + i * passo[1]); datas.push(A.iso(d)); }
+        const pid = profManual();
+        if (pid && !A.fazServico(A.prof(pid), s.nome) && !confirm(`${nomeProf(pid)} não costuma fazer "${s.nome}". Adicionar mesmo assim?`)) return;
+        datas.forEach(di => listaAInserir.push({ dataExata: di, diaTextoVisual: A.visual(di), hora, hIndex: A.HORAS.indexOf(hora), blocos: A.blocosDe(s), servicoNome: s.nome, preco: precoAtual(s), estadoPagamento: estado, ...(pid ? { prof: pid } : {}) }));
+        $('manual-data').value = ''; $('manual-repeticao').value = '1'; $('manual-is-voucher').checked = false;
+        renderListaAInserir();
+    };
+    const badgePag = e => e === 'Já Pago' ? '<span class="badge b-pago">Já Pago</span>' : isVoucher(e) ? `<span class="badge b-voucher">${esc(VN)}</span>` : '<span class="badge b-apagar">A Pagar</span>';
+    function renderListaAInserir() {
+        const c = $('lista-pendentes-container'), b = $('btn-gravar-tudo');
+        if (!listaAInserir.length) { c.innerHTML = '<p class="vazio">Nenhum serviço adicionado ainda.</p>'; b.style.display = 'none'; return; }
+        let total = 0;
+        c.innerHTML = listaAInserir.map((it, i) => { total += it.preco; return `<div class="item-pendente"><div><strong>${esc(it.servicoNome)}</strong> ${badgePag(it.estadoPagamento)}${pillProf(it.prof)}<br><small> ${it.diaTextoVisual} às ${it.hora}</small></div><div style="display:flex;align-items:center;gap:10px;"><span style="font-weight:bold;color:var(--accent-dark)">${A.eur(it.preco)}</span><button class="btn-small" data-rm="${i}">X</button></div></div>`; }).join('');
+        b.textContent = ` Gravar Tudo na Agenda (${listaAInserir.length} serviços | Valor Base: ${A.eur(total)})`; b.style.display = 'block';
+    }
+    $('lista-pendentes-container').addEventListener('click', e => { const b = e.target.closest('[data-rm]'); if (b) { listaAInserir.splice(+b.dataset.rm, 1); renderListaAInserir(); } });
+    renderListaAInserir();
+
+    // ocupação calculada a partir das reservas (o painel vê tudo)
+    // chave: dia-hora (uma pessoa) ou dia-hora|prof (equipa) lista de marcações nesse horário
+    function mapaOcupacao() {
+        const m = {};
+        reservasDB.forEach(r => A.slotsDe(r).forEach((h, k) => { const key = r.dataExata + '-' + h + (TEAM ? '|' + (r.prof || '') : ''); (m[key] = m[key] || []).push({ id: r.id, isMain: k === 0, cliente: r.clienteNome, servico: r.servicoNome, prof: r.prof }); }));
+        return m;
+    }
+
+    $('btn-gravar-tudo').onclick = async () => {
+        const nome = $('manual-nome').value.trim(), tel = $('manual-telemovel').value.trim() || 'S/N';
+        if (!nome) { alert("O nome da cliente está vazio. Preencha '1. Dados da Cliente' antes de gravar."); return; }
+        const oc = mapaOcupacao(), up = {}, conflitos = [];
+        let msg = A.tpl(L.mensagens.confirmacaoVarias, { nome, loja: L.nome }) + '\n\n';
+        listaAInserir.forEach(it => {
+            const id = A.db.ref('reservas').push().key;
+            up['reservas/' + id] = { ...it, clienteNome: nome, clienteEmail: 'N/A', clienteTelemovel: tel, clienteNif: 'N/A', pagamento: 'Manual', status: 'ativo', dataRegisto: new Date().toISOString(), mensagemEnviada: false };
+            A.slotsDe(it).forEach(h => { if (oc[it.dataExata + '-' + h + (TEAM ? '|' + it.prof : '')]) conflitos.push(`${it.diaTextoVisual} ${h}`); else up[A.chaveOcup(it.dataExata, h, it.prof)] = id; });
+            msg += ` *${it.diaTextoVisual}* às *${it.hora}* | ${it.servicoNome}${it.prof && TEAM ? ' com ' + nomeProf(it.prof) : ''}\n`;
+        });
+        if (conflitos.length && !confirm(`Atenção: já existe marcação em ${[...new Set(conflitos)].slice(0, 5).join(', ')}${conflitos.length > 5 ? '…' : ''}.\nGravar mesmo assim (sobreposto)?`)) return;
+        msg += '\n' + L.mensagens.despedida;
+        try { await A.db.ref().update(up); } catch (e) { alert('Ocorreu um erro a gravar no servidor.'); return; }
+        const ids = Object.keys(up).filter(k => k.startsWith('reservas/')).map(k => k.slice(9));
+        if (confirm(`${listaAInserir.length} marcações gravadas na agenda.\n\nEnviar agora a confirmação por WhatsApp à cliente?`)) {
+            if (A.telValido(tel)) {
+                window.open(`https://wa.me/${A.telInt(tel)}?text=${encodeURIComponent(msg)}`, '_blank');
+                const u = {}; ids.forEach(id => u[`reservas/${id}/mensagemEnviada`] = true); A.db.ref().update(u);
+            } else alert('Não é possível abrir o WhatsApp: o telemóvel não é válido.');
+        }
+        listaAInserir = []; renderListaAInserir(); $('manual-nome').value = ''; $('manual-telemovel').value = '';
+    };
+
+    // ---------- WhatsApp pendentes ----------
+    const msgConfirmacao = r => A.tpl(L.mensagens.confirmacao, { nome: r.clienteNome, servico: r.servicoNome + (TEAM && r.prof ? ' com ' + nomeProf(r.prof) : ''), data: r.diaTextoVisual, hora: r.hora, loja: L.nome });
+    const pendentesWA = () => { const h = A.iso(new Date()); return reservasDB.filter(r => !r.mensagemEnviada && r.dataExata >= h && r.status !== 'noshow'); };
+    function renderPendentesWA() {
+        const p = pendentesWA(), c = $('lista-pendentes-whatsapp');
+        if (!p.length) { c.innerHTML = '<p class="vazio">Nenhuma cliente a aguardar confirmação!</p>'; return; }
+        c.innerHTML = p.map(r => `<div class="item-pendente" style="background:#fafafa;border:1px solid #eee;">
+            <div style="line-height:1.4"><strong>${esc(r.clienteNome)}</strong>${pillProf(r.prof)}<br><small> <b>${r.diaTextoVisual}</b> às <b>${r.hora}</b> | ${esc(r.servicoNome)}</small><br><small style="color:#666"> ${esc(r.clienteTelemovel)}</small></div>
+            <div style="display:flex;align-items:center;gap:8px;">
+                ${A.telValido(r.clienteTelemovel) ? `<button class="btn-small" style="background:#25D366" data-wa="${r.id}"> Enviar</button>` : '<span style="color:#d9534f;font-size:0.75rem;font-weight:bold">S/ Tel</span>'}
+                <button class="btn-small" style="background:#999" data-enviado="${r.id}" title="Marcar como enviado"></button>
+            </div></div>`).join('');
+    }
+    function abrirWA(id) {
+        const r = reservasDB.find(x => x.id === id); if (!r) return;
+        window.open(`https://wa.me/${A.telInt(r.clienteTelemovel)}?text=${encodeURIComponent(msgConfirmacao(r))}`, '_blank');
+        A.db.ref(`reservas/${id}`).update({ mensagemEnviada: true });
+    }
+    document.addEventListener('click', e => {
+        const t = e.target.closest('[data-wa],[data-enviado],[data-pago],[data-falta],[data-del],[data-vou],[data-desbloq]'); if (!t) return;
+        const d = t.dataset;
+        if (d.wa) abrirWA(d.wa);
+        else if (d.enviado) A.db.ref(`reservas/${d.enviado}`).update({ mensagemEnviada: true });
+        else if (d.pago && confirm('Confirmar que esta marcação já foi paga?')) A.db.ref(`reservas/${d.pago}`).update({ estadoPagamento: 'Já Pago' });
+        else if (d.falta && confirm('Registar não comparência (falta)? O valor não conta para a faturação.')) A.db.ref(`reservas/${d.falta}`).update({ status: 'noshow' });
+        else if (d.del && confirm('Cancelar/eliminar esta marcação definitivamente? O horário fica livre no site.')) eliminarReserva(d.del);
+        else if (d.vou) confirmarVoucher(d.vou);
+        else if (d.desbloq && confirm('Desbloquear esta data?')) A.db.ref(`bloqueios/${d.desbloq}`).remove();
+    });
+    $('btn-todos-enviados').onclick = () => {
+        const p = pendentesWA(); if (!p.length) return;
+        if (confirm(`Marcar as ${p.length} marcações pendentes como "enviadas"?`)) { const u = {}; p.forEach(r => u[`reservas/${r.id}/mensagemEnviada`] = true); A.db.ref().update(u); }
+    };
+
+    function eliminarReserva(id) {
+        const r = reservasDB.find(x => x.id === id), u = { ['reservas/' + id]: null };
+        if (r) A.slotsDe(r).forEach(h => {
+            // só liberta o horário se pertencer a esta marcação
+            const outra = reservasDB.find(x => x.id !== id && x.dataExata === r.dataExata && (!TEAM || x.prof === r.prof) && A.slotsDe(x).includes(h));
+            u[A.chaveOcup(r.dataExata, h, r.prof)] = outra ? outra.id : null;
+        });
+        A.db.ref().update(u);
+    }
+    function confirmarVoucher(id) {
+        const v = parseFloat($('vou-' + id).value);
+        if (isNaN(v) || v < 0) { alert('Introduza o valor limpo que recebeu!'); return; }
+        if (confirm(`Confirmar que recebeu ${A.eur(v)} líquidos deste voucher ${VN}? O valor entra nos gráficos de faturação.`))
+            A.db.ref(`reservas/${id}`).update({ estadoPagamento: 'Voucher Pago', precoLimpo: v });
+    }
+
+    // ---------- Agenda do painel ----------
+    document.querySelectorAll('[data-sem]').forEach(b => b.onclick = () => { semanaAdmin.setDate(semanaAdmin.getDate() + 7 * b.dataset.sem); renderAgenda(); });
+    function renderAgenda() {
+        $('admin-mes-ano-texto').textContent = `${A.MESES[semanaAdmin.getMonth()]} ${semanaAdmin.getFullYear()}`;
+        const dias = [...Array(7)].map((_, i) => { const d = new Date(semanaAdmin); d.setDate(d.getDate() + i); return d; });
+        $('agenda-admin-thead-tr').innerHTML = '<th style="width:70px">Hora</th>' + dias.map(d => `<th>${A.DIAS_NOME[d.getDay()]}<br><small style="font-size:0.7rem;color:#888">${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}</small></th>`).join('');
+        const oc = mapaOcupacao(), hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+        // Equipa: "Todas" mostra todas lado a lado; ou só uma pessoa (a colaboradora vê sempre só a sua)
+        const filtro = TEAM ? (PAPEL.admin ? ($('agenda-prof').value || '*') : PAPEL.prof) : null;
+        const pessoas = TEAM ? (filtro === '*' ? EQ.map(p => p.id) : [filtro]) : [null];
+        $('agenda-admin-body').innerHTML = A.HORAS.map(h => `<tr><td style="font-weight:bold;background:var(--bg-color);color:var(--accent-dark)">${h}</td>${dias.map(d => {
+            const di = A.iso(d);
+            const ocs = pessoas.flatMap(pid => oc[di + '-' + h + (TEAM ? '|' + pid : '')] || []);
+            if (ocs.length) {
+                if (!TEAM) { const o = ocs[0]; return `<td class="bloco-admin-reservado" style="${d < hoje ? 'opacity:.6' : ''}">${o.isMain ? `<strong style="color:var(--text-color)">${esc(o.cliente)}</strong><br><small>${esc(o.servico)}</small>` : ''}</td>`; }
+                return `<td style="background:#f3eef0;padding:4px;${d < hoje ? 'opacity:.6' : ''}">${ocs.map(o => `<span class="cel-res" style="border-left-color:${corProf(o.prof)}">${o.isMain ? `<b>${esc(o.cliente)}</b><br>${esc(o.servico)}${pessoas.length > 1 ? ' · ' + esc(nomeProf(o.prof)) : ''}` : ` ${pessoas.length > 1 ? esc(nomeProf(o.prof)) : ''}`}</span>`).join('')}</td>`;
+            }
+            if (d < hoje) return '<td style="background:#f5f5f5;color:#ccc">-</td>';
+            const abertos = pessoas.filter(pid => A.aberto(d, h, pid));
+            if (!abertos.length) return '<td class="bloco-admin-descanso">Fechado</td>';
+            const mot = abertos.map(pid => A.bloqueado(bloqueiosMapa, di, h, pid)).filter(Boolean);
+            if (mot.length === abertos.length) return `<td class="bloco-admin-descanso">${esc(mot[0])}</td>`;
+            return '<td style="color:#aaa">Livre</td>';
+        }).join('')}</tr>`).join('');
+    }
+
+    // ---------- Bloqueios, notícias, campanhas, preços ----------
+    $('btn-bloquear').onclick = () => {
+        const data = $('admin-bloqueio-data').value; if (!data) { alert('Selecione uma data.'); return; }
+        const quem = TEAM ? (PAPEL.admin ? $('admin-bloqueio-prof').value : PAPEL.prof) : '';
+        A.db.ref('bloqueios').push({ data, hora: $('admin-bloqueio-hora').value, motivo: $('admin-bloqueio-motivo').value.trim() || 'Fechado', ...(quem ? { prof: quem } : {}) })
+            .then(() => { alert('Agenda bloqueada com sucesso!'); $('admin-bloqueio-data').value = ''; $('admin-bloqueio-motivo').value = ''; });
+    };
+    function renderBloqueios() {
+        const hoje = A.iso(new Date()), lst = bloqueiosDB.filter(b => b.data >= hoje && (PAPEL.admin || !b.prof || b.prof === PAPEL.prof)).sort((a, b) => a.data.localeCompare(b.data));
+        $('admin-lista-bloqueios').innerHTML = !lst.length ? '<p class="vazio">Sem dias bloqueados.</p>' :
+            lst.map(b => `<div class="admin-list-item"><span> <strong>${A.visual(b.data)}</strong> (${b.hora === 'Todas' ? 'Dia todo' : 'às ' + b.hora})${b.prof ? pillProf(b.prof) : TEAM ? ' <small>(salão)</small>' : ''}<br><small style="color:#d9534f">${esc(b.motivo)}</small></span>${PAPEL.admin || b.prof === PAPEL.prof ? `<button class="btn-small" data-desbloq="${b.id}">Desbloquear</button>` : ''}</div>`).join('');
+    }
+    $('btn-noticia').onclick = () => A.db.ref('config/noticiasBarra').set($('admin-noticias-texto').value.trim()).then(() => alert('Barra atualizada!'));
+    $('btn-noticia-off').onclick = () => A.db.ref('config/noticiasBarra').set('').then(() => alert('Barra desativada!'));
+    $('btn-campanha').onclick = () => {
+        const d = Math.min(100, Math.max(0, parseFloat($('admin-desconto-percentual').value) || 0));
+        A.db.ref('config/campanha').set({ texto: $('admin-campanha-texto').value.trim(), desconto: d, servicoAlvo: $('admin-campanha-servico').value }).then(() => alert('Campanha publicada!'));
+    };
+    $('btn-campanha-off').onclick = () => A.db.ref('config/campanha').set({ texto: '', desconto: 0, servicoAlvo: 'Todos' }).then(() => alert('Campanha removida!'));
+    $('btn-preco').onclick = () => {
+        const s = L.servicos[$('admin-select-servico').value], p = parseFloat($('admin-novo-preco').value);
+        if (isNaN(p) || p < 0) { alert('Indique um preço válido.'); return; }
+        A.db.ref('precos/' + chavePreco(s.nome)).set(p).then(() => { alert(`Preço atualizado para ${A.eur(p)}!`); $('admin-novo-preco').value = ''; });
+    };
+    $('btn-preco-repor').onclick = () => { const s = L.servicos[$('admin-select-servico').value]; A.db.ref('precos/' + chavePreco(s.nome)).remove().then(() => alert(`Preço reposto para ${A.eur(s.preco)}.`)); };
+
+    $('btn-reconstruir').onclick = () => {
+        if (!confirm('Reconstruir os horários ocupados do site a partir de todas as marcações?')) return;
+        const oc = {};
+        reservasDB.forEach(r => A.slotsDe(r).forEach(h => { const o = (oc[r.dataExata] = oc[r.dataExata] || {}); if (TEAM && r.prof) (o[r.prof] = o[r.prof] || {})[h] = r.id; else o[h] = r.id; }));
+        A.db.ref('ocupacao').set(oc).then(() => alert('Ocupação reconstruída.'));
+    };
+
+    // ---------- Equipa (só a dona) ----------
+    $('agenda-prof').onchange = renderAgenda;
+    function renderEquipa() {
+        if (!TEAM || !PAPEL.admin) return;
+        const pref = `${mesFat.getFullYear()}-${String(mesFat.getMonth() + 1).padStart(2, '0')}`;
+        const ligadas = new Set(Object.values(staffDB).map(x => x.id));
+        $('equipa-body').innerHTML = EQ.map(p => {
+            const rs = reservasDB.filter(r => r.prof === p.id && (r.dataExata || '').startsWith(pref));
+            const falt = rs.filter(r => r.status === 'noshow').length;
+            const fat = rs.filter(r => r.status !== 'noshow').reduce((a, r) => a + (isVoucher(r.estadoPagamento) ? 0 : isVoucherPago(r.estadoPagamento) ? (parseFloat(r.precoLimpo) || 0) : (r.preco || 0)), 0);
+            return `<tr><td style="text-align:left"><span class="pill-prof" style="background:${corProf(p.id)};margin:0 8px 0 0">&nbsp;</span><b>${esc(p.nome)}</b></td><td>${rs.length - falt}</td><td style="color:${falt ? '#d9534f' : '#5cb85c'};font-weight:bold">${falt}</td><td style="font-weight:bold;color:var(--accent-dark)">${A.eur(fat)}</td><td>${ligadas.has(p.id) ? ' Ligada' : Object.values(convitesDB).includes(p.id) ? '⏳ Convite enviado' : '—'}</td></tr>`;
+        }).join('');
+    }
+    function renderAcessos() {
+        if (!TEAM || !PAPEL.admin) return;
+        const emailDe = id => { const k = Object.keys(convitesDB).find(k => convitesDB[k] === id); return k ? k.replace(/,/g, '.') : ''; };
+        $('acessos').innerHTML = EQ.map(p => `<div class="acesso"><b>${esc(p.nome)}</b><input type="email" data-ac="${esc(p.id)}" value="${esc(emailDe(p.id))}" placeholder="email@gmail.com"><button class="btn-small" style="background:var(--accent-dark)" data-acg="${esc(p.id)}">Guardar</button><button class="btn-small" style="background:#999" data-acr="${esc(p.id)}">Retirar acesso</button></div>`).join('');
+    }
+    $('acessos').addEventListener('click', e => {
+        const g = e.target.closest('[data-acg]'), r = e.target.closest('[data-acr]');
+        if (g) {
+            const id = g.dataset.acg, email = $('acessos').querySelector(`[data-ac="${id}"]`).value.trim();
+            if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { alert('Escreva um email válido.'); return; }
+            const u = {}; Object.keys(convitesDB).forEach(k => { if (convitesDB[k] === id) u['convites/' + k] = null; }); u['convites/' + chaveEmail(email)] = id;
+            A.db.ref().update(u).then(() => alert(`Feito. A ${nomeProf(id)} já pode entrar no painel com ${email}.`));
+        }
+        if (r) {
+            const id = r.dataset.acr; if (!confirm(`Retirar o acesso da ${nomeProf(id)} ao painel?`)) return;
+            const u = {}; Object.keys(convitesDB).forEach(k => { if (convitesDB[k] === id) u['convites/' + k] = null; }); Object.keys(staffDB).forEach(uid => { if (staffDB[uid].id === id) u['staff/' + uid] = null; });
+            A.db.ref().update(u);
+        }
+    });
+
+    // ---------- CRM ----------
+    $('pesquisa-crm').oninput = e => { termoCRM = e.target.value.toLowerCase(); pagCRM = 1; processarCRM(); };
+    document.querySelectorAll('[data-sort]').forEach(th => th.onclick = () => {
+        const c = th.dataset.sort; if (sortCol === c) sortDir *= -1; else { sortCol = c; sortDir = (c === 'nome' || c === 'tel') ? 1 : -1; } processarCRM();
+    });
+    function processarCRM() {
+        clientesProc = clientesRaw.filter(c => (c.nome || '').toLowerCase().includes(termoCRM) || c.tel.toLowerCase().includes(termoCRM));
+        clientesProc.sort((a, b) => { let x = a[sortCol], y = b[sortCol]; if (typeof x === 'string') { x = x.toLowerCase(); y = (y || '').toLowerCase(); } return x < y ? -sortDir : x > y ? sortDir : 0; });
+        renderCRM();
+    }
+    function paginacao(id, atual, total, fn) {
+        const c = $(id); if (total <= 1) { c.innerHTML = ''; return; }
+        let h = '<div class="paginacao">';
+        if (atual > 1) h += `<button class="paginacao-btn" data-p="${atual - 1}">« Ant</button>`;
+        const ini = Math.max(1, atual - 2), fim = Math.min(total, atual + 2);
+        if (ini > 1) h += '<span style="color:#999">...</span>';
+        for (let i = ini; i <= fim; i++) h += `<button class="paginacao-btn ${i === atual ? 'active' : ''}" data-p="${i}">${i}</button>`;
+        if (fim < total) h += '<span style="color:#999">...</span>';
+        if (atual < total) h += `<button class="paginacao-btn" data-p="${atual + 1}">Seg »</button>`;
+        c.innerHTML = h + '</div>';
+        c.onclick = e => { const b = e.target.closest('[data-p]'); if (b) fn(+b.dataset.p); };
+    }
+    function renderCRM() {
+        const tot = Math.ceil(clientesProc.length / POR_PAG) || 1; if (pagCRM > tot) pagCRM = tot;
+        $('lista-clientes-body').innerHTML = clientesProc.slice((pagCRM - 1) * POR_PAG, pagCRM * POR_PAG).map(c =>
+            `<tr><td><strong>${esc(c.nome)}</strong></td><td>${esc(c.tel)}</td><td>${c.total}</td><td style="color:${c.faltas > 0 ? '#d9534f' : '#5cb85c'};font-weight:bold">${c.faltas}</td><td>${c.ultima ? A.visual(c.ultima) : '-'}</td><td style="color:var(--accent-dark);font-weight:bold">${A.eur(c.gasto)}</td></tr>`).join('') || '<tr><td colspan="6" class="vazio">Sem clientes.</td></tr>';
+        paginacao('paginacao-crm', pagCRM, tot, p => { pagCRM = p; renderCRM(); });
+    }
+    $('btn-export').onclick = () => {
+        if (!clientesProc.length) { alert('Não há clientes para exportar nesta pesquisa.'); return; }
+        const q = v => '"' + String(v).replace(/"/g, '""') + '"';
+        let csv = '﻿Nome;Telemovel;Total Marcacoes;Faltas;Ultima Visita;Total Gasto (Euros)\n';
+        clientesProc.forEach(c => { csv += [q(c.nome), q(c.tel), c.total, c.faltas, q(c.ultima ? A.visual(c.ultima) : ''), q(c.gasto.toFixed(2).replace('.', ','))].join(';') + '\n'; });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+        a.download = `Clientes_${L.id}.csv`; document.body.appendChild(a); a.click(); a.remove();
+    };
+
+    // ---------- Lista de marcações ----------
+    $('pesquisa-reservas').oninput = e => { termoRes = e.target.value.toLowerCase(); pagRes = 1; processarReservas(); };
+    function processarReservas() {
+        reservasProc = reservasRaw.filter(r => [r.clienteNome, r.clienteTelemovel, r.servicoNome, r.diaTextoVisual, nomeProf(r.prof)].some(v => v && String(v).toLowerCase().includes(termoRes)));
+        renderReservas();
+    }
+    function renderReservas() {
+        const c = $('admin-lista-reservas');
+        if (!reservasProc.length) { c.innerHTML = '<p class="vazio">Nenhum resultado encontrado.</p>'; $('paginacao-reservas').innerHTML = ''; return; }
+        const tot = Math.ceil(reservasProc.length / POR_PAG) || 1; if (pagRes > tot) pagRes = tot;
+        c.innerHTML = reservasProc.slice((pagRes - 1) * POR_PAG, pagRes * POR_PAG).map(r => {
+            const falta = r.status === 'noshow', e = r.estadoPagamento;
+            const badge = e === 'Já Pago' ? '<span class="badge b-pago">Já Pago</span>' : isVoucher(e) ? `<span class="badge b-voucher">${esc(VN)}</span>` : isVoucherPago(e) ? `<span class="badge b-pago">${esc(VN)} Pago (${A.eur(r.precoLimpo)})</span>` : '<span class="badge b-apagar">A Pagar</span>';
+            const podePagar = !falta && e !== 'Já Pago' && !isVoucher(e) && !isVoucherPago(e);
+            return `<div class="admin-list-item" style="${falta ? 'opacity:0.6;background:#f9f9f9' : ''}">
+                <span><strong>${esc(r.clienteNome)}</strong>${pillProf(r.prof)} — <b style="color:var(--accent-dark)">${A.eur(r.preco)}</b> (${esc(r.pagamento || '-')}) ${badge} ${falta ? '<span style="color:#d9534f;font-weight:bold;margin-left:10px">[FALTOU]</span>' : ''}
+                <br> ${r.diaTextoVisual} às ${r.hora} | <i>${esc(r.servicoNome)}</i>
+                <br><small> ${esc(r.clienteTelemovel)}${r.clienteEmail && r.clienteEmail !== 'N/A' ? ' · ' + esc(r.clienteEmail) : ''}${r.clienteNif && r.clienteNif !== 'N/A' && r.clienteNif !== 'Consumidor Final' ? ' · NIF ' + esc(r.clienteNif) : ''}</small>
+                ${A.telValido(r.clienteTelemovel) ? `<br><button class="btn-whatsapp" data-wa="${r.id}"> Enviar Confirmação</button>` : ''}</span>
+                <div style="display:flex;flex-direction:column;gap:6px;">
+                    ${podePagar ? `<button class="btn-small" style="background:#5cb85c" data-pago="${r.id}">Pago </button>` : ''}
+                    ${!falta ? `<button class="btn-small" style="background:#f0ad4e" data-falta="${r.id}">Faltou</button>` : ''}
+                    <button class="btn-small" data-del="${r.id}">Eliminar</button>
+                </div></div>`;
+        }).join('');
+        paginacao('paginacao-reservas', pagRes, tot, p => { pagRes = p; renderReservas(); });
+    }
+
+    // ---------- Dashboard ----------
+    document.querySelectorAll('[data-mes]').forEach(b => b.onclick = () => { mesFat.setMonth(mesFat.getMonth() + +b.dataset.mes); atualizarDashboard(); });
+    function atualizarDashboard() {
+        const pref = `${mesFat.getFullYear()}-${String(mesFat.getMonth() + 1).padStart(2, '0')}`;
+        $('faturacao-mes-ano-texto').textContent = `${A.MESES[mesFat.getMonth()]} ${mesFat.getFullYear()}`;
+        let fat = 0, n = 0; const porServ = {}, fMes = {}, fSem = {}, cli = {}; let htmlV = '';
+        reservasDB.forEach(r => {
+            const falta = r.status === 'noshow', tel = r.clienteTelemovel || 'S/N';
+            let val = r.preco || 0;
+            if (isVoucher(r.estadoPagamento)) val = 0; else if (isVoucherPago(r.estadoPagamento)) val = parseFloat(r.precoLimpo) || 0;
+            if (isVoucher(r.estadoPagamento) && !falta) htmlV += `<div class="admin-list-item" style="flex-direction:column;align-items:flex-start;border-bottom:1px dashed #ccc;padding:8px 0;">
+                <span><strong>${esc(r.clienteNome)}</strong><br><small> ${r.diaTextoVisual} | ${esc(r.servicoNome)}</small></span>
+                <div style="display:flex;gap:5px;margin-top:5px;width:100%;"><input type="number" id="vou-${r.id}" placeholder="Limpo (€)" step="0.5" style="margin:0;padding:6px;width:100px;font-size:0.8rem;"><button class="btn-small" style="background:#8e44ad" data-vou="${r.id}">Confirmar OK</button></div></div>`;
+            const c = cli[tel] = cli[tel] || { nome: r.clienteNome, total: 0, faltas: 0, gasto: 0, ultima: '' };
+            c.total++; if (falta) c.faltas++; else c.gasto += val;
+            if ((r.dataExata || '') > c.ultima) { c.ultima = r.dataExata; c.nome = r.clienteNome || c.nome; }
+            if (!falta && r.dataExata) {
+                const [a, m, d] = r.dataExata.split('-');
+                fMes[a + '-' + m] = (fMes[a + '-' + m] || 0) + val;
+                const sk = `${a}-${m} S${Math.ceil(+d / 7)}`; fSem[sk] = (fSem[sk] || 0) + val;
+                if (r.dataExata.startsWith(pref)) { fat += val; n++; porServ[r.servicoNome] = (porServ[r.servicoNome] || 0) + 1; }
+            }
+        });
+        $('stat-faturacao').textContent = fat.toFixed(2).replace('.', ',') + ' €';
+        $('stat-marcacoes').textContent = n;
+        let pop = 'Nenhum', mx = 0; for (const s in porServ) if (porServ[s] > mx) { mx = porServ[s]; pop = s; }
+        $('stat-popular').textContent = pop;
+        $('admin-lista-vouchers').innerHTML = htmlV || '<p class="vazio">Sem vouchers pendentes.</p>';
+        clientesRaw = Object.keys(cli).map(k => ({ tel: k, ...cli[k] }));
+        reservasRaw = reservasDB.slice().reverse();
+        processarCRM(); processarReservas();
+        graficos(fMes, fSem); renderEquipa();
+    }
+    function graficos(m, s) {
+        if (!window.Chart) return;
+        const cor = L.cores.destaque, cor2 = L.cores.destaqueEscuro;
+        const km = Object.keys(m).sort().slice(-12), ks = Object.keys(s).sort().slice(-12);
+        const opt = { responsive: true, plugins: { legend: { display: false } } };
+        const lbM = km.map(k => { const [a, mm] = k.split('-'); return A.MESES[+mm - 1].slice(0, 3) + ' ' + a.slice(2); });
+        const lbS = ks.map(k => { const [a, mm, sw] = k.split(/[- ]/); return `${sw} ${A.MESES[+mm - 1].slice(0, 3)}`; });
+        if (gMensal) gMensal.destroy(); if (gSemanal) gSemanal.destroy();
+        gMensal = new Chart($('graficoMensal'), { type: 'bar', data: { labels: lbM.length ? lbM : ['Sem dados'], datasets: [{ data: km.length ? km.map(k => m[k]) : [0], backgroundColor: cor, borderRadius: 4 }] }, options: opt });
+        gSemanal = new Chart($('graficoSemanal'), { type: 'line', data: { labels: lbS.length ? lbS : ['Sem dados'], datasets: [{ data: ks.length ? ks.map(k => s[k]) : [0], borderColor: cor2, backgroundColor: cor2 + '33', fill: true, tension: 0.3 }] }, options: opt });
+    }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; img-src 'self' data:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Política de privacidade</title>
+<meta name="robots" content="index,follow">
+<script src="loja.js"></script>
+<style>
+:root{--bg:#faf6f7;--ink:#33202a;--accent:#8a5a6b;--muted:#6b5d64;--line:rgba(0,0,0,.12)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1.05rem/1.7 var(--ft,system-ui),system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:44rem;margin:0 auto;padding:clamp(1.2rem,5vw,3rem) 16px 5rem}
+a{color:var(--accent)}
+h1{font-family:var(--ftit,inherit),Georgia,serif;font-size:clamp(2rem,6vw,2.8rem);line-height:1.1;margin:.5rem 0 .3rem;color:var(--accent)}
+h2{font-size:1.2rem;margin:2rem 0 .3rem}
+p,li{margin:.4rem 0}ul{padding-left:1.2rem}
+.back{display:inline-block;font-weight:700;text-decoration:none;margin-bottom:.8rem}
+.meta{color:var(--muted);font-size:.9rem}
+</style>
+</head>
+<body>
+<main id="m"></main>
+<script>
+(function () {
+  const L = window.LOJA || {}, R = L.rgpd || {}, C = L.cores || {};
+  const esc = v => String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const r = document.documentElement.style;
+  if (C.fundo) r.setProperty('--bg', C.fundo); if (C.texto) r.setProperty('--ink', C.texto); if (C.destaqueEscuro) r.setProperty('--accent', C.destaqueEscuro);
+  if (L.fontes) { r.setProperty('--ft', `'${L.fontes.texto}'`); r.setProperty('--ftit', `'${L.fontes.titulo}'`);
+    const f = document.createElement('link'); f.rel = 'stylesheet'; f.href = 'fonts/fonts.css'; document.head.appendChild(f); }
+  const nome = R.responsavel || L.nome || 'o estabelecimento';
+  const morada = R.morada || (L.morada || []).join(', ');
+  const contacto = [R.email, L.telefone].filter(Boolean).map(esc).join(' · ');
+  const prestador = R.prestador || 'AW (awdigital.pt)';
+  const usaEmail = !!(L.emailjs && L.emailjs.publicKey);
+  const usaNif = L.pedirNif !== false;
+  document.title = 'Política de privacidade · ' + (L.nome || '');
+  document.getElementById('m').innerHTML = `
+  <a class="back" href="./">← Voltar ao site</a>
+  <h1>Política de privacidade</h1>
+  <p class="meta">${esc(L.nome || '')} · atualizada em ${esc(R.atualizado || 'novembro de 2026')}</p>
+  <p>Aqui explicamos que dados pessoais pedimos quando faz uma marcação, para que os usamos e que direitos tem.</p>
+
+  <h2>Quem é responsável pelos seus dados</h2>
+  <p><strong>${esc(nome)}</strong>${R.nif ? ', NIF ' + esc(R.nif) : ''}${morada ? ', ' + esc(morada) : ''}.${contacto ? '<br>Contacto: ' + contacto + '.' : ''}</p>
+
+  <h2>Que dados recolhemos</h2>
+  <ul>
+    <li>Nome e telemóvel, para identificar e contactar sobre a sua marcação.</li>
+    <li>Email (opcional), para lhe enviar a confirmação.</li>
+    ${usaNif ? '<li>NIF (opcional), apenas se quiser fatura com número de contribuinte.</li>' : ''}
+    <li>O serviço, o dia e a hora marcados, e a forma de pagamento escolhida.</li>
+  </ul>
+
+  <h2>Para que usamos os dados</h2>
+  <p>Para gerir a sua marcação, confirmar ou reagendar, e emitir a fatura. Não usamos os seus dados para publicidade nem os vendemos.</p>
+
+  <h2>Fundamento legal</h2>
+  <p>A execução do serviço que pediu (a marcação) e, no caso do NIF e da faturação, o cumprimento de obrigações legais.</p>
+
+  <h2>Quem mais trata os dados</h2>
+  <p>O site e a base de dados são mantidos por ${esc(prestador)}, que trata os dados em nome de ${esc(nome)} e só segundo as suas instruções. Os dados ficam guardados na plataforma Google Firebase (que pode tratar dados fora do Espaço Económico Europeu, com garantias legais, como as cláusulas contratuais-tipo).${usaEmail ? ' A confirmação por email é enviada através do serviço EmailJS.' : ''} Os avisos de novas marcações enviados a quem gere o espaço usam a aplicação Telegram.</p>
+
+  <h2>Durante quanto tempo guardamos</h2>
+  <p>Os dados das marcações são guardados enquanto forem necessários para o serviço e, depois, ${esc(R.retencao || 'até 2 anos após a última marcação')}. Os documentos de faturação são guardados durante o prazo exigido por lei.</p>
+
+  <h2>Cookies e armazenamento no seu dispositivo</h2>
+  <p>Este site não usa cookies de publicidade nem de rastreio. Usa apenas o armazenamento do navegador para funcionar (por exemplo, para o painel de gestão e para ser instalável como aplicação).</p>
+
+  <h2>Os seus direitos</h2>
+  <p>Pode pedir acesso, retificação, apagamento, limitação, oposição e portabilidade dos seus dados, contactando ${esc(nome)}. Se achar que o tratamento viola a lei, pode apresentar reclamação à Comissão Nacional de Proteção de Dados (<a href="https://www.cnpd.pt" target="_blank" rel="noopener">cnpd.pt</a>).</p>
+  `;
+})();
+</script>
+</body>
+</html>
